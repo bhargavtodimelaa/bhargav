@@ -8,11 +8,9 @@
 <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#0a0e17">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Live TV Player</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" defer></script>
@@ -25,22 +23,21 @@ html,body{
   background: #0a0e17;
   width:100%;
   min-height:100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   color:#f0f2f5;
   overflow-x:hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overscroll-behavior: none;
 }
 
-::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: #0a0e17; }
 ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #3b4bff, #6366f1); border-radius: 10px; }
 
 /* Header */
 .header {
     background: rgba(10, 14, 23, 0.92);
-    padding: 12px 16px;
+    padding: 14px 20px;
     border-bottom: 1px solid rgba(59, 75, 255, 0.06);
     display: flex;
     flex-wrap: wrap;
@@ -53,14 +50,13 @@ html,body{
     -webkit-backdrop-filter: blur(25px) saturate(1.2);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
     animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    min-height: 56px;
 }
 @keyframes slideDown {
     from { transform: translateY(-100%); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
 .header h1 {
-    font-size: clamp(1rem, 4vw, 1.3rem);
+    font-size: 1.3rem;
     font-weight: 700;
     background: linear-gradient(135deg, #e0e7ff, #818cf8, #3b4bff, #6366f1);
     background-size: 300% 300%;
@@ -70,7 +66,7 @@ html,body{
     letter-spacing: -0.5px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     animation: gradientShift 4s ease infinite;
 }
 @keyframes gradientShift {
@@ -80,7 +76,7 @@ html,body{
 .header h1::before {
     content: "📡";
     -webkit-text-fill-color: initial;
-    font-size: clamp(1rem, 3.5vw, 1.3rem);
+    font-size: 1.3rem;
     animation: pulse 2s ease-in-out infinite;
 }
 @keyframes pulse {
@@ -89,9 +85,9 @@ html,body{
 }
 .header .channel-counter {
     background: rgba(59, 75, 255, 0.08);
-    padding: 3px 12px;
+    padding: 4px 16px;
     border-radius: 40px;
-    font-size: clamp(0.6rem, 1.8vw, 0.75rem);
+    font-size: 0.75rem;
     color: #b9c2d4;
     border: 1px solid rgba(59, 75, 255, 0.08);
     backdrop-filter: blur(4px);
@@ -99,34 +95,37 @@ html,body{
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
 }
+.header .channel-counter:hover {
+    background: rgba(59, 75, 255, 0.15);
+    transform: scale(1.03);
+}
 
 /* Filter Bar */
 .filter-bar {
     background: rgba(17, 23, 31, 0.85);
     backdrop-filter: blur(20px) saturate(1.2);
     -webkit-backdrop-filter: blur(20px) saturate(1.2);
-    padding: 10px 16px;
+    padding: 12px 20px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px 10px;
+    gap: 8px 14px;
     border-bottom: 1px solid rgba(38, 46, 59, 0.15);
     position: sticky;
-    top: 56px;
+    top: 64px;
     z-index: 9;
     animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
-    min-height: 48px;
 }
 .filter-bar input {
-    flex: 1 1 140px;
+    flex: 1 1 180px;
     background: rgba(30, 38, 50, 0.35);
     border: 1px solid rgba(47, 56, 73, 0.25);
     color: #f0f2f5;
-    padding: 6px 14px;
+    padding: 8px 18px;
     border-radius: 30px;
     outline: none;
-    font-size: clamp(0.75rem, 2vw, 0.85rem);
-    min-width: 80px;
+    font-size: 0.85rem;
+    min-width: 120px;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
@@ -135,6 +134,7 @@ html,body{
     border-color: #3b4bff;
     box-shadow: 0 0 30px rgba(59, 75, 255, 0.08);
     background: rgba(30, 38, 50, 0.6);
+    transform: scale(1.01);
 }
 .filter-bar input::placeholder {
     color: #7a869c;
@@ -143,16 +143,14 @@ html,body{
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
-    flex: 1 1 auto;
-    justify-content: flex-start;
 }
 .filter-bar .category-btn {
     background: rgba(30, 38, 50, 0.25);
     border: 1px solid rgba(47, 56, 73, 0.15);
     color: #c8d0e0;
-    padding: 3px 12px;
+    padding: 4px 16px;
     border-radius: 30px;
-    font-size: clamp(0.5rem, 1.5vw, 0.65rem);
+    font-size: 0.65rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -168,10 +166,14 @@ html,body{
     box-shadow: 0 4px 20px rgba(59, 75, 255, 0.25);
     transform: scale(1.04);
 }
+.filter-bar .category-btn:hover:not(.active) {
+    background: rgba(47, 56, 73, 0.4);
+    transform: translateY(-1px);
+}
 
 /* Last Played Section */
 .last-played-section {
-    padding: 10px 16px 4px;
+    padding: 12px 20px 4px;
     max-width: 1440px;
     margin: 0 auto;
     width: 100%;
@@ -182,20 +184,19 @@ html,body{
     animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .last-played-section .section-title {
-    font-size: clamp(0.6rem, 1.8vw, 0.75rem);
+    font-size: 0.75rem;
     color: #8895b0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     font-weight: 600;
 }
 .last-played-section .last-played-grid {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     overflow-x: auto;
-    padding-bottom: 6px;
+    padding-bottom: 8px;
     scrollbar-width: thin;
-    -webkit-overflow-scrolling: touch;
 }
 .last-played-section .last-played-grid::-webkit-scrollbar {
     height: 2px;
@@ -205,11 +206,10 @@ html,body{
     border-radius: 10px;
 }
 .last-played-card {
-    flex: 0 0 auto;
-    width: clamp(70px, 15vw, 120px);
+    flex: 0 0 120px;
     background: linear-gradient(145deg, rgba(21, 29, 40, 0.8), rgba(17, 23, 31, 0.8));
-    border-radius: 12px;
-    padding: 8px 6px;
+    border-radius: 14px;
+    padding: 12px 8px;
     border: 1px solid rgba(38, 48, 62, 0.2);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -217,14 +217,16 @@ html,body{
     flex-direction: column;
     align-items: center;
     text-align: center;
-    min-width: 60px;
+    min-width: 100px;
 }
-.last-played-card:active {
-    transform: scale(0.95);
+.last-played-card:hover {
+    transform: translateY(-3px) scale(1.03);
+    border-color: rgba(59, 75, 255, 0.3);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 .last-played-card .lp-logo {
-    width: clamp(30px, 8vw, 50px);
-    height: clamp(30px, 8vw, 50px);
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: rgba(14, 20, 30, 0.4);
     display: flex;
@@ -232,16 +234,16 @@ html,body{
     justify-content: center;
     overflow: hidden;
     border: 2px solid rgba(46, 58, 78, 0.2);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 .last-played-card .lp-logo img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    padding: 3px;
+    padding: 4px;
 }
 .last-played-card .lp-name {
-    font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+    font-size: 0.7rem;
     font-weight: 500;
     color: #e8edf5;
     display: -webkit-box;
@@ -252,12 +254,12 @@ html,body{
     line-height: 1.2;
 }
 .last-played-card .lp-badge {
-    font-size: clamp(0.4rem, 1vw, 0.5rem);
+    font-size: 0.5rem;
     color: #3b4bff;
     background: rgba(59, 75, 255, 0.15);
-    padding: 1px 6px;
+    padding: 1px 8px;
     border-radius: 30px;
-    margin-top: 3px;
+    margin-top: 4px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -265,10 +267,10 @@ html,body{
 
 /* Grid */
 .grid-container {
-    padding: 12px 12px 24px;
+    padding: 16px 16px 30px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(clamp(90px, 20vw, 150px), 1fr));
-    gap: clamp(8px, 2vw, 16px);
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
     max-width: 1440px;
     margin: 0 auto;
     width: 100%;
@@ -282,7 +284,7 @@ html,body{
 /* Channel Card */
 .channel-card {
     background: linear-gradient(145deg, rgba(21, 29, 40, 0.8), rgba(17, 23, 31, 0.8));
-    border-radius: clamp(12px, 2vw, 16px);
+    border-radius: 16px;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     border: 1px solid rgba(38, 48, 62, 0.2);
@@ -291,29 +293,42 @@ html,body{
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: clamp(10px, 2vw, 14px) clamp(6px, 1.5vw, 8px) clamp(8px, 1.5vw, 12px);
+    padding: 14px 8px 12px;
     position: relative;
     animation: cardFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: calc(var(--index, 0) * 0.03s);
     will-change: transform;
-    -webkit-touch-callout: none;
 }
 @keyframes cardFadeIn {
     from { opacity: 0; transform: scale(0.94) translateY(12px); }
     to { opacity: 1; transform: scale(1) translateY(0); }
 }
-.channel-card:active {
-    transform: scale(0.95);
+.channel-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(59, 75, 255, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: 16px;
+}
+.channel-card:hover {
+    transform: translateY(-4px) scale(1.015);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+    border-color: rgba(59, 75, 255, 0.2);
+}
+.channel-card:hover::before {
+    opacity: 1;
 }
 .channel-card .logo-wrapper {
-    width: clamp(45px, 12vw, 72px);
-    height: clamp(45px, 12vw, 72px);
+    width: 72px;
+    height: 72px;
     background: rgba(14, 20, 30, 0.4);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     overflow: hidden;
     border: 2px solid rgba(46, 58, 78, 0.2);
     flex-shrink: 0;
@@ -321,19 +336,21 @@ html,body{
     position: relative;
     z-index: 1;
 }
-.channel-card .logo-wrapper:active {
-    transform: scale(0.95);
+.channel-card:hover .logo-wrapper {
+    border-color: #3b4bff;
+    transform: scale(1.06);
+    box-shadow: 0 0 25px rgba(59, 75, 255, 0.1);
 }
 .channel-card img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    padding: 4px;
+    padding: 5px;
     position: relative;
     z-index: 1;
 }
 .channel-card .channel-name {
-    font-size: clamp(0.55rem, 1.8vw, 0.8rem);
+    font-size: 0.8rem;
     font-weight: 600;
     line-height: 1.3;
     color: #e8edf5;
@@ -347,11 +364,11 @@ html,body{
     z-index: 1;
 }
 .channel-card .channel-category {
-    font-size: clamp(0.45rem, 1.2vw, 0.55rem);
+    font-size: 0.55rem;
     color: #8895b0;
-    margin-top: 3px;
+    margin-top: 4px;
     background: rgba(31, 42, 56, 0.4);
-    padding: 1px 8px;
+    padding: 2px 10px;
     border-radius: 30px;
     display: inline-block;
     font-weight: 500;
@@ -366,9 +383,9 @@ html,body{
 .empty-box {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 40px 20px;
+    padding: 50px 20px;
     color: #6d7b96;
-    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    font-size: 1rem;
     background: rgba(17, 23, 31, 0.25);
     border-radius: 18px;
     border: 1px dashed rgba(47, 56, 73, 0.15);
@@ -376,8 +393,8 @@ html,body{
 .empty-box::before {
     content: "📺";
     display: block;
-    font-size: clamp(2.5rem, 8vw, 3rem);
-    margin-bottom: 10px;
+    font-size: 3rem;
+    margin-bottom: 12px;
     animation: float 3s ease-in-out infinite;
 }
 @keyframes float {
@@ -415,10 +432,10 @@ html,body{
     background: #000;
 }
 
-/* iOS Style Buttons - Mobile Optimized */
+/* iOS Style Buttons */
 .back-btn, .close-btn {
     position: absolute;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.5);
     backdrop-filter: blur(20px) saturate(1.5);
     -webkit-backdrop-filter: blur(20px) saturate(1.5);
     border: 1px solid rgba(255,255,255,0.06);
@@ -427,17 +444,16 @@ html,body{
     z-index: 1001;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-    touch-action: manipulation;
 }
 .back-btn {
-    top: clamp(12px, 3vh, 18px);
-    left: clamp(12px, 3vw, 18px);
-    padding: clamp(4px, 1.5vw, 8px) clamp(10px, 3vw, 16px) clamp(4px, 1.5vw, 8px) clamp(8px, 2vw, 12px);
+    top: 18px;
+    left: 18px;
+    padding: 8px 16px 8px 12px;
     border-radius: 30px;
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: clamp(0.65rem, 2vw, 0.85rem);
+    gap: 6px;
+    font-size: 0.85rem;
     font-weight: 500;
     animation: backBtnFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
 }
@@ -445,12 +461,13 @@ html,body{
     from { opacity: 0; transform: translateX(-15px) scale(0.9); }
     to { opacity: 1; transform: translateX(0) scale(1); }
 }
-.back-btn:active {
-    transform: scale(0.92);
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: scale(1.04);
 }
 .back-btn svg {
-    width: clamp(12px, 3vw, 16px);
-    height: clamp(12px, 3vw, 16px);
+    width: 16px;
+    height: 16px;
     fill: none;
     stroke: white;
     stroke-width: 2.5;
@@ -462,10 +479,10 @@ html,body{
 }
 
 .close-btn {
-    top: clamp(12px, 3vh, 18px);
-    right: clamp(12px, 3vw, 18px);
-    width: clamp(30px, 8vw, 40px);
-    height: clamp(30px, 8vw, 40px);
+    top: 18px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -476,12 +493,15 @@ html,body{
     from { opacity: 0; transform: scale(0.7) rotate(-90deg); }
     to { opacity: 1; transform: scale(1) rotate(0); }
 }
-.close-btn:active {
-    transform: scale(0.88);
+.close-btn:hover {
+    background: #ff3b3b;
+    transform: scale(1.08) rotate(90deg);
+    border-color: #ff3b3b;
+    box-shadow: 0 0 25px rgba(255, 59, 59, 0.15);
 }
 .close-btn svg {
-    width: clamp(14px, 4vw, 18px);
-    height: clamp(14px, 4vw, 18px);
+    width: 18px;
+    height: 18px;
     fill: none;
     stroke: white;
     stroke-width: 2.5;
@@ -489,44 +509,43 @@ html,body{
     stroke-linejoin: round;
 }
 
-/* Player Info - Mobile Optimized */
+/* Player Info */
 .player-info {
     position: absolute;
-    bottom: clamp(40px, 10vh, 80px);
+    bottom: 80px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.65);
     backdrop-filter: blur(20px) saturate(1.5);
     -webkit-backdrop-filter: blur(20px) saturate(1.5);
-    padding: clamp(4px, 1.5vw, 6px) clamp(12px, 4vw, 20px) clamp(4px, 1.5vw, 6px) clamp(10px, 3vw, 14px);
+    padding: 6px 20px 6px 14px;
     border-radius: 50px;
     border: 1px solid rgba(255,255,255,0.05);
     color: #eef2f8;
-    font-size: clamp(0.6rem, 2vw, 0.85rem);
+    font-size: 0.85rem;
     font-weight: 500;
     pointer-events: none;
     display: flex;
     align-items: center;
-    gap: clamp(6px, 2vw, 10px);
+    gap: 10px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.4);
     animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
     white-space: nowrap;
-    max-width: 90%;
 }
 @keyframes slideUpFade {
     from { opacity: 0; transform: translateX(-50%) translateY(15px) scale(0.95); }
     to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 }
 .player-info img {
-    width: clamp(20px, 5vw, 28px);
-    height: clamp(20px, 5vw, 28px);
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: rgba(30, 38, 50, 0.6);
-    padding: 2px;
+    padding: 3px;
     border: 1px solid rgba(255,255,255,0.05);
 }
 .player-info .channel-name-text {
-    max-width: clamp(60px, 40vw, 180px);
+    max-width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -558,7 +577,7 @@ html,body{
     will-change: transform, width, height, top, left;
 }
 .video-expand {
-    border-radius: clamp(12px, 2vw, 16px);
+    border-radius: 16px;
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -568,7 +587,7 @@ html,body{
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Modern Error Modal - Mobile Optimized */
+/* Modern Error Modal */
 .error-overlay {
     display: none;
     position: fixed;
@@ -582,7 +601,6 @@ html,body{
     justify-content: center;
     align-items: center;
     animation: fadeIn 0.3s ease;
-    padding: 20px;
 }
 .error-overlay.active {
     display: flex;
@@ -593,10 +611,10 @@ html,body{
 }
 .error-modal {
     background: linear-gradient(145deg, #1a1f2e, #141a24);
-    border-radius: clamp(20px, 4vw, 24px);
-    padding: clamp(24px, 5vw, 40px) clamp(20px, 5vw, 36px) clamp(20px, 4vw, 32px);
+    border-radius: 24px;
+    padding: 40px 36px 32px;
     max-width: 420px;
-    width: 100%;
+    width: 90%;
     text-align: center;
     border: 1px solid rgba(59, 75, 255, 0.1);
     box-shadow: 0 30px 80px rgba(0,0,0,0.6);
@@ -607,22 +625,22 @@ html,body{
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
 .error-modal .error-icon {
-    font-size: clamp(2.5rem, 8vw, 3.5rem);
-    margin-bottom: 12px;
+    font-size: 3.5rem;
+    margin-bottom: 16px;
     display: block;
     animation: float 2s ease-in-out infinite;
 }
 .error-modal h2 {
     color: #f0f2f5;
-    font-size: clamp(1rem, 3vw, 1.3rem);
+    font-size: 1.3rem;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 .error-modal p {
     color: #8895b0;
-    font-size: clamp(0.8rem, 2vw, 0.95rem);
+    font-size: 0.95rem;
     line-height: 1.5;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 .error-modal .error-actions {
     display: flex;
@@ -631,175 +649,82 @@ html,body{
     flex-wrap: wrap;
 }
 .error-modal .error-btn {
-    padding: clamp(8px, 2vw, 10px) clamp(20px, 5vw, 28px);
+    padding: 10px 28px;
     border-radius: 30px;
     border: none;
-    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    touch-action: manipulation;
-}
-.error-modal .error-btn:active {
-    transform: scale(0.95);
 }
 .error-modal .error-btn.primary {
     background: linear-gradient(135deg, #3b4bff, #6366f1);
     color: white;
     box-shadow: 0 4px 20px rgba(59, 75, 255, 0.3);
 }
+.error-modal .error-btn.primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 30px rgba(59, 75, 255, 0.4);
+}
 .error-modal .error-btn.secondary {
     background: rgba(255,255,255,0.08);
     color: #b9c2d4;
     border: 1px solid rgba(255,255,255,0.06);
 }
-
-/* Mobile Specific Optimizations */
-@media (max-width: 480px) {
-    .filter-bar {
-        top: 48px;
-        padding: 8px 12px;
-    }
-    .filter-bar .category-group {
-        gap: 3px;
-    }
-    .filter-bar .category-btn {
-        padding: 2px 8px;
-        font-size: 0.5rem;
-    }
-    .grid-container {
-        padding: 8px 8px 16px;
-        gap: 6px;
-    }
-    .channel-card {
-        padding: 8px 4px 6px;
-    }
-    .channel-card .logo-wrapper {
-        width: 50px;
-        height: 50px;
-    }
-    .channel-card .channel-name {
-        font-size: 0.55rem;
-    }
-    .header {
-        padding: 8px 12px;
-        min-height: 48px;
-    }
-    .header h1 {
-        font-size: 0.95rem;
-    }
-    .header .channel-counter {
-        font-size: 0.55rem;
-        padding: 2px 10px;
-    }
-    .last-played-card {
-        width: 70px;
-        padding: 6px 4px;
-        min-width: 60px;
-    }
-    .last-played-card .lp-logo {
-        width: 35px;
-        height: 35px;
-    }
-    .last-played-card .lp-name {
-        font-size: 0.5rem;
-    }
-    .last-played-card .lp-badge {
-        font-size: 0.4rem;
-        padding: 1px 4px;
-    }
-    .last-played-section {
-        padding: 6px 12px 2px;
-    }
-    .last-played-section .section-title {
-        font-size: 0.55rem;
-    }
-    .player-info {
-        bottom: 30px;
-        padding: 4px 10px 4px 8px;
-        font-size: 0.6rem;
-    }
-    .player-info img {
-        width: 18px;
-        height: 18px;
-    }
-    .player-info .channel-name-text {
-        max-width: 60px;
-    }
-    .back-btn {
-        padding: 4px 8px 4px 6px;
-        font-size: 0.6rem;
-    }
-    .back-btn svg {
-        width: 12px;
-        height: 12px;
-    }
-    .close-btn {
-        width: 30px;
-        height: 30px;
-    }
-    .close-btn svg {
-        width: 14px;
-        height: 14px;
-    }
-    .error-modal {
-        padding: 20px 16px 18px;
-    }
-    .error-modal .error-icon {
-        font-size: 2.5rem;
-    }
-    .error-modal h2 {
-        font-size: 1rem;
-    }
-    .error-modal p {
-        font-size: 0.8rem;
-    }
+.error-modal .error-btn.secondary:hover {
+    background: rgba(255,255,255,0.15);
+    transform: scale(1.05);
 }
 
-/* Landscape Mobile */
-@media (max-height: 500px) and (orientation: landscape) {
-    .header {
-        padding: 6px 12px;
-        min-height: 40px;
-    }
-    .header h1 {
-        font-size: 0.9rem;
-    }
-    .filter-bar {
-        top: 40px;
-        padding: 4px 12px;
-        min-height: 36px;
-    }
-    .grid-container {
-        padding: 6px 12px 12px;
-        gap: 6px;
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    }
-    .channel-card .logo-wrapper {
-        width: 40px;
-        height: 40px;
-    }
-    .channel-card .channel-name {
-        font-size: 0.5rem;
-    }
-    .channel-card {
-        padding: 6px 4px 6px;
-    }
-    .last-played-card {
-        width: 60px;
-        padding: 4px 3px;
-        min-width: 50px;
-    }
-    .last-played-card .lp-logo {
-        width: 28px;
-        height: 28px;
-    }
-    .last-played-card .lp-name {
-        font-size: 0.45rem;
-    }
-    .player-info {
-        bottom: 20px;
-    }
+/* Responsive */
+@media (max-width: 768px) {
+    .header { padding: 10px 14px; }
+    .header h1 { font-size: 1.1rem; }
+    .header h1::before { font-size: 1.1rem; }
+    .filter-bar { padding: 8px 14px; top: 56px; }
+    .filter-bar input { min-width: 80px; font-size: 0.8rem; padding: 7px 14px; }
+    .grid-container { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; padding: 12px 10px 24px; }
+    .channel-card .logo-wrapper { width: 60px; height: 60px; }
+    .channel-card { padding: 10px 6px 10px; }
+    .channel-card .channel-name { font-size: 0.7rem; }
+    .player-info { bottom: 50px; font-size: 0.75rem; padding: 5px 14px 5px 10px; }
+    .player-info img { width: 22px; height: 22px; }
+    .back-btn { top: 12px; left: 12px; padding: 6px 12px 6px 8px; font-size: 0.75rem; }
+    .back-btn svg { width: 14px; height: 14px; }
+    .close-btn { top: 12px; right: 12px; width: 34px; height: 34px; }
+    .close-btn svg { width: 16px; height: 16px; }
+    .filter-bar .category-btn { font-size: 0.55rem; padding: 3px 10px; }
+    .player-info .channel-name-text { max-width: 100px; }
+    .header .channel-counter { font-size: 0.65rem; padding: 3px 12px; }
+    .error-modal { padding: 30px 24px 28px; }
+    .error-modal .error-icon { font-size: 3rem; }
+    .error-modal h2 { font-size: 1.1rem; }
+    .last-played-card { flex: 0 0 100px; min-width: 80px; padding: 10px 6px; }
+    .last-played-card .lp-logo { width: 40px; height: 40px; }
+    .last-played-card .lp-name { font-size: 0.6rem; }
+}
+
+@media (max-width: 480px) {
+    .grid-container { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+    .channel-card .logo-wrapper { width: 50px; height: 50px; }
+    .channel-card .channel-name { font-size: 0.6rem; }
+    .channel-card .channel-category { font-size: 0.5rem; padding: 1px 8px; }
+    .header h1 { font-size: 0.9rem; }
+    .player-info { bottom: 40px; font-size: 0.65rem; padding: 4px 10px 4px 8px; }
+    .player-info img { width: 18px; height: 18px; }
+    .back-btn { top: 10px; left: 10px; padding: 4px 10px 4px 6px; font-size: 0.65rem; }
+    .back-btn svg { width: 12px; height: 12px; }
+    .close-btn { top: 10px; right: 10px; width: 30px; height: 30px; }
+    .close-btn svg { width: 14px; height: 14px; }
+    .filter-bar .category-btn { font-size: 0.5rem; padding: 2px 8px; }
+    .player-info .channel-name-text { max-width: 60px; }
+    .error-modal { padding: 24px 18px 22px; }
+    .error-modal .error-icon { font-size: 2.5rem; }
+    .error-modal h2 { font-size: 1rem; }
+    .error-modal p { font-size: 0.85rem; }
+    .last-played-card { flex: 0 0 80px; min-width: 70px; padding: 8px 4px; }
+    .last-played-card .lp-logo { width: 35px; height: 35px; }
+    .last-played-card .lp-name { font-size: 0.5rem; }
 }
 </style>
 </head>
@@ -860,6 +785,8 @@ let filteredChannels = [];
 let currentCategory = 'All';
 let searchTerm = '';
 let cachedCookie = null;
+let cookieTimestamp = 0;
+const COOKIE_MAX_AGE = 5 * 60 * 1000; // 5 minutes
 let activeCookie = null;
 let expandElement = null;
 let isClosing = false;
@@ -871,7 +798,6 @@ let isErrorShowing = false;
 let lastPlayedChannels = [];
 let isPlaying = false;
 let playTimeout = null;
-let audioSelectionTimer = null;
 
 // ─── LOCAL STORAGE ────────────────────────────────────
 const STORAGE_KEY = 'liveTV_lastPlayed';
@@ -881,7 +807,6 @@ function loadLastPlayed() {
         const data = localStorage.getItem(STORAGE_KEY);
         if (data) {
             lastPlayedChannels = JSON.parse(data);
-            // Store only essential data to save space
             lastPlayedChannels = lastPlayedChannels.filter(ch => ch && ch.id && ch.name);
             return lastPlayedChannels;
         }
@@ -894,19 +819,8 @@ function loadLastPlayed() {
 function saveLastPlayed(channel) {
     if (!channel || !channel.id) return;
     
-    // Store only essential data to save localStorage space
-    const minimalChannel = {
-        id: channel.id,
-        name: channel.name,
-        category: channel.category || 'General',
-        logo: channel.logo || '',
-        url: channel.url || '',
-        keyId: channel.keyId || null,
-        key: channel.key || null
-    };
-    
     lastPlayedChannels = lastPlayedChannels.filter(ch => ch.id !== channel.id);
-    lastPlayedChannels.unshift(minimalChannel);
+    lastPlayedChannels.unshift(channel);
     lastPlayedChannels = lastPlayedChannels.slice(0, 10);
     
     try {
@@ -933,7 +847,6 @@ function renderLastPlayed() {
                 <img src="${ch.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(ch.name) + '&background=1e2632&color=fff&size=50'}" 
                      alt="${ch.name}" 
                      loading="lazy"
-                     decoding="async"
                      onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=1e2632&color=fff&size=50';" />
             </div>
             <div class="lp-name">${ch.name}</div>
@@ -943,7 +856,6 @@ function renderLastPlayed() {
     
     grid.querySelectorAll('.last-played-card').forEach(card => {
         card.addEventListener('click', (e) => {
-            e.stopPropagation();
             if (isClosing || isPlaying) return;
             const raw = card.dataset.channel;
             try {
@@ -990,7 +902,7 @@ function renderLastPlayed() {
             } catch(e) {
                 console.error('Failed to play last played channel:', e);
             }
-        }, { passive: true });
+        });
     });
 }
 
@@ -1022,10 +934,6 @@ function cleanupAnimations() {
 }
 
 function destroyPlayer() {
-    if (audioSelectionTimer) {
-        clearTimeout(audioSelectionTimer);
-        audioSelectionTimer = null;
-    }
     if (shakaPlayer) {
         try {
             shakaPlayer.destroy();
@@ -1193,6 +1101,7 @@ errorRetry.addEventListener('click', () => {
     if (errorChannel) {
         // Clear cookie cache to force fresh fetch
         cachedCookie = null;
+        cookieTimestamp = 0;
         setTimeout(() => playChannel(errorChannel), 300);
     }
 });
@@ -1213,8 +1122,14 @@ errorOverlay.addEventListener('click', (e) => {
     }
 });
 
-// ─── FETCH COOKIE ────────────────────────────────────
+// ─── FETCH COOKIE (FRESH EVERY TIME) ────────────────
 async function fetchCookie() {
+    // Always fetch fresh cookie on page reload
+    const now = Date.now();
+    if (cachedCookie && (now - cookieTimestamp) < COOKIE_MAX_AGE) {
+        return cachedCookie;
+    }
+    
     try {
         const res = await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/cookies', {
             cache: 'no-cache',
@@ -1227,6 +1142,7 @@ async function fetchCookie() {
         const cookieObj = data.find(item => item.cookie);
         if (cookieObj && cookieObj.cookie) {
             cachedCookie = cookieObj.cookie;
+            cookieTimestamp = now;
             return cachedCookie;
         }
         return null;
@@ -1305,7 +1221,7 @@ function renderGrid() {
         html += `
             <div class="channel-card" style="--index: ${index}" data-channel='${JSON.stringify(ch).replace(/'/g,"&#39;")}'>
                 <div class="logo-wrapper">
-                    <img src="${logo}" alt="${ch.name}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=1e2632&color=fff&size=80';" />
+                    <img src="${logo}" alt="${ch.name}" loading="lazy" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=1e2632&color=fff&size=80';" />
                 </div>
                 <div class="channel-name">${ch.name}</div>
                 <span class="channel-category">${ch.category || 'General'}</span>
@@ -1337,7 +1253,7 @@ function renderGrid() {
                     playTimeout = setTimeout(() => playChannel(found), 450);
                 }
             }
-        }, { passive: true });
+        });
     });
 }
 
@@ -1351,7 +1267,7 @@ function updateCounter() {
 searchInput.addEventListener('input', (e) => {
     searchTerm = e.target.value;
     applyFilters();
-}, { passive: true });
+});
 
 // ─── PLAY CHANNEL ────────────────────────────────────
 async function playChannel(channel) {
@@ -1437,10 +1353,8 @@ async function playChannel(channel) {
                 await shakaPlayer.load(streamUrls[i]);
                 
                 // Try to select Telugu audio after a small delay
-                if (audioSelectionTimer) clearTimeout(audioSelectionTimer);
-                audioSelectionTimer = setTimeout(() => {
+                setTimeout(() => {
                     try {
-                        if (!shakaPlayer) return;
                         const tracks = shakaPlayer.getAudioTracks();
                         if (tracks && tracks.length > 0) {
                             let teluguTrack = tracks.find(t => t.language === 'te');
@@ -1455,7 +1369,6 @@ async function playChannel(channel) {
                     } catch (audioError) {
                         console.warn('Audio selection failed:', audioError);
                     }
-                    audioSelectionTimer = null;
                 }, 500);
                 
                 await videoEl.play();
@@ -1489,10 +1402,6 @@ function closePlayer() {
     if (playTimeout) {
         clearTimeout(playTimeout);
         playTimeout = null;
-    }
-    if (audioSelectionTimer) {
-        clearTimeout(audioSelectionTimer);
-        audioSelectionTimer = null;
     }
     
     destroyPlayer();
@@ -1559,7 +1468,7 @@ if (document.readyState === 'loading') {
 console.log('🚀 Live TV loaded. Click any channel to play.');
 console.log('🎤 Audio will default to Telugu when available.');
 console.log('🕐 Last played channels are saved locally.');
-console.log('📱 Optimized for mobile and desktop.');
+console.log('🍪 Cookie is fetched fresh on every page reload.');
 </script>
 
 </body>
