@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Preconnect for faster loading -->
+<link rel="preconnect" href="https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="dns-prefetch" href="https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev">
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0a0e17">
 <title>Live TV Player</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" defer></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
 
 <style>
@@ -162,6 +169,100 @@ html,body{
 .filter-bar .category-btn:hover:not(.active) {
     background: rgba(47, 56, 73, 0.4);
     transform: translateY(-1px);
+}
+
+/* Last Played Section */
+.last-played-section {
+    padding: 12px 20px 4px;
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
+    display: none;
+}
+.last-played-section.visible {
+    display: block;
+    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.last-played-section .section-title {
+    font-size: 0.75rem;
+    color: #8895b0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+.last-played-section .last-played-grid {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+}
+.last-played-section .last-played-grid::-webkit-scrollbar {
+    height: 2px;
+}
+.last-played-section .last-played-grid::-webkit-scrollbar-thumb {
+    background: #3b4bff;
+    border-radius: 10px;
+}
+.last-played-card {
+    flex: 0 0 120px;
+    background: linear-gradient(145deg, rgba(21, 29, 40, 0.8), rgba(17, 23, 31, 0.8));
+    border-radius: 14px;
+    padding: 12px 8px;
+    border: 1px solid rgba(38, 48, 62, 0.2);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 100px;
+}
+.last-played-card:hover {
+    transform: translateY(-3px) scale(1.03);
+    border-color: rgba(59, 75, 255, 0.3);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+.last-played-card .lp-logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(14, 20, 30, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px solid rgba(46, 58, 78, 0.2);
+    margin-bottom: 6px;
+}
+.last-played-card .lp-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    padding: 4px;
+}
+.last-played-card .lp-name {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #e8edf5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-height: 2.2em;
+    line-height: 1.2;
+}
+.last-played-card .lp-badge {
+    font-size: 0.5rem;
+    color: #3b4bff;
+    background: rgba(59, 75, 255, 0.15);
+    padding: 1px 8px;
+    border-radius: 30px;
+    margin-top: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
 /* Grid */
@@ -486,6 +587,95 @@ html,body{
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Modern Error Modal */
+.error-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(20px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+.error-overlay.active {
+    display: flex;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+.error-modal {
+    background: linear-gradient(145deg, #1a1f2e, #141a24);
+    border-radius: 24px;
+    padding: 40px 36px 32px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    border: 1px solid rgba(59, 75, 255, 0.1);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    animation: modalSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalSlide {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.error-modal .error-icon {
+    font-size: 3.5rem;
+    margin-bottom: 16px;
+    display: block;
+    animation: float 2s ease-in-out infinite;
+}
+.error-modal h2 {
+    color: #f0f2f5;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.error-modal p {
+    color: #8895b0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+.error-modal .error-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.error-modal .error-btn {
+    padding: 10px 28px;
+    border-radius: 30px;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.error-modal .error-btn.primary {
+    background: linear-gradient(135deg, #3b4bff, #6366f1);
+    color: white;
+    box-shadow: 0 4px 20px rgba(59, 75, 255, 0.3);
+}
+.error-modal .error-btn.primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 30px rgba(59, 75, 255, 0.4);
+}
+.error-modal .error-btn.secondary {
+    background: rgba(255,255,255,0.08);
+    color: #b9c2d4;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+.error-modal .error-btn.secondary:hover {
+    background: rgba(255,255,255,0.15);
+    transform: scale(1.05);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .header { padding: 10px 14px; }
@@ -506,6 +696,12 @@ html,body{
     .filter-bar .category-btn { font-size: 0.55rem; padding: 3px 10px; }
     .player-info .channel-name-text { max-width: 100px; }
     .header .channel-counter { font-size: 0.65rem; padding: 3px 12px; }
+    .error-modal { padding: 30px 24px 28px; }
+    .error-modal .error-icon { font-size: 3rem; }
+    .error-modal h2 { font-size: 1.1rem; }
+    .last-played-card { flex: 0 0 100px; min-width: 80px; padding: 10px 6px; }
+    .last-played-card .lp-logo { width: 40px; height: 40px; }
+    .last-played-card .lp-name { font-size: 0.6rem; }
 }
 
 @media (max-width: 480px) {
@@ -522,6 +718,13 @@ html,body{
     .close-btn svg { width: 14px; height: 14px; }
     .filter-bar .category-btn { font-size: 0.5rem; padding: 2px 8px; }
     .player-info .channel-name-text { max-width: 60px; }
+    .error-modal { padding: 24px 18px 22px; }
+    .error-modal .error-icon { font-size: 2.5rem; }
+    .error-modal h2 { font-size: 1rem; }
+    .error-modal p { font-size: 0.85rem; }
+    .last-played-card { flex: 0 0 80px; min-width: 70px; padding: 8px 4px; }
+    .last-played-card .lp-logo { width: 35px; height: 35px; }
+    .last-played-card .lp-name { font-size: 0.5rem; }
 }
 </style>
 </head>
@@ -535,6 +738,12 @@ html,body{
 <div class="filter-bar">
     <input type="text" id="searchInput" placeholder="🔍 Search channels..." />
     <div class="category-group" id="categoryGroup"></div>
+</div>
+
+<!-- Last Played Section -->
+<div class="last-played-section" id="lastPlayedSection">
+    <div class="section-title">🕐 Recently Played</div>
+    <div class="last-played-grid" id="lastPlayedGrid"></div>
 </div>
 
 <div class="grid-container" id="channelGrid"></div>
@@ -556,6 +765,19 @@ html,body{
     </div>
 </div>
 
+<!-- Modern Error Modal -->
+<div class="error-overlay" id="errorOverlay">
+    <div class="error-modal">
+        <span class="error-icon">⚠️</span>
+        <h2>Technical Difficulties</h2>
+        <p>This channel is currently facing technical difficulties. Please try again later or choose another channel.</p>
+        <div class="error-actions">
+            <button class="error-btn primary" id="errorRetry">Retry</button>
+            <button class="error-btn secondary" id="errorClose">OK</button>
+        </div>
+    </div>
+</div>
+
 <script>
 // ─── GLOBALS ──────────────────────────────────────────
 let allChannels = [];
@@ -566,12 +788,129 @@ let cachedCookie = null;
 let activeCookie = null;
 let expandElement = null;
 let isClosing = false;
+let shakaPlayer = null;
+let currentChannel = null;
+let currentCardRect = null;
+let errorChannel = null;
+let isErrorShowing = false;
+let lastPlayedChannels = [];
 
+// ─── LOCAL STORAGE ────────────────────────────────────
+const STORAGE_KEY = 'liveTV_lastPlayed';
+
+function loadLastPlayed() {
+    try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (data) {
+            lastPlayedChannels = JSON.parse(data);
+            // Filter out any invalid entries
+            lastPlayedChannels = lastPlayedChannels.filter(ch => ch && ch.id && ch.name);
+            return lastPlayedChannels;
+        }
+    } catch (e) {
+        console.warn('Failed to load last played:', e);
+    }
+    return [];
+}
+
+function saveLastPlayed(channel) {
+    if (!channel || !channel.id) return;
+    
+    // Remove duplicate if exists
+    lastPlayedChannels = lastPlayedChannels.filter(ch => ch.id !== channel.id);
+    // Add to front
+    lastPlayedChannels.unshift(channel);
+    // Keep only last 10
+    lastPlayedChannels = lastPlayedChannels.slice(0, 10);
+    
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(lastPlayedChannels));
+    } catch (e) {
+        console.warn('Failed to save last played:', e);
+    }
+    renderLastPlayed();
+}
+
+function renderLastPlayed() {
+    const section = document.getElementById('lastPlayedSection');
+    const grid = document.getElementById('lastPlayedGrid');
+    
+    if (!lastPlayedChannels.length) {
+        section.classList.remove('visible');
+        return;
+    }
+    
+    section.classList.add('visible');
+    grid.innerHTML = lastPlayedChannels.map(ch => `
+        <div class="last-played-card" data-channel='${JSON.stringify(ch).replace(/'/g,"&#39;")}'>
+            <div class="lp-logo">
+                <img src="${ch.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(ch.name) + '&background=1e2632&color=fff&size=50'}" 
+                     alt="${ch.name}" 
+                     loading="lazy"
+                     onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=1e2632&color=fff&size=50';" />
+            </div>
+            <div class="lp-name">${ch.name}</div>
+            <div class="lp-badge">▶ Play</div>
+        </div>
+    `).join('');
+    
+    // Add click handlers for last played cards
+    grid.querySelectorAll('.last-played-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (isClosing) return;
+            const raw = card.dataset.channel;
+            try {
+                const ch = JSON.parse(raw);
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX || rect.left + rect.width/2;
+                const y = e.clientY || rect.top + rect.height/2;
+                
+                createRipple(x, y);
+                // Create a temporary card for animation
+                const tempCard = document.createElement('div');
+                tempCard.className = 'channel-card';
+                tempCard.style.cssText = `
+                    width:${rect.width}px;
+                    height:${rect.height}px;
+                    position:fixed;
+                    left:${rect.left}px;
+                    top:${rect.top}px;
+                    background: linear-gradient(145deg, rgba(21, 29, 40, 0.8), rgba(17, 23, 31, 0.8));
+                    border-radius: 14px;
+                    display:flex;
+                    flex-direction:column;
+                    align-items:center;
+                    justify-content:center;
+                    padding:14px 8px;
+                    border:1px solid rgba(38,48,62,0.2);
+                    z-index:998;
+                `;
+                tempCard.innerHTML = `
+                    <div class="logo-wrapper" style="width:72px;height:72px;background:rgba(14,20,30,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:8px;overflow:hidden;border:2px solid rgba(46,58,78,0.2);">
+                        <img src="${ch.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(ch.name) + '&background=1e2632&color=fff&size=80'}" style="max-width:100%;max-height:100%;object-fit:contain;padding:5px;" />
+                    </div>
+                    <div class="channel-name" style="font-size:0.8rem;font-weight:600;color:#e8edf5;">${ch.name}</div>
+                    <span class="channel-category" style="font-size:0.55rem;color:#8895b0;margin-top:4px;background:rgba(31,42,56,0.4);padding:2px 10px;border-radius:30px;border:1px solid rgba(47,56,73,0.1);">${ch.category || 'General'}</span>
+                `;
+                document.body.appendChild(tempCard);
+                
+                createExpandAnimation(tempCard);
+                setTimeout(() => {
+                    if (tempCard.parentNode) tempCard.remove();
+                }, 600);
+                setTimeout(() => playChannel(ch), 450);
+            } catch(e) {
+                console.error('Failed to play last played channel:', e);
+            }
+        });
+    });
+}
+
+// ─── DOM REFS ─────────────────────────────────────────
 const grid = document.getElementById('channelGrid');
 const searchInput = document.getElementById('searchInput');
 const categoryGroup = document.getElementById('categoryGroup');
 const channelCounter = document.getElementById('channelCounter');
-
 const playerOverlay = document.getElementById('playerOverlay');
 const closePlayerBtn = document.getElementById('closePlayer');
 const backBtn = document.getElementById('backBtn');
@@ -579,10 +918,18 @@ const videoEl = document.getElementById('video');
 const playerContainer = document.getElementById('player-container');
 const playerName = document.getElementById('playerName');
 const playerLogo = document.getElementById('playerLogo');
+const errorOverlay = document.getElementById('errorOverlay');
+const errorRetry = document.getElementById('errorRetry');
+const errorClose = document.getElementById('errorClose');
 
-let shakaPlayer = null;
-let currentChannel = null;
-let currentCardRect = null;
+// ─── MEMORY OPTIMIZATION ─────────────────────────────
+function cleanupAnimations() {
+    if (expandElement) {
+        expandElement.remove();
+        expandElement = null;
+    }
+    document.querySelectorAll('.ripple-container, .video-expand, .video-shrink').forEach(el => el.remove());
+}
 
 // ─── RIPPLE EFFECT ────────────────────────────────────
 function createRipple(x, y) {
@@ -597,11 +944,12 @@ function createRipple(x, y) {
     
     container.appendChild(ripple);
     document.body.appendChild(container);
-    setTimeout(() => container.remove(), 700);
+    setTimeout(() => { if (container.parentNode) container.remove(); }, 700);
 }
 
 // ─── EXPAND ANIMATION ────────────────────────────────
 function createExpandAnimation(card) {
+    cleanupAnimations();
     const rect = card.getBoundingClientRect();
     currentCardRect = rect;
     
@@ -721,11 +1069,51 @@ function createShrinkAnimation(callback) {
     }, 450);
 }
 
+// ─── MODERN ERROR HANDLING ───────────────────────────
+function showError(channel) {
+    if (isErrorShowing) return;
+    isErrorShowing = true;
+    errorChannel = channel;
+    errorOverlay.classList.add('active');
+}
+
+function hideError() {
+    isErrorShowing = false;
+    errorOverlay.classList.remove('active');
+    errorChannel = null;
+}
+
+errorRetry.addEventListener('click', () => {
+    hideError();
+    if (errorChannel) {
+        setTimeout(() => playChannel(errorChannel), 300);
+    }
+});
+
+errorClose.addEventListener('click', () => {
+    hideError();
+    // Close the player and return to channels
+    if (playerOverlay.classList.contains('active')) {
+        closePlayer();
+    }
+});
+
+errorOverlay.addEventListener('click', (e) => {
+    if (e.target === errorOverlay) {
+        hideError();
+        if (playerOverlay.classList.contains('active')) {
+            closePlayer();
+        }
+    }
+});
+
 // ─── FETCH COOKIE ────────────────────────────────────
 async function fetchCookie() {
     if (cachedCookie) return cachedCookie;
     try {
-        const res = await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/cookies');
+        const res = await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/cookies', {
+            cache: 'force-cache'
+        });
         const data = await res.json();
         const cookieObj = data.find(item => item.cookie);
         if (cookieObj && cookieObj.cookie) {
@@ -743,7 +1131,8 @@ async function fetchCookie() {
 async function fetchChannels() {
     try {
         const res = await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/channels', {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            cache: 'force-cache'
         });
         const data = await res.json();
         allChannels = Array.isArray(data) ? data : (data.channels || []);
@@ -752,6 +1141,10 @@ async function fetchChannels() {
         extractCategories();
         applyFilters();
         updateCounter();
+        
+        // Load last played after channels are loaded
+        loadLastPlayed();
+        renderLastPlayed();
     } catch (e) {
         grid.innerHTML = `<div class="empty-box">⚠️ Could not load channels. Refresh or try again later.</div>`;
         console.error(e);
@@ -854,10 +1247,13 @@ async function playChannel(channel) {
     playerName.textContent = channel.name || 'Channel';
     playerLogo.src = channel.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(channel.name) + '&background=1e2632&color=fff&size=40';
 
+    // Save to last played
+    saveLastPlayed(channel);
+
     if (!shakaPlayer) {
         shaka.polyfill.installAll();
         if (!shaka.Player.isBrowserSupported()) {
-            alert('Your browser does not support Shaka Player.');
+            showError(channel);
             return;
         }
         shakaPlayer = new shaka.Player(videoEl);
@@ -866,13 +1262,16 @@ async function playChannel(channel) {
         } catch(e) { /* ignore */ }
     }
 
-    // ─── SET PREFERRED AUDIO LANGUAGE TO TELUGU ──────
-    // This tells Shaka to prefer Telugu audio tracks
+    // Set preferred audio language to Telugu
     shakaPlayer.configure({
         preferredAudioLanguage: 'te',
         preferredTextLanguage: 'en',
         drm: {},
-        streaming: { lowLatencyMode: true }
+        streaming: { 
+            lowLatencyMode: true,
+            rebufferingGoal: 2,
+            bufferBehind: 30
+        }
     });
 
     const keyId = channel.keyId && channel.keyId !== 'null' ? channel.keyId : null;
@@ -913,26 +1312,21 @@ async function playChannel(channel) {
         try {
             await shakaPlayer.load(streamUrls[i]);
             
-            // ─── FORCE TELUGU AUDIO IF AVAILABLE ──────
-            // After loading, try to select Telugu audio track
+            // Try to select Telugu audio
             try {
                 const tracks = shakaPlayer.getAudioTracks();
                 if (tracks && tracks.length > 0) {
-                    // Find Telugu track
                     let teluguTrack = tracks.find(t => t.language === 'te');
-                    // If no Telugu, try to find any Indian language
                     if (!teluguTrack) {
-                        teluguTrack = tracks.find(t => ['hi', 'ta', 'ml', 'kn', 'mr', 'bn', 'te'].includes(t.language));
+                        teluguTrack = tracks.find(t => ['hi', 'ta', 'ml', 'kn', 'mr', 'bn'].includes(t.language));
                     }
                     if (teluguTrack) {
                         shakaPlayer.selectAudioTrack(teluguTrack);
-                        console.log('🎤 Selected audio track:', teluguTrack.language, teluguTrack.label || '');
-                    } else {
-                        console.log('🎤 No Telugu/Indian audio track found, using default');
+                        console.log('🎤 Selected audio:', teluguTrack.language);
                     }
                 }
             } catch (audioError) {
-                console.warn('Audio track selection failed:', audioError);
+                console.warn('Audio selection failed:', audioError);
             }
             
             await videoEl.play();
@@ -945,8 +1339,7 @@ async function playChannel(channel) {
     }
 
     if (!loaded) {
-        alert('Could not play this channel. Try another one.');
-        closePlayer();
+        showError(channel);
     }
 }
 
@@ -954,6 +1347,7 @@ async function playChannel(channel) {
 function closePlayer() {
     if (isClosing) return;
     isClosing = true;
+    hideError();
     
     if (shakaPlayer) {
         shakaPlayer.unload().catch(() => {});
@@ -962,6 +1356,7 @@ function closePlayer() {
     videoEl.src = '';
     
     playerOverlay.classList.remove('active');
+    cleanupAnimations();
     
     createShrinkAnimation(() => {
         isClosing = false;
@@ -980,11 +1375,30 @@ playerContainer.addEventListener('click', (e) => {
 });
 
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closePlayer();
+    if (e.key === 'Escape') {
+        if (errorOverlay.classList.contains('active')) {
+            hideError();
+            if (playerOverlay.classList.contains('active')) {
+                closePlayer();
+            }
+        } else {
+            closePlayer();
+        }
+    }
+});
+
+// Handle memory cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (shakaPlayer) {
+        shakaPlayer.destroy().catch(() => {});
+    }
+    cleanupAnimations();
 });
 
 // ─── INIT ────────────────────────────────────────────
-// Ensure channels load on first visit
+// Load last played from storage
+loadLastPlayed();
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', fetchChannels);
 } else {
@@ -993,6 +1407,7 @@ if (document.readyState === 'loading') {
 
 console.log('🚀 Live TV loaded. Click any channel to play.');
 console.log('🎤 Audio will default to Telugu when available.');
+console.log('🕐 Last played channels are saved locally.');
 </script>
 
 </body>
