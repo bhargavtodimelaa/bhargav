@@ -729,6 +729,42 @@ html,body{
 </style>
 </head>
 <body>
+  <script>
+// Force focus back to page when user clicks outside
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        // User switched tabs - can't do much
+    }
+});
+
+// Try to keep focus on the page
+document.addEventListener('blur', function(e) {
+    // Only if they click on browser UI
+    setTimeout(() => {
+        if (!document.hasFocus()) {
+            // Attempt to refocus
+            document.body.focus();
+        }
+    }, 100);
+});
+
+// Click anywhere to ensure focus
+document.addEventListener('click', function() {
+    document.body.focus();
+});
+
+// Prevent focus from leaving to address bar
+document.addEventListener('focusout', function(e) {
+    // If focus leaves the page
+    if (!document.hasFocus()) {
+        setTimeout(() => document.body.focus(), 50);
+    }
+});
+
+// Make body focusable
+document.body.setAttribute('tabindex', '0');
+document.body.focus();
+</script>
 <script>
 // Disable right click
 document.addEventListener('contextmenu', function(e) {
