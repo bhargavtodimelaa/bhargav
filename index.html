@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
 html,body{
   background: #0a0e17;
@@ -20,26 +20,18 @@ html,body{
   color:#f0f2f5;
   overflow-x:hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-}
-::-webkit-scrollbar-track {
-    background: #0a0e17;
-}
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #3b4bff, #6366f1);
-    border-radius: 10px;
-}
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: #0a0e17; }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #3b4bff, #6366f1); border-radius: 10px; }
 
 /* Header */
 .header {
     background: rgba(10, 14, 23, 0.92);
-    padding: 16px 24px;
-    border-bottom: 1px solid rgba(59, 75, 255, 0.08);
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(59, 75, 255, 0.06);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -48,15 +40,16 @@ html,body{
     top: 0;
     z-index: 10;
     backdrop-filter: blur(25px) saturate(1.2);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-    animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    -webkit-backdrop-filter: blur(25px) saturate(1.2);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes slideDown {
     from { transform: translateY(-100%); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
 .header h1 {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 700;
     background: linear-gradient(135deg, #e0e7ff, #818cf8, #3b4bff, #6366f1);
     background-size: 300% 300%;
@@ -66,7 +59,7 @@ html,body{
     letter-spacing: -0.5px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     animation: gradientShift 4s ease infinite;
 }
 @keyframes gradientShift {
@@ -76,7 +69,7 @@ html,body{
 .header h1::before {
     content: "📡";
     -webkit-text-fill-color: initial;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     animation: pulse 2s ease-in-out infinite;
 }
 @keyframes pulse {
@@ -84,54 +77,57 @@ html,body{
     50% { transform: scale(1.08); }
 }
 .header .channel-counter {
-    background: rgba(59, 75, 255, 0.1);
-    padding: 5px 18px;
+    background: rgba(59, 75, 255, 0.08);
+    padding: 4px 16px;
     border-radius: 40px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #b9c2d4;
-    border: 1px solid rgba(59, 75, 255, 0.1);
+    border: 1px solid rgba(59, 75, 255, 0.08);
     backdrop-filter: blur(4px);
     font-weight: 500;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
 }
 .header .channel-counter:hover {
-    background: rgba(59, 75, 255, 0.2);
-    transform: scale(1.05);
+    background: rgba(59, 75, 255, 0.15);
+    transform: scale(1.03);
 }
 
 /* Filter Bar */
 .filter-bar {
     background: rgba(17, 23, 31, 0.85);
     backdrop-filter: blur(20px) saturate(1.2);
-    padding: 14px 24px;
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    padding: 12px 20px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px 16px;
-    border-bottom: 1px solid rgba(38, 46, 59, 0.2);
+    gap: 8px 14px;
+    border-bottom: 1px solid rgba(38, 46, 59, 0.15);
     position: sticky;
-    top: 68px;
+    top: 64px;
     z-index: 9;
-    animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+    animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
 }
 .filter-bar input {
-    flex: 1 1 200px;
-    background: rgba(30, 38, 50, 0.4);
-    border: 1px solid rgba(47, 56, 73, 0.3);
+    flex: 1 1 180px;
+    background: rgba(30, 38, 50, 0.35);
+    border: 1px solid rgba(47, 56, 73, 0.25);
     color: #f0f2f5;
-    padding: 9px 20px;
+    padding: 8px 18px;
     border-radius: 30px;
     outline: none;
-    font-size: 0.9rem;
-    min-width: 140px;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 0.85rem;
+    min-width: 120px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 .filter-bar input:focus {
     border-color: #3b4bff;
-    box-shadow: 0 0 30px rgba(59, 75, 255, 0.1);
-    background: rgba(30, 38, 50, 0.7);
-    transform: scale(1.02);
+    box-shadow: 0 0 30px rgba(59, 75, 255, 0.08);
+    background: rgba(30, 38, 50, 0.6);
+    transform: scale(1.01);
 }
 .filter-bar input::placeholder {
     color: #7a869c;
@@ -139,18 +135,18 @@ html,body{
 .filter-bar .category-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    gap: 4px;
 }
 .filter-bar .category-btn {
-    background: rgba(30, 38, 50, 0.3);
-    border: 1px solid rgba(47, 56, 73, 0.2);
+    background: rgba(30, 38, 50, 0.25);
+    border: 1px solid rgba(47, 56, 73, 0.15);
     color: #c8d0e0;
-    padding: 5px 18px;
+    padding: 4px 16px;
     border-radius: 30px;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
     backdrop-filter: blur(4px);
     letter-spacing: 0.3px;
@@ -160,100 +156,100 @@ html,body{
     background: linear-gradient(135deg, #3b4bff, #6366f1);
     border-color: #3b4bff;
     color: white;
-    box-shadow: 0 4px 20px rgba(59, 75, 255, 0.3);
-    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(59, 75, 255, 0.25);
+    transform: scale(1.04);
 }
 .filter-bar .category-btn:hover:not(.active) {
-    background: rgba(47, 56, 73, 0.5);
+    background: rgba(47, 56, 73, 0.4);
     transform: translateY(-1px);
 }
 
-/* Grid Container */
+/* Grid */
 .grid-container {
-    padding: 20px 20px 40px;
+    padding: 16px 16px 30px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
     max-width: 1440px;
     margin: 0 auto;
     width: 100%;
-    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
 }
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 /* Channel Card */
 .channel-card {
-    background: linear-gradient(145deg, rgba(21, 29, 40, 0.85), rgba(17, 23, 31, 0.85));
-    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(21, 29, 40, 0.8), rgba(17, 23, 31, 0.8));
+    border-radius: 16px;
     overflow: hidden;
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    border: 1px solid rgba(38, 48, 62, 0.3);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(38, 48, 62, 0.2);
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 16px 10px 14px;
+    padding: 14px 8px 12px;
     position: relative;
-    animation: cardFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(var(--index, 0) * 0.04s);
-    transform-origin: center;
+    animation: cardFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--index, 0) * 0.03s);
+    will-change: transform;
 }
 @keyframes cardFadeIn {
-    from { opacity: 0; transform: scale(0.92) translateY(15px); }
+    from { opacity: 0; transform: scale(0.94) translateY(12px); }
     to { opacity: 1; transform: scale(1) translateY(0); }
 }
 .channel-card::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(59, 75, 255, 0.06), transparent);
+    background: linear-gradient(135deg, rgba(59, 75, 255, 0.05), transparent);
     opacity: 0;
-    transition: opacity 0.5s ease;
-    border-radius: 18px;
+    transition: opacity 0.4s ease;
+    border-radius: 16px;
 }
 .channel-card:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    border-color: rgba(59, 75, 255, 0.25);
+    transform: translateY(-4px) scale(1.015);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+    border-color: rgba(59, 75, 255, 0.2);
 }
 .channel-card:hover::before {
     opacity: 1;
 }
 .channel-card .logo-wrapper {
-    width: 80px;
-    height: 80px;
-    background: rgba(14, 20, 30, 0.5);
+    width: 72px;
+    height: 72px;
+    background: rgba(14, 20, 30, 0.4);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     overflow: hidden;
-    border: 2px solid rgba(46, 58, 78, 0.3);
+    border: 2px solid rgba(46, 58, 78, 0.2);
     flex-shrink: 0;
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     z-index: 1;
 }
 .channel-card:hover .logo-wrapper {
     border-color: #3b4bff;
-    transform: scale(1.08);
-    box-shadow: 0 0 30px rgba(59, 75, 255, 0.15);
+    transform: scale(1.06);
+    box-shadow: 0 0 25px rgba(59, 75, 255, 0.1);
 }
 .channel-card img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    padding: 6px;
+    padding: 5px;
     position: relative;
     z-index: 1;
 }
 .channel-card .channel-name {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     line-height: 1.3;
     color: #e8edf5;
@@ -262,16 +258,16 @@ html,body{
     -webkit-box-orient: vertical;
     overflow: hidden;
     word-break: break-word;
-    max-height: 2.6em;
+    max-height: 2.4em;
     position: relative;
     z-index: 1;
 }
 .channel-card .channel-category {
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     color: #8895b0;
-    margin-top: 5px;
-    background: rgba(31, 42, 56, 0.5);
-    padding: 2px 12px;
+    margin-top: 4px;
+    background: rgba(31, 42, 56, 0.4);
+    padding: 2px 10px;
     border-radius: 30px;
     display: inline-block;
     font-weight: 500;
@@ -279,33 +275,33 @@ html,body{
     text-transform: uppercase;
     position: relative;
     z-index: 1;
-    border: 1px solid rgba(47, 56, 73, 0.15);
+    border: 1px solid rgba(47, 56, 73, 0.1);
 }
 
 /* Empty State */
 .empty-box {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 60px 20px;
+    padding: 50px 20px;
     color: #6d7b96;
-    font-size: 1.1rem;
-    background: rgba(17, 23, 31, 0.3);
-    border-radius: 20px;
-    border: 1px dashed rgba(47, 56, 73, 0.2);
+    font-size: 1rem;
+    background: rgba(17, 23, 31, 0.25);
+    border-radius: 18px;
+    border: 1px dashed rgba(47, 56, 73, 0.15);
 }
 .empty-box::before {
     content: "📺";
     display: block;
-    font-size: 3.5rem;
-    margin-bottom: 15px;
+    font-size: 3rem;
+    margin-bottom: 12px;
     animation: float 3s ease-in-out infinite;
 }
 @keyframes float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+    50% { transform: translateY(-6px); }
 }
 
-/* Player Overlay - iOS Style */
+/* Player Overlay */
 .player-overlay {
     display: none;
     position: fixed;
@@ -335,38 +331,74 @@ html,body{
     background: #000;
 }
 
-/* iOS Style Back Button */
-.back-btn {
+/* iOS Style Buttons */
+.back-btn, .close-btn {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.5);
     backdrop-filter: blur(20px) saturate(1.5);
-    border: 1px solid rgba(255,255,255,0.08);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border: 1px solid rgba(255,255,255,0.06);
     color: white;
-    padding: 10px 18px 10px 14px;
-    border-radius: 30px;
     cursor: pointer;
     z-index: 1001;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+.back-btn {
+    top: 18px;
+    left: 18px;
+    padding: 8px 16px 8px 12px;
+    border-radius: 30px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.9rem;
+    gap: 6px;
+    font-size: 0.85rem;
     font-weight: 500;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-    animation: backBtnFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+    animation: backBtnFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
 }
 @keyframes backBtnFade {
-    from { opacity: 0; transform: translateX(-20px) scale(0.9); }
+    from { opacity: 0; transform: translateX(-15px) scale(0.9); }
     to { opacity: 1; transform: translateX(0) scale(1); }
 }
 .back-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: scale(1.05);
-    border-color: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.12);
+    transform: scale(1.04);
 }
 .back-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: white;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.back-btn span {
+    letter-spacing: 0.2px;
+}
+
+.close-btn {
+    top: 18px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: closeBtnFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+@keyframes closeBtnFade {
+    from { opacity: 0; transform: scale(0.7) rotate(-90deg); }
+    to { opacity: 1; transform: scale(1) rotate(0); }
+}
+.close-btn:hover {
+    background: #ff3b3b;
+    transform: scale(1.08) rotate(90deg);
+    border-color: #ff3b3b;
+    box-shadow: 0 0 25px rgba(255, 59, 59, 0.15);
+}
+.close-btn svg {
     width: 18px;
     height: 18px;
     fill: none;
@@ -375,92 +407,49 @@ html,body{
     stroke-linecap: round;
     stroke-linejoin: round;
 }
-.back-btn span {
-    letter-spacing: 0.3px;
-}
 
-/* Close Button - iOS Style */
-.close-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(20px) saturate(1.5);
-    border: 1px solid rgba(255,255,255,0.08);
-    color: white;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 1001;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-    animation: closeBtnFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
-}
-@keyframes closeBtnFade {
-    from { opacity: 0; transform: scale(0.8) rotate(-90deg); }
-    to { opacity: 1; transform: scale(1) rotate(0); }
-}
-.close-btn:hover {
-    background: #ff3b3b;
-    transform: scale(1.1) rotate(90deg);
-    border-color: #ff3b3b;
-    box-shadow: 0 0 30px rgba(255, 59, 59, 0.2);
-}
-.close-btn svg {
-    width: 20px;
-    height: 20px;
-    fill: none;
-    stroke: white;
-    stroke-width: 2.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-/* Player Info - iOS Style */
+/* Player Info */
 .player-info {
     position: absolute;
-    bottom: 90px;
+    bottom: 80px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.65);
     backdrop-filter: blur(20px) saturate(1.5);
-    padding: 8px 24px 8px 16px;
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    padding: 6px 20px 6px 14px;
     border-radius: 50px;
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.05);
     color: #eef2f8;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
     pointer-events: none;
     display: flex;
     align-items: center;
-    gap: 12px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+    gap: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
     white-space: nowrap;
 }
 @keyframes slideUpFade {
-    from { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.95); }
+    from { opacity: 0; transform: translateX(-50%) translateY(15px) scale(0.95); }
     to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 }
 .player-info img {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    background: rgba(30, 38, 50, 0.8);
+    background: rgba(30, 38, 50, 0.6);
     padding: 3px;
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.05);
 }
 .player-info .channel-name-text {
-    max-width: 200px;
+    max-width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Ripple Effect */
+/* Ripple */
 .ripple-container {
     position: fixed;
     pointer-events: none;
@@ -469,69 +458,70 @@ html,body{
 .ripple {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(59, 75, 255, 0.3), rgba(99, 102, 241, 0.15), transparent);
+    background: radial-gradient(circle, rgba(59, 75, 255, 0.25), rgba(99, 102, 241, 0.1), transparent);
     transform: scale(0);
-    animation: rippleExpand 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: rippleExpand 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 @keyframes rippleExpand {
     0% { transform: scale(0); opacity: 1; }
     100% { transform: scale(25); opacity: 0; }
 }
 
-/* Expand/Shrink Animation */
-.video-expand {
+/* Expand/Shrink */
+.video-expand, .video-shrink {
     position: fixed;
     pointer-events: none;
     z-index: 999;
-    border-radius: 18px;
     overflow: hidden;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, width, height, top, left;
+}
+.video-expand {
+    border-radius: 16px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .video-shrink {
-    position: fixed;
-    pointer-events: none;
-    z-index: 999;
     border-radius: 0;
-    overflow: hidden;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .header { padding: 12px 16px; }
+    .header { padding: 10px 14px; }
     .header h1 { font-size: 1.1rem; }
-    .header h1::before { font-size: 1.2rem; }
-    .filter-bar { padding: 10px 16px; top: 60px; }
-    .filter-bar input { min-width: 100px; font-size: 0.85rem; padding: 8px 16px; }
-    .grid-container { grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 12px; padding: 14px 12px 30px; }
-    .channel-card .logo-wrapper { width: 65px; height: 65px; }
-    .channel-card { padding: 12px 8px 10px; }
-    .channel-card .channel-name { font-size: 0.75rem; }
-    .player-info { bottom: 60px; font-size: 0.8rem; padding: 6px 16px 6px 12px; }
-    .player-info img { width: 24px; height: 24px; }
-    .back-btn { top: 14px; left: 14px; padding: 8px 14px 8px 10px; font-size: 0.8rem; }
-    .close-btn { top: 14px; right: 14px; width: 38px; height: 38px; }
-    .close-btn svg { width: 17px; height: 17px; }
-    .filter-bar .category-btn { font-size: 0.6rem; padding: 4px 12px; }
-    .player-info .channel-name-text { max-width: 120px; }
+    .header h1::before { font-size: 1.1rem; }
+    .filter-bar { padding: 8px 14px; top: 56px; }
+    .filter-bar input { min-width: 80px; font-size: 0.8rem; padding: 7px 14px; }
+    .grid-container { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; padding: 12px 10px 24px; }
+    .channel-card .logo-wrapper { width: 60px; height: 60px; }
+    .channel-card { padding: 10px 6px 10px; }
+    .channel-card .channel-name { font-size: 0.7rem; }
+    .player-info { bottom: 50px; font-size: 0.75rem; padding: 5px 14px 5px 10px; }
+    .player-info img { width: 22px; height: 22px; }
+    .back-btn { top: 12px; left: 12px; padding: 6px 12px 6px 8px; font-size: 0.75rem; }
+    .back-btn svg { width: 14px; height: 14px; }
+    .close-btn { top: 12px; right: 12px; width: 34px; height: 34px; }
+    .close-btn svg { width: 16px; height: 16px; }
+    .filter-bar .category-btn { font-size: 0.55rem; padding: 3px 10px; }
+    .player-info .channel-name-text { max-width: 100px; }
+    .header .channel-counter { font-size: 0.65rem; padding: 3px 12px; }
 }
 
 @media (max-width: 480px) {
-    .grid-container { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 8px; }
-    .channel-card .logo-wrapper { width: 55px; height: 55px; }
-    .channel-card .channel-name { font-size: 0.65rem; }
-    .channel-card .channel-category { font-size: 0.5rem; padding: 2px 8px; }
-    .header h1 { font-size: 0.95rem; }
-    .header .channel-counter { font-size: 0.65rem; padding: 3px 12px; }
-    .player-info { bottom: 50px; font-size: 0.7rem; padding: 5px 12px 5px 10px; }
-    .player-info img { width: 20px; height: 20px; }
-    .back-btn { top: 12px; left: 12px; padding: 6px 12px 6px 8px; font-size: 0.7rem; }
-    .back-btn svg { width: 14px; height: 14px; }
-    .close-btn { top: 12px; right: 12px; width: 34px; height: 34px; }
-    .close-btn svg { width: 15px; height: 15px; }
-    .player-info .channel-name-text { max-width: 80px; }
+    .grid-container { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+    .channel-card .logo-wrapper { width: 50px; height: 50px; }
+    .channel-card .channel-name { font-size: 0.6rem; }
+    .channel-card .channel-category { font-size: 0.5rem; padding: 1px 8px; }
+    .header h1 { font-size: 0.9rem; }
+    .player-info { bottom: 40px; font-size: 0.65rem; padding: 4px 10px 4px 8px; }
+    .player-info img { width: 18px; height: 18px; }
+    .back-btn { top: 10px; left: 10px; padding: 4px 10px 4px 6px; font-size: 0.65rem; }
+    .back-btn svg { width: 12px; height: 12px; }
+    .close-btn { top: 10px; right: 10px; width: 30px; height: 30px; }
+    .close-btn svg { width: 14px; height: 14px; }
+    .filter-bar .category-btn { font-size: 0.5rem; padding: 2px 8px; }
+    .player-info .channel-name-text { max-width: 60px; }
 }
 </style>
 </head>
@@ -550,22 +540,13 @@ html,body{
 <div class="grid-container" id="channelGrid"></div>
 
 <div class="player-overlay" id="playerOverlay">
-    <!-- iOS Style Back Button -->
     <button class="back-btn" id="backBtn">
-        <svg viewBox="0 0 24 24">
-            <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
         <span>Back</span>
     </button>
-    
-    <!-- iOS Style Close Button -->
     <button class="close-btn" id="closePlayer">
-        <svg viewBox="0 0 24 24">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
     </button>
-    
     <div id="player-container">
         <video id="video" controls playsinline autoplay></video>
     </div>
@@ -576,7 +557,7 @@ html,body{
 </div>
 
 <script>
-// ─── GLOBALS ──────────────────────────────────────────────
+// ─── GLOBALS ──────────────────────────────────────────
 let allChannels = [];
 let filteredChannels = [];
 let currentCategory = 'All';
@@ -603,7 +584,7 @@ let shakaPlayer = null;
 let currentChannel = null;
 let currentCardRect = null;
 
-// ─── RIPPLE EFFECT ──────────────────────────────────────
+// ─── RIPPLE EFFECT ────────────────────────────────────
 function createRipple(x, y) {
     const container = document.createElement('div');
     container.className = 'ripple-container';
@@ -611,15 +592,15 @@ function createRipple(x, y) {
     
     const ripple = document.createElement('div');
     ripple.className = 'ripple';
-    const size = Math.min(window.innerWidth, window.innerHeight) * 0.25;
+    const size = Math.min(window.innerWidth, window.innerHeight) * 0.2;
     ripple.style.cssText = `width:${size}px;height:${size}px;left:${x - size/2}px;top:${y - size/2}px`;
     
     container.appendChild(ripple);
     document.body.appendChild(container);
-    setTimeout(() => container.remove(), 800);
+    setTimeout(() => container.remove(), 700);
 }
 
-// ─── EXPAND ANIMATION ────────────────────────────────────
+// ─── EXPAND ANIMATION ────────────────────────────────
 function createExpandAnimation(card) {
     const rect = card.getBoundingClientRect();
     currentCardRect = rect;
@@ -639,7 +620,6 @@ function createExpandAnimation(card) {
         padding:20px;
     `;
     
-    // Clone card content
     const clone = card.cloneNode(true);
     clone.style.cssText = `
         width:100%;
@@ -653,19 +633,15 @@ function createExpandAnimation(card) {
         box-shadow:none;
     `;
     const wrapper = clone.querySelector('.logo-wrapper');
-    if (wrapper) {
-        wrapper.style.width = '120px';
-        wrapper.style.height = '120px';
-    }
+    if (wrapper) { wrapper.style.width = '100px'; wrapper.style.height = '100px'; }
     const name = clone.querySelector('.channel-name');
-    if (name) name.style.fontSize = '1.3rem';
+    if (name) name.style.fontSize = '1.2rem';
     const cat = clone.querySelector('.channel-category');
-    if (cat) cat.style.fontSize = '0.8rem';
+    if (cat) cat.style.fontSize = '0.7rem';
     
     expandElement.appendChild(clone);
     document.body.appendChild(expandElement);
     
-    // Animate to full screen
     requestAnimationFrame(() => {
         expandElement.style.width = '100%';
         expandElement.style.height = '100%';
@@ -680,10 +656,10 @@ function createExpandAnimation(card) {
             expandElement = null;
         }
         playerOverlay.classList.add('active');
-    }, 600);
+    }, 500);
 }
 
-// ─── SHRINK ANIMATION (iOS Style) ──────────────────────
+// ─── SHRINK ANIMATION ────────────────────────────────
 function createShrinkAnimation(callback) {
     if (!currentCardRect) {
         if (callback) callback();
@@ -705,7 +681,6 @@ function createShrinkAnimation(callback) {
         z-index:1000;
     `;
     
-    // Create a mini video snapshot effect
     const snapshot = document.createElement('div');
     snapshot.style.cssText = `
         width:100%;
@@ -720,36 +695,33 @@ function createShrinkAnimation(callback) {
     const logo = currentChannel?.logo || '';
     const name = currentChannel?.name || 'Channel';
     snapshot.innerHTML = `
-        <img src="${logo}" style="width:80px;height:80px;border-radius:50%;object-fit:contain;background:#1e2632;padding:10px;margin-bottom:15px;" />
-        <div style="color:#e8edf5;font-size:1.1rem;font-weight:600;">${name}</div>
+        <img src="${logo}" style="width:70px;height:70px;border-radius:50%;object-fit:contain;background:#1e2632;padding:8px;margin-bottom:12px;" />
+        <div style="color:#e8edf5;font-size:1rem;font-weight:600;">${name}</div>
     `;
     
     shrinkEl.appendChild(snapshot);
     document.body.appendChild(shrinkEl);
     
-    // Animate to card position
     requestAnimationFrame(() => {
-        shrinkEl.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+        shrinkEl.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
         shrinkEl.style.width = rect.width + 'px';
         shrinkEl.style.height = rect.height + 'px';
         shrinkEl.style.left = rect.left + 'px';
         shrinkEl.style.top = rect.top + 'px';
-        shrinkEl.style.borderRadius = '18px';
-        shrinkEl.style.boxShadow = '0 30px 80px rgba(0,0,0,0.7)';
+        shrinkEl.style.borderRadius = '16px';
+        shrinkEl.style.boxShadow = '0 30px 80px rgba(0,0,0,0.6)';
         shrinkEl.style.overflow = 'hidden';
         snapshot.style.transform = 'scale(0.7)';
-        snapshot.style.opacity = '0.6';
+        snapshot.style.opacity = '0.5';
     });
     
     setTimeout(() => {
-        if (shrinkEl) {
-            shrinkEl.remove();
-        }
+        if (shrinkEl) shrinkEl.remove();
         if (callback) callback();
-    }, 550);
+    }, 450);
 }
 
-// ─── FETCH COOKIE ──────────────────────────────────────
+// ─── FETCH COOKIE ────────────────────────────────────
 async function fetchCookie() {
     if (cachedCookie) return cachedCookie;
     try {
@@ -762,12 +734,12 @@ async function fetchCookie() {
         }
         return null;
     } catch (e) {
-        console.warn('Failed to fetch cookie:', e);
+        console.warn('Cookie fetch failed:', e);
         return null;
     }
 }
 
-// ─── FETCH CHANNELS ──────────────────────────────────────
+// ─── FETCH CHANNELS ──────────────────────────────────
 async function fetchChannels() {
     try {
         const res = await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/channels', {
@@ -776,6 +748,7 @@ async function fetchChannels() {
         const data = await res.json();
         allChannels = Array.isArray(data) ? data : (data.channels || []);
         allChannels = allChannels.filter(c => c && typeof c === 'object' && c.name);
+        
         extractCategories();
         applyFilters();
         updateCounter();
@@ -785,7 +758,7 @@ async function fetchChannels() {
     }
 }
 
-// ─── CATEGORIES ──────────────────────────────────────────
+// ─── CATEGORIES ──────────────────────────────────────
 function extractCategories() {
     const cats = new Set();
     cats.add('All');
@@ -807,7 +780,7 @@ function extractCategories() {
     });
 }
 
-// ─── FILTER & RENDER ─────────────────────────────────────
+// ─── FILTER & RENDER ─────────────────────────────────
 function applyFilters() {
     const term = searchTerm.toLowerCase().trim();
     filteredChannels = allChannels.filter(ch => {
@@ -852,27 +825,29 @@ function renderGrid() {
             const raw = card.dataset.channel;
             try {
                 const ch = JSON.parse(raw);
-                setTimeout(() => playChannel(ch), 500);
+                setTimeout(() => playChannel(ch), 450);
             } catch(e) {
                 const id = card.dataset.id;
                 const found = allChannels.find(c => String(c.id) === String(id));
-                if (found) setTimeout(() => playChannel(found), 500);
+                if (found) setTimeout(() => playChannel(found), 450);
             }
         });
     });
 }
 
 function updateCounter() {
-    channelCounter.textContent = `${filteredChannels.length} / ${allChannels.length} channels`;
+    const total = allChannels.length;
+    const filtered = filteredChannels.length;
+    channelCounter.textContent = `${filtered} / ${total} channels`;
 }
 
-// ─── SEARCH ──────────────────────────────────────────────
+// ─── SEARCH ──────────────────────────────────────────
 searchInput.addEventListener('input', (e) => {
     searchTerm = e.target.value;
     applyFilters();
 });
 
-// ─── PLAY CHANNEL ────────────────────────────────────────
+// ─── PLAY CHANNEL ────────────────────────────────────
 async function playChannel(channel) {
     if (!channel || isClosing) return;
     currentChannel = channel;
@@ -882,7 +857,7 @@ async function playChannel(channel) {
     if (!shakaPlayer) {
         shaka.polyfill.installAll();
         if (!shaka.Player.isBrowserSupported()) {
-            alert('Browser not supported for Shaka Player.');
+            alert('Your browser does not support Shaka Player.');
             return;
         }
         shakaPlayer = new shaka.Player(videoEl);
@@ -890,6 +865,15 @@ async function playChannel(channel) {
             new shaka.ui.Overlay(shakaPlayer, playerContainer, videoEl);
         } catch(e) { /* ignore */ }
     }
+
+    // ─── SET PREFERRED AUDIO LANGUAGE TO TELUGU ──────
+    // This tells Shaka to prefer Telugu audio tracks
+    shakaPlayer.configure({
+        preferredAudioLanguage: 'te',
+        preferredTextLanguage: 'en',
+        drm: {},
+        streaming: { lowLatencyMode: true }
+    });
 
     const keyId = channel.keyId && channel.keyId !== 'null' ? channel.keyId : null;
     const key = channel.key && channel.key !== 'null' ? channel.key : null;
@@ -928,6 +912,29 @@ async function playChannel(channel) {
     for (let i = 0; i < streamUrls.length; i++) {
         try {
             await shakaPlayer.load(streamUrls[i]);
+            
+            // ─── FORCE TELUGU AUDIO IF AVAILABLE ──────
+            // After loading, try to select Telugu audio track
+            try {
+                const tracks = shakaPlayer.getAudioTracks();
+                if (tracks && tracks.length > 0) {
+                    // Find Telugu track
+                    let teluguTrack = tracks.find(t => t.language === 'te');
+                    // If no Telugu, try to find any Indian language
+                    if (!teluguTrack) {
+                        teluguTrack = tracks.find(t => ['hi', 'ta', 'ml', 'kn', 'mr', 'bn', 'te'].includes(t.language));
+                    }
+                    if (teluguTrack) {
+                        shakaPlayer.selectAudioTrack(teluguTrack);
+                        console.log('🎤 Selected audio track:', teluguTrack.language, teluguTrack.label || '');
+                    } else {
+                        console.log('🎤 No Telugu/Indian audio track found, using default');
+                    }
+                }
+            } catch (audioError) {
+                console.warn('Audio track selection failed:', audioError);
+            }
+            
             await videoEl.play();
             loaded = true;
             console.log('✅ Playing:', channel.name);
@@ -943,22 +950,19 @@ async function playChannel(channel) {
     }
 }
 
-// ─── CLOSE PLAYER (iOS Style) ──────────────────────────
+// ─── CLOSE PLAYER ────────────────────────────────────
 function closePlayer() {
     if (isClosing) return;
     isClosing = true;
     
-    // Stop playback
     if (shakaPlayer) {
         shakaPlayer.unload().catch(() => {});
     }
     videoEl.pause();
     videoEl.src = '';
     
-    // Remove overlay
     playerOverlay.classList.remove('active');
     
-    // Create shrink animation
     createShrinkAnimation(() => {
         isClosing = false;
         currentChannel = null;
@@ -967,7 +971,7 @@ function closePlayer() {
     });
 }
 
-// ─── EVENT LISTENERS ────────────────────────────────────
+// ─── EVENT LISTENERS ────────────────────────────────
 closePlayerBtn.addEventListener('click', closePlayer);
 backBtn.addEventListener('click', closePlayer);
 
@@ -979,9 +983,16 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closePlayer();
 });
 
-// ─── INIT ────────────────────────────────────────────────
-fetchChannels();
+// ─── INIT ────────────────────────────────────────────
+// Ensure channels load on first visit
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fetchChannels);
+} else {
+    fetchChannels();
+}
+
 console.log('🚀 Live TV loaded. Click any channel to play.');
+console.log('🎤 Audio will default to Telugu when available.');
 </script>
 
 </body>
