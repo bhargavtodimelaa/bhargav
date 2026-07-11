@@ -785,6 +785,8 @@ let filteredChannels = [];
 let currentCategory = 'All';
 let searchTerm = '';
 let cachedCookie = null;
+let cookieTimestamp = 0;
+const COOKIE_MAX_AGE = 5 * 60 * 1000; // 5 minutes
 let activeCookie = null;
 let expandElement = null;
 let isClosing = false;
@@ -794,6 +796,8 @@ let currentCardRect = null;
 let errorChannel = null;
 let isErrorShowing = false;
 let lastPlayedChannels = [];
+let isPlaying = false;
+let playTimeout = null;
 
 // ─── LOCAL STORAGE ────────────────────────────────────
 const STORAGE_KEY = 'liveTV_lastPlayed';
@@ -803,7 +807,6 @@ function loadLastPlayed() {
         const data = localStorage.getItem(STORAGE_KEY);
         if (data) {
             lastPlayedChannels = JSON.parse(data);
-            // Filter out any invalid entries
             lastPlayedChannels = lastPlayedChannels.filter(ch => ch && ch.id && ch.name);
             return lastPlayedChannels;
         }
@@ -816,11 +819,8 @@ function loadLastPlayed() {
 function saveLastPlayed(channel) {
     if (!channel || !channel.id) return;
     
-    // Remove duplicate if exists
     lastPlayedChannels = lastPlayedChannels.filter(ch => ch.id !== channel.id);
-    // Add to front
     lastPlayedChannels.unshift(channel);
-    // Keep only last 10
     lastPlayedChannels = lastPlayedChannels.slice(0, 10);
     
     try {
@@ -854,10 +854,9 @@ function renderLastPlayed() {
         </div>
     `).join('');
     
-    // Add click handlers for last played cards
     grid.querySelectorAll('.last-played-card').forEach(card => {
         card.addEventListener('click', (e) => {
-            if (isClosing) return;
+            if (isClosing || isPlaying) return;
             const raw = card.dataset.channel;
             try {
                 const ch = JSON.parse(raw);
@@ -866,7 +865,8 @@ function renderLastPlayed() {
                 const y = e.clientY || rect.top + rect.height/2;
                 
                 createRipple(x, y);
-                // Create a temporary card for animation
+                
+                // Create temporary card for animation
                 const tempCard = document.createElement('div');
                 tempCard.className = 'channel-card';
                 tempCard.style.cssText = `
@@ -928,7 +928,20 @@ function cleanupAnimations() {
         expandElement.remove();
         expandElement = null;
     }
-    document.querySelectorAll('.ripple-container, .video-expand, .video-shrink').forEach(el => el.remove());
+    document.querySelectorAll('.ripple-container, .video-expand, .video-shrink').forEach(el => {
+        if (el.parentNode) el.remove();
+    });
+}
+
+function destroyPlayer() {
+    if (shakaPlayer) {
+        try {
+            shakaPlayer.destroy();
+        } catch(e) {
+            console.warn('Player destroy error:', e);
+        }
+        shakaPlayer = null;
+    }
 }
 
 // ─── RIPPLE EFFECT ────────────────────────────────────
@@ -1086,13 +1099,15 @@ function hideError() {
 errorRetry.addEventListener('click', () => {
     hideError();
     if (errorChannel) {
+        // Clear cookie cache to force fresh fetch
+        cachedCookie = null;
+        cookieTimestamp = 0;
         setTimeout(() => playChannel(errorChannel), 300);
     }
 });
 
 errorClose.addEventListener('click', () => {
     hideError();
-    // Close the player and return to channels
     if (playerOverlay.classList.contains('active')) {
         closePlayer();
     }
@@ -1107,17 +1122,27 @@ errorOverlay.addEventListener('click', (e) => {
     }
 });
 
-// ─── FETCH COOKIE ────────────────────────────────────
+// ─── FETCH COOKIE (FRESH EVERY TIME) ────────────────
 async function fetchCookie() {
-    if (cachedCookie) return cachedCookie;
+    // Always fetch fresh cookie on page reload
+    const now = Date.now();
+    if (cachedCookie && (now - cookieTimestamp) < COOKIE_MAX_AGE) {
+        return cachedCookie;
+    }
+    
     try {
         const res = await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/cookies', {
-            cache: 'force-cache'
+            cache: 'no-cache',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
         });
         const data = await res.json();
         const cookieObj = data.find(item => item.cookie);
         if (cookieObj && cookieObj.cookie) {
             cachedCookie = cookieObj.cookie;
+            cookieTimestamp = now;
             return cachedCookie;
         }
         return null;
@@ -1132,7 +1157,7 @@ async function fetchChannels() {
     try {
         const res = await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/channels', {
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            cache: 'force-cache'
+            cache: 'no-cache'
         });
         const data = await res.json();
         allChannels = Array.isArray(data) ? data : (data.channels || []);
@@ -1207,7 +1232,7 @@ function renderGrid() {
 
     document.querySelectorAll('.channel-card').forEach(card => {
         card.addEventListener('click', (e) => {
-            if (isClosing) return;
+            if (isClosing || isPlaying) return;
             const rect = card.getBoundingClientRect();
             const x = e.clientX || rect.left + rect.width/2;
             const y = e.clientY || rect.top + rect.height/2;
@@ -1218,11 +1243,15 @@ function renderGrid() {
             const raw = card.dataset.channel;
             try {
                 const ch = JSON.parse(raw);
-                setTimeout(() => playChannel(ch), 450);
+                if (playTimeout) clearTimeout(playTimeout);
+                playTimeout = setTimeout(() => playChannel(ch), 450);
             } catch(e) {
                 const id = card.dataset.id;
                 const found = allChannels.find(c => String(c.id) === String(id));
-                if (found) setTimeout(() => playChannel(found), 450);
+                if (found) {
+                    if (playTimeout) clearTimeout(playTimeout);
+                    playTimeout = setTimeout(() => playChannel(found), 450);
+                }
             }
         });
     });
@@ -1243,6 +1272,12 @@ searchInput.addEventListener('input', (e) => {
 // ─── PLAY CHANNEL ────────────────────────────────────
 async function playChannel(channel) {
     if (!channel || isClosing) return;
+    if (isPlaying) {
+        console.warn('Already playing a channel');
+        return;
+    }
+    
+    isPlaying = true;
     currentChannel = channel;
     playerName.textContent = channel.name || 'Channel';
     playerLogo.src = channel.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(channel.name) + '&background=1e2632&color=fff&size=40';
@@ -1250,96 +1285,110 @@ async function playChannel(channel) {
     // Save to last played
     saveLastPlayed(channel);
 
-    if (!shakaPlayer) {
+    // Destroy old player if exists
+    destroyPlayer();
+
+    try {
         shaka.polyfill.installAll();
         if (!shaka.Player.isBrowserSupported()) {
             showError(channel);
+            isPlaying = false;
             return;
         }
+        
         shakaPlayer = new shaka.Player(videoEl);
         try {
             new shaka.ui.Overlay(shakaPlayer, playerContainer, videoEl);
         } catch(e) { /* ignore */ }
-    }
 
-    // Set preferred audio language to Telugu
-    shakaPlayer.configure({
-        preferredAudioLanguage: 'te',
-        preferredTextLanguage: 'en',
-        drm: {},
-        streaming: { 
-            lowLatencyMode: true,
-            rebufferingGoal: 2,
-            bufferBehind: 30
-        }
-    });
-
-    const keyId = channel.keyId && channel.keyId !== 'null' ? channel.keyId : null;
-    const key = channel.key && channel.key !== 'null' ? channel.key : null;
-    
-    if (keyId && key) {
+        // Set preferred audio language to Telugu
         shakaPlayer.configure({
-            drm: { clearKeys: { [keyId]: key } },
-            streaming: { lowLatencyMode: true }
-        });
-    } else {
-        shakaPlayer.configure({
-            drm: { clearKeys: {} },
-            streaming: { lowLatencyMode: true }
-        });
-    }
-
-    const cookie = await fetchCookie();
-    activeCookie = cookie || '';
-
-    if (shakaPlayer.getNetworkingEngine) {
-        const engine = shakaPlayer.getNetworkingEngine();
-        engine.registerRequestFilter((type, request) => {
-            request.headers["Referer"] = "https://www.jiotv.com/";
-            request.headers["User-Agent"] = "plaYtv/7.1.5";
-            if (activeCookie && (type === 0 || type === 1)) {
-                request.uris[0] = request.uris[0].split("?")[0] + "?" + activeCookie;
+            preferredAudioLanguage: 'te',
+            preferredTextLanguage: 'en',
+            drm: {},
+            streaming: { 
+                lowLatencyMode: true,
+                rebufferingGoal: 2,
+                bufferBehind: 30
             }
         });
-    }
 
-    const streamUrls = [channel.url, channel.url1, channel.url2, channel.url3]
-        .filter(Boolean)
-        .map(u => u.replace('bpk-tv//', 'bpk-tv/'));
+        const keyId = channel.keyId && channel.keyId !== 'null' ? channel.keyId : null;
+        const key = channel.key && channel.key !== 'null' ? channel.key : null;
+        
+        if (keyId && key) {
+            shakaPlayer.configure({
+                drm: { clearKeys: { [keyId]: key } },
+                streaming: { lowLatencyMode: true }
+            });
+        } else {
+            shakaPlayer.configure({
+                drm: { clearKeys: {} },
+                streaming: { lowLatencyMode: true }
+            });
+        }
 
-    let loaded = false;
-    for (let i = 0; i < streamUrls.length; i++) {
-        try {
-            await shakaPlayer.load(streamUrls[i]);
-            
-            // Try to select Telugu audio
-            try {
-                const tracks = shakaPlayer.getAudioTracks();
-                if (tracks && tracks.length > 0) {
-                    let teluguTrack = tracks.find(t => t.language === 'te');
-                    if (!teluguTrack) {
-                        teluguTrack = tracks.find(t => ['hi', 'ta', 'ml', 'kn', 'mr', 'bn'].includes(t.language));
-                    }
-                    if (teluguTrack) {
-                        shakaPlayer.selectAudioTrack(teluguTrack);
-                        console.log('🎤 Selected audio:', teluguTrack.language);
-                    }
+        // Fetch fresh cookie
+        const cookie = await fetchCookie();
+        activeCookie = cookie || '';
+
+        if (shakaPlayer.getNetworkingEngine) {
+            const engine = shakaPlayer.getNetworkingEngine();
+            engine.registerRequestFilter((type, request) => {
+                request.headers["Referer"] = "https://www.jiotv.com/";
+                request.headers["User-Agent"] = "plaYtv/7.1.5";
+                if (activeCookie && (type === 0 || type === 1)) {
+                    request.uris[0] = request.uris[0].split("?")[0] + "?" + activeCookie;
                 }
-            } catch (audioError) {
-                console.warn('Audio selection failed:', audioError);
-            }
-            
-            await videoEl.play();
-            loaded = true;
-            console.log('✅ Playing:', channel.name);
-            break;
-        } catch (e) {
-            console.warn('Stream attempt', i+1, 'failed:', e);
+            });
         }
-    }
 
-    if (!loaded) {
+        const streamUrls = [channel.url, channel.url1, channel.url2, channel.url3]
+            .filter(Boolean)
+            .map(u => u.replace('bpk-tv//', 'bpk-tv/'));
+
+        let loaded = false;
+        for (let i = 0; i < streamUrls.length; i++) {
+            try {
+                await shakaPlayer.load(streamUrls[i]);
+                
+                // Try to select Telugu audio after a small delay
+                setTimeout(() => {
+                    try {
+                        const tracks = shakaPlayer.getAudioTracks();
+                        if (tracks && tracks.length > 0) {
+                            let teluguTrack = tracks.find(t => t.language === 'te');
+                            if (!teluguTrack) {
+                                teluguTrack = tracks.find(t => ['hi', 'ta', 'ml', 'kn', 'mr', 'bn'].includes(t.language));
+                            }
+                            if (teluguTrack) {
+                                shakaPlayer.selectAudioTrack(teluguTrack);
+                                console.log('🎤 Selected audio:', teluguTrack.language);
+                            }
+                        }
+                    } catch (audioError) {
+                        console.warn('Audio selection failed:', audioError);
+                    }
+                }, 500);
+                
+                await videoEl.play();
+                loaded = true;
+                console.log('✅ Playing:', channel.name);
+                isPlaying = false;
+                break;
+            } catch (e) {
+                console.warn('Stream attempt', i+1, 'failed:', e);
+            }
+        }
+
+        if (!loaded) {
+            showError(channel);
+            isPlaying = false;
+        }
+    } catch (e) {
+        console.error('Play error:', e);
         showError(channel);
+        isPlaying = false;
     }
 }
 
@@ -1348,10 +1397,14 @@ function closePlayer() {
     if (isClosing) return;
     isClosing = true;
     hideError();
+    isPlaying = false;
     
-    if (shakaPlayer) {
-        shakaPlayer.unload().catch(() => {});
+    if (playTimeout) {
+        clearTimeout(playTimeout);
+        playTimeout = null;
     }
+    
+    destroyPlayer();
     videoEl.pause();
     videoEl.src = '';
     
@@ -1385,13 +1438,20 @@ document.addEventListener('keydown', (e) => {
             closePlayer();
         }
     }
+    // Space for play/pause
+    if (e.key === ' ' && playerOverlay.classList.contains('active')) {
+        e.preventDefault();
+        if (videoEl.paused) {
+            videoEl.play().catch(() => {});
+        } else {
+            videoEl.pause();
+        }
+    }
 });
 
 // Handle memory cleanup on page unload
 window.addEventListener('beforeunload', () => {
-    if (shakaPlayer) {
-        shakaPlayer.destroy().catch(() => {});
-    }
+    destroyPlayer();
     cleanupAnimations();
 });
 
@@ -1408,6 +1468,7 @@ if (document.readyState === 'loading') {
 console.log('🚀 Live TV loaded. Click any channel to play.');
 console.log('🎤 Audio will default to Telugu when available.');
 console.log('🕐 Last played channels are saved locally.');
+console.log('🍪 Cookie is fetched fresh on every page reload.');
 </script>
 
 </body>
