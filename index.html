@@ -729,7 +729,46 @@ html,body{
 </style>
 </head>
 <body>
+<script>
+// Disable right click
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
 
+// Disable keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // F12
+    if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Ctrl+U (view source)
+    if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Ctrl+S (save page)
+    if (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Ctrl+Shift+P (command palette)
+    if (e.ctrlKey && e.shiftKey && (e.key === 'P' || e.keyCode === 80)) {
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
 <header class="header">
     <h1>Live TV</h1>
     <span class="channel-counter" id="channelCounter">0 channels</span>
