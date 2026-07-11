@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="referrer" content="no-referrer">
+<title>Live TV Player</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+html,body{
+  background: #0a0e17;
+  width:100%;
+  min-height:100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  color:#f0f2f5;
+  overflow-x:hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+::-webkit-scrollbar-track {
+    background: #0a0e17;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #3b4bff, #6366f1);
+    border-radius: 10px;
+}
+
+/* Header */
+.header {
+    background: rgba(10, 14, 23, 0.92);
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(59, 75, 255, 0.08);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(25px) saturate(1.2);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+    animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.header h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #e0e7ff, #818cf8, #3b4bff, #6366f1);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: gradientShift 4s ease infinite;
+}
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+.header h1::before {
+    content: "📡";
+    -webkit-text-fill-color: initial;
+    font-size: 1.4rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+.header .channel-counter {
+    background: rgba(59, 75, 255, 0.1);
+    padding: 5px 18px;
+    border-radius: 40px;
+    font-size: 0.8rem;
+    color: #b9c2d4;
+    border: 1px solid rgba(59, 75, 255, 0.1);
+    backdrop-filter: blur(4px);
+    font-weight: 500;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.header .channel-counter:hover {
+    background: rgba(59, 75, 255, 0.2);
+    transform: scale(1.05);
+}
+
+/* Filter Bar */
+.filter-bar {
+    background: rgba(17, 23, 31, 0.85);
+    backdrop-filter: blur(20px) saturate(1.2);
+    padding: 14px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    border-bottom: 1px solid rgba(38, 46, 59, 0.2);
+    position: sticky;
+    top: 68px;
+    z-index: 9;
+    animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+.filter-bar input {
+    flex: 1 1 200px;
+    background: rgba(30, 38, 50, 0.4);
+    border: 1px solid rgba(47, 56, 73, 0.3);
+    color: #f0f2f5;
+    padding: 9px 20px;
+    border-radius: 30px;
+    outline: none;
+    font-size: 0.9rem;
+    min-width: 140px;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(4px);
+}
+.filter-bar input:focus {
+    border-color: #3b4bff;
+    box-shadow: 0 0 30px rgba(59, 75, 255, 0.1);
+    background: rgba(30, 38, 50, 0.7);
+    transform: scale(1.02);
+}
+.filter-bar input::placeholder {
+    color: #7a869c;
+}
+.filter-bar .category-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.filter-bar .category-btn {
+    background: rgba(30, 38, 50, 0.3);
+    border: 1px solid rgba(47, 56, 73, 0.2);
+    color: #c8d0e0;
+    padding: 5px 18px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+.filter-bar .category-btn.active {
+    background: linear-gradient(135deg, #3b4bff, #6366f1);
+    border-color: #3b4bff;
+    color: white;
+    box-shadow: 0 4px 20px rgba(59, 75, 255, 0.3);
+    transform: scale(1.05);
+}
+.filter-bar .category-btn:hover:not(.active) {
+    background: rgba(47, 56, 73, 0.5);
+    transform: translateY(-1px);
+}
+
+/* Grid Container */
+.grid-container {
+    padding: 20px 20px 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 18px;
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Channel Card */
+.channel-card {
+    background: linear-gradient(145deg, rgba(21, 29, 40, 0.85), rgba(17, 23, 31, 0.85));
+    border-radius: 18px;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(38, 48, 62, 0.3);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 16px 10px 14px;
+    position: relative;
+    animation: cardFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--index, 0) * 0.04s);
+    transform-origin: center;
+}
+@keyframes cardFadeIn {
+    from { opacity: 0; transform: scale(0.92) translateY(15px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.channel-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(59, 75, 255, 0.06), transparent);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    border-radius: 18px;
+}
+.channel-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    border-color: rgba(59, 75, 255, 0.25);
+}
+.channel-card:hover::before {
+    opacity: 1;
+}
+.channel-card .logo-wrapper {
+    width: 80px;
+    height: 80px;
+    background: rgba(14, 20, 30, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    overflow: hidden;
+    border: 2px solid rgba(46, 58, 78, 0.3);
+    flex-shrink: 0;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    z-index: 1;
+}
+.channel-card:hover .logo-wrapper {
+    border-color: #3b4bff;
+    transform: scale(1.08);
+    box-shadow: 0 0 30px rgba(59, 75, 255, 0.15);
+}
+.channel-card img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    padding: 6px;
+    position: relative;
+    z-index: 1;
+}
+.channel-card .channel-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #e8edf5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    max-height: 2.6em;
+    position: relative;
+    z-index: 1;
+}
+.channel-card .channel-category {
+    font-size: 0.6rem;
+    color: #8895b0;
+    margin-top: 5px;
+    background: rgba(31, 42, 56, 0.5);
+    padding: 2px 12px;
+    border-radius: 30px;
+    display: inline-block;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+    border: 1px solid rgba(47, 56, 73, 0.15);
+}
+
+/* Empty State */
+.empty-box {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #6d7b96;
+    font-size: 1.1rem;
+    background: rgba(17, 23, 31, 0.3);
+    border-radius: 20px;
+    border: 1px dashed rgba(47, 56, 73, 0.2);
+}
+.empty-box::before {
+    content: "📺";
+    display: block;
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* Player Overlay - iOS Style */
+.player-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 1000;
+    flex-direction: column;
+}
+.player-overlay.active {
+    display: flex;
+}
+#player-container {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#video {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    background: #000;
+}
+
+/* iOS Style Back Button */
+.back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(20px) saturate(1.5);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: white;
+    padding: 10px 18px 10px 14px;
+    border-radius: 30px;
+    cursor: pointer;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    animation: backBtnFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+@keyframes backBtnFade {
+    from { opacity: 0; transform: translateX(-20px) scale(0.9); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+}
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.05);
+    border-color: rgba(255,255,255,0.15);
+}
+.back-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: white;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.back-btn span {
+    letter-spacing: 0.3px;
+}
+
+/* Close Button - iOS Style */
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(20px) saturate(1.5);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    animation: closeBtnFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+@keyframes closeBtnFade {
+    from { opacity: 0; transform: scale(0.8) rotate(-90deg); }
+    to { opacity: 1; transform: scale(1) rotate(0); }
+}
+.close-btn:hover {
+    background: #ff3b3b;
+    transform: scale(1.1) rotate(90deg);
+    border-color: #ff3b3b;
+    box-shadow: 0 0 30px rgba(255, 59, 59, 0.2);
+}
+.close-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: white;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Player Info - iOS Style */
+.player-info {
+    position: absolute;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(20px) saturate(1.5);
+    padding: 8px 24px 8px 16px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #eef2f8;
+    font-size: 0.9rem;
+    font-weight: 500;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+    white-space: nowrap;
+}
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+.player-info img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(30, 38, 50, 0.8);
+    padding: 3px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+.player-info .channel-name-text {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Ripple Effect */
+.ripple-container {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+}
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59, 75, 255, 0.3), rgba(99, 102, 241, 0.15), transparent);
+    transform: scale(0);
+    animation: rippleExpand 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes rippleExpand {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(25); opacity: 0; }
+}
+
+/* Expand/Shrink Animation */
+.video-expand {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.video-shrink {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header { padding: 12px 16px; }
+    .header h1 { font-size: 1.1rem; }
+    .header h1::before { font-size: 1.2rem; }
+    .filter-bar { padding: 10px 16px; top: 60px; }
+    .filter-bar input { min-width: 100px; font-size: 0.85rem; padding: 8px 16px; }
+    .grid-container { grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 12px; padding: 14px 12px 30px; }
+    .channel-card .logo-wrapper { width: 65px; height: 65px; }
+    .channel-card { padding: 12px 8px 10px; }
+    .channel-card .channel-name { font-size: 0.75rem; }
+    .player-info { bottom: 60px; font-size: 0.8rem; padding: 6px 16px 6px 12px; }
+    .player-info img { width: 24px; height: 24px; }
+    .back-btn { top: 14px; left: 14px; padding: 8px 14px 8px 10px; font-size: 0.8rem; }
+    .close-btn { top: 14px; right: 14px; width: 38px; height: 38px; }
+    .close-btn svg { width: 17px; height: 17px; }
+    .filter-bar .category-btn { font-size: 0.6rem; padding: 4px 12px; }
+    .player-info .channel-name-text { max-width: 120px; }
+}
+
+@media (max-width: 480px) {
+    .grid-container { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 8px; }
+    .channel-card .logo-wrapper { width: 55px; height: 55px; }
+    .channel-card .channel-name { font-size: 0.65rem; }
+    .channel-card .channel-category { font-size: 0.5rem; padding: 2px 8px; }
+    .header h1 { font-size: 0.95rem; }
+    .header .channel-counter { font-size: 0.65rem; padding: 3px 12px; }
+    .player-info { bottom: 50px; font-size: 0.7rem; padding: 5px 12px 5px 10px; }
+    .player-info img { width: 20px; height: 20px; }
+    .back-btn { top: 12px; left: 12px; padding: 6px 12px 6px 8px; font-size: 0.7rem; }
+    .back-btn svg { width: 14px; height: 14px; }
+    .close-btn { top: 12px; right: 12px; width: 34px; height: 34px; }
+    .close-btn svg { width: 15px; height: 15px; }
+    .player-info .channel-name-text { max-width: 80px; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+    <h1>Live TV</h1>
+    <span class="channel-counter" id="channelCounter">0 channels</span>
+</header>
+
+<div class="filter-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Search channels..." />
+    <div class="category-group" id="categoryGroup"></div>
+</div>
+
+<div class="grid-container" id="channelGrid"></div>
+
+<div class="player-overlay" id="playerOverlay">
+    <!-- iOS Style Back Button -->
+    <button class="back-btn" id="backBtn">
+        <svg viewBox="0 0 24 24">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Back</span>
+    </button>
+    
+    <!-- iOS Style Close Button -->
+    <button class="close-btn" id="closePlayer">
+        <svg viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+    
+    <div id="player-container">
+        <video id="video" controls playsinline autoplay></video>
+    </div>
+    <div class="player-info" id="playerInfo">
+        <img id="playerLogo" src="" alt="logo" />
+        <span class="channel-name-text" id="playerName">Channel</span>
+    </div>
+</div>
+
+<script>
+// ─── GLOBALS ──────────────────────────────────────────────
+let allChannels = [];
+let filteredChannels = [];
+let currentCategory = 'All';
+let searchTerm = '';
+let cachedCookie = null;
+let activeCookie = null;
+let expandElement = null;
+let isClosing = false;
+
+const grid = document.getElementById('channelGrid');
+const searchInput = document.getElementById('searchInput');
+const categoryGroup = document.getElementById('categoryGroup');
+const channelCounter = document.getElementById('channelCounter');
+
+const playerOverlay = document.getElementById('playerOverlay');
+const closePlayerBtn = document.getElementById('closePlayer');
+const backBtn = document.getElementById('backBtn');
+const videoEl = document.getElementById('video');
+const playerContainer = document.getElementById('player-container');
+const playerName = document.getElementById('playerName');
+const playerLogo = document.getElementById('playerLogo');
+
+let shakaPlayer = null;
+let currentChannel = null;
+let currentCardRect = null;
+
+// ─── RIPPLE EFFECT ──────────────────────────────────────
+function createRipple(x, y) {
+    const container = document.createElement('div');
+    container.className = 'ripple-container';
+    container.style.cssText = 'position:fixed;pointer-events:none;z-index:999;top:0;left:0;width:100%;height:100%';
+    
+    const ripple = document.createElement('div');
+    ripple.className = 'ripple';
+    const size = Math.min(window.innerWidth, window.innerHeight) * 0.25;
+    ripple.style.cssText = `width:${size}px;height:${size}px;left:${x - size/2}px;top:${y - size/2}px`;
+    
+    container.appendChild(ripple);
+    document.body.appendChild(container);
+    setTimeout(() => container.remove(), 800);
+}
+
+// ─── EXPAND ANIMATION ────────────────────────────────────
+function createExpandAnimation(card) {
+    const rect = card.getBoundingClientRect();
+    currentCardRect = rect;
+    
+    expandElement = document.createElement('div');
+    expandElement.className = 'video-expand';
+    expandElement.style.cssText = `
+        width:${rect.width}px;
+        height:${rect.height}px;
+        left:${rect.left}px;
+        top:${rect.top}px;
+        background:#151d28;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    `;
+    
+    // Clone card content
+    const clone = card.cloneNode(true);
+    clone.style.cssText = `
+        width:100%;
+        height:100%;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        background:transparent;
+        border:none;
+        box-shadow:none;
+    `;
+    const wrapper = clone.querySelector('.logo-wrapper');
+    if (wrapper) {
+        wrapper.style.width = '120px';
+        wrapper.style.height = '120px';
+    }
+    const name = clone.querySelector('.channel-name');
+    if (name) name.style.fontSize = '1.3rem';
+    const cat = clone.querySelector('.channel-category');
+    if (cat) cat.style.fontSize = '0.8rem';
+    
+    expandElement.appendChild(clone);
+    document.body.appendChild(expandElement);
+    
+    // Animate to full screen
+    requestAnimationFrame(() => {
+        expandElement.style.width = '100%';
+        expandElement.style.height = '100%';
+        expandElement.style.left = '0';
+        expandElement.style.top = '0';
+        expandElement.style.borderRadius = '0';
+    });
+    
+    setTimeout(() => {
+        if (expandElement) {
+            expandElement.remove();
+            expandElement = null;
+        }
+        playerOverlay.classList.add('active');
+    }, 600);
+}
+
+// ─── SHRINK ANIMATION (iOS Style) ──────────────────────
+function createShrinkAnimation(callback) {
+    if (!currentCardRect) {
+        if (callback) callback();
+        return;
+    }
+    
+    const rect = currentCardRect;
+    const shrinkEl = document.createElement('div');
+    shrinkEl.className = 'video-shrink';
+    shrinkEl.style.cssText = `
+        width:100%;
+        height:100%;
+        left:0;
+        top:0;
+        background:#000;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:1000;
+    `;
+    
+    // Create a mini video snapshot effect
+    const snapshot = document.createElement('div');
+    snapshot.style.cssText = `
+        width:100%;
+        height:100%;
+        background:linear-gradient(135deg, #151d28, #0a0e17);
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+    `;
+    
+    const logo = currentChannel?.logo || '';
+    const name = currentChannel?.name || 'Channel';
+    snapshot.innerHTML = `
+        <img src="${logo}" style="width:80px;height:80px;border-radius:50%;object-fit:contain;background:#1e2632;padding:10px;margin-bottom:15px;" />
+        <div style="color:#e8edf5;font-size:1.1rem;font-weight:600;">${name}</div>
+    `;
+    
+    shrinkEl.appendChild(snapshot);
+    document.body.appendChild(shrinkEl);
+    
+    // Animate to card position
+    requestAnimationFrame(() => {
+        shrinkEl.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+        shrinkEl.style.width = rect.width + 'px';
+        shrinkEl.style.height = rect.height + 'px';
+        shrinkEl.style.left = rect.left + 'px';
+        shrinkEl.style.top = rect.top + 'px';
+        shrinkEl.style.borderRadius = '18px';
+        shrinkEl.style.boxShadow = '0 30px 80px rgba(0,0,0,0.7)';
+        shrinkEl.style.overflow = 'hidden';
+        snapshot.style.transform = 'scale(0.7)';
+        snapshot.style.opacity = '0.6';
+    });
+    
+    setTimeout(() => {
+        if (shrinkEl) {
+            shrinkEl.remove();
+        }
+        if (callback) callback();
+    }, 550);
+}
+
+// ─── FETCH COOKIE ──────────────────────────────────────
+async function fetchCookie() {
+    if (cachedCookie) return cachedCookie;
+    try {
+        const res = await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/cookies');
+        const data = await res.json();
+        const cookieObj = data.find(item => item.cookie);
+        if (cookieObj && cookieObj.cookie) {
+            cachedCookie = cookieObj.cookie;
+            return cachedCookie;
+        }
+        return null;
+    } catch (e) {
+        console.warn('Failed to fetch cookie:', e);
+        return null;
+    }
+}
+
+// ─── FETCH CHANNELS ──────────────────────────────────────
+async function fetchChannels() {
+    try {
+        const res = await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/channels', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await res.json();
+        allChannels = Array.isArray(data) ? data : (data.channels || []);
+        allChannels = allChannels.filter(c => c && typeof c === 'object' && c.name);
+        extractCategories();
+        applyFilters();
+        updateCounter();
+    } catch (e) {
+        grid.innerHTML = `<div class="empty-box">⚠️ Could not load channels. Refresh or try again later.</div>`;
+        console.error(e);
+    }
+}
+
+// ─── CATEGORIES ──────────────────────────────────────────
+function extractCategories() {
+    const cats = new Set();
+    cats.add('All');
+    allChannels.forEach(c => {
+        if (c.category && c.category.trim()) cats.add(c.category.trim());
+    });
+    const sorted = ['All', ...Array.from(cats).filter(c => c !== 'All').sort()];
+    categoryGroup.innerHTML = sorted.map(cat =>
+        `<span class="category-btn ${cat === 'All' ? 'active' : ''}" data-cat="${cat}">${cat}</span>`
+    ).join('');
+
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentCategory = btn.dataset.cat;
+            applyFilters();
+        });
+    });
+}
+
+// ─── FILTER & RENDER ─────────────────────────────────────
+function applyFilters() {
+    const term = searchTerm.toLowerCase().trim();
+    filteredChannels = allChannels.filter(ch => {
+        const matchName = ch.name.toLowerCase().includes(term);
+        const matchCat = currentCategory === 'All' || ch.category === currentCategory;
+        return matchName && matchCat;
+    });
+    renderGrid();
+    updateCounter();
+}
+
+function renderGrid() {
+    if (!filteredChannels.length) {
+        grid.innerHTML = `<div class="empty-box">📭 No channels found</div>`;
+        return;
+    }
+    let html = '';
+    filteredChannels.forEach((ch, index) => {
+        const logo = ch.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(ch.name) + '&background=1e2632&color=fff&size=80';
+        html += `
+            <div class="channel-card" style="--index: ${index}" data-channel='${JSON.stringify(ch).replace(/'/g,"&#39;")}'>
+                <div class="logo-wrapper">
+                    <img src="${logo}" alt="${ch.name}" loading="lazy" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=1e2632&color=fff&size=80';" />
+                </div>
+                <div class="channel-name">${ch.name}</div>
+                <span class="channel-category">${ch.category || 'General'}</span>
+            </div>
+        `;
+    });
+    grid.innerHTML = html;
+
+    document.querySelectorAll('.channel-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (isClosing) return;
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX || rect.left + rect.width/2;
+            const y = e.clientY || rect.top + rect.height/2;
+            
+            createRipple(x, y);
+            createExpandAnimation(card);
+            
+            const raw = card.dataset.channel;
+            try {
+                const ch = JSON.parse(raw);
+                setTimeout(() => playChannel(ch), 500);
+            } catch(e) {
+                const id = card.dataset.id;
+                const found = allChannels.find(c => String(c.id) === String(id));
+                if (found) setTimeout(() => playChannel(found), 500);
+            }
+        });
+    });
+}
+
+function updateCounter() {
+    channelCounter.textContent = `${filteredChannels.length} / ${allChannels.length} channels`;
+}
+
+// ─── SEARCH ──────────────────────────────────────────────
+searchInput.addEventListener('input', (e) => {
+    searchTerm = e.target.value;
+    applyFilters();
+});
+
+// ─── PLAY CHANNEL ────────────────────────────────────────
+async function playChannel(channel) {
+    if (!channel || isClosing) return;
+    currentChannel = channel;
+    playerName.textContent = channel.name || 'Channel';
+    playerLogo.src = channel.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(channel.name) + '&background=1e2632&color=fff&size=40';
+
+    if (!shakaPlayer) {
+        shaka.polyfill.installAll();
+        if (!shaka.Player.isBrowserSupported()) {
+            alert('Browser not supported for Shaka Player.');
+            return;
+        }
+        shakaPlayer = new shaka.Player(videoEl);
+        try {
+            new shaka.ui.Overlay(shakaPlayer, playerContainer, videoEl);
+        } catch(e) { /* ignore */ }
+    }
+
+    const keyId = channel.keyId && channel.keyId !== 'null' ? channel.keyId : null;
+    const key = channel.key && channel.key !== 'null' ? channel.key : null;
+    
+    if (keyId && key) {
+        shakaPlayer.configure({
+            drm: { clearKeys: { [keyId]: key } },
+            streaming: { lowLatencyMode: true }
+        });
+    } else {
+        shakaPlayer.configure({
+            drm: { clearKeys: {} },
+            streaming: { lowLatencyMode: true }
+        });
+    }
+
+    const cookie = await fetchCookie();
+    activeCookie = cookie || '';
+
+    if (shakaPlayer.getNetworkingEngine) {
+        const engine = shakaPlayer.getNetworkingEngine();
+        engine.registerRequestFilter((type, request) => {
+            request.headers["Referer"] = "https://www.jiotv.com/";
+            request.headers["User-Agent"] = "plaYtv/7.1.5";
+            if (activeCookie && (type === 0 || type === 1)) {
+                request.uris[0] = request.uris[0].split("?")[0] + "?" + activeCookie;
+            }
+        });
+    }
+
+    const streamUrls = [channel.url, channel.url1, channel.url2, channel.url3]
+        .filter(Boolean)
+        .map(u => u.replace('bpk-tv//', 'bpk-tv/'));
+
+    let loaded = false;
+    for (let i = 0; i < streamUrls.length; i++) {
+        try {
+            await shakaPlayer.load(streamUrls[i]);
+            await videoEl.play();
+            loaded = true;
+            console.log('✅ Playing:', channel.name);
+            break;
+        } catch (e) {
+            console.warn('Stream attempt', i+1, 'failed:', e);
+        }
+    }
+
+    if (!loaded) {
+        alert('Could not play this channel. Try another one.');
+        closePlayer();
+    }
+}
+
+// ─── CLOSE PLAYER (iOS Style) ──────────────────────────
+function closePlayer() {
+    if (isClosing) return;
+    isClosing = true;
+    
+    // Stop playback
+    if (shakaPlayer) {
+        shakaPlayer.unload().catch(() => {});
+    }
+    videoEl.pause();
+    videoEl.src = '';
+    
+    // Remove overlay
+    playerOverlay.classList.remove('active');
+    
+    // Create shrink animation
+    createShrinkAnimation(() => {
+        isClosing = false;
+        currentChannel = null;
+        activeCookie = null;
+        currentCardRect = null;
+    });
+}
+
+// ─── EVENT LISTENERS ────────────────────────────────────
+closePlayerBtn.addEventListener('click', closePlayer);
+backBtn.addEventListener('click', closePlayer);
+
+playerContainer.addEventListener('click', (e) => {
+    if (e.target === playerContainer) closePlayer();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closePlayer();
+});
+
+// ─── INIT ────────────────────────────────────────────────
+fetchChannels();
+console.log('🚀 Live TV loaded. Click any channel to play.');
+</script>
+
+</body>
+</html>
