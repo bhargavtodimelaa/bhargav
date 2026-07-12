@@ -1727,8 +1727,8 @@
     console.log('📡 Offline detection system active.');
 })();
 </script>
-  <script>
-// ─── PRELOAD MPD ON HOVER ──────────────────────────────────
+ <script>
+// ─── PRELOAD MPD ON HOVER (WITH COOKIE) ──────────────────
 (function() {
     // Store preload promises and abort controllers
     const preloadCache = new Map();
@@ -1737,11 +1737,18 @@
     let currentHoveredChannel = null;
 
     // Configuration
-    const PRELOAD_DELAY = 300; // ms to wait before preloading (to avoid unnecessary loads)
-    const PRELOAD_TIMEOUT = 30000; // 30 seconds max for preload
-    const CACHE_MAX_AGE = 60000; // 1 minute cache
+    const PRELOAD_DELAY = 300;
+    const CACHE_MAX_AGE = 60000;
 
-    // Preload function
+    // Get the cookie (uses existing fetchCookie function)
+    async function getCookie() {
+        if (typeof fetchCookie === 'function') {
+            return await fetchCookie();
+        }
+        return null;
+    }
+
+    // Preload function with cookie attached
     async function preloadChannel(channel) {
         if (!channel || !channel.url) return;
 
@@ -1775,8 +1782,21 @@
 
             if (!streamUrls.length) return;
 
-            // Try to preload the MPD manifest
-            const response = await fetch(streamUrls[0], {
+            // Get fresh cookie
+            const cookie = await getCookie();
+            let url = streamUrls[0];
+            
+            // Attach cookie as query parameter (like in playChannel)
+            if (cookie) {
+                // Remove any existing query params
+                url = url.split('?')[0];
+                // Add cookie as parameter
+                url = url + '?' + cookie;
+                console.log('🍪 Cookie attached to preload for:', channel.name);
+            }
+
+            // Preload the MPD manifest with cookie
+            const response = await fetch(url, {
                 signal: controller.signal,
                 headers: {
                     'Referer': 'https://www.jiotv.com/',
@@ -1786,22 +1806,18 @@
 
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-            // Read the manifest as text (this is the actual preload)
+            // Read the manifest as text
             const manifestText = await response.text();
             
-            // Cache the result
+            // Cache the result with the URL that includes cookie
             preloadCache.set(channelId, {
                 data: manifestText,
                 timestamp: Date.now(),
-                url: streamUrls[0]
+                url: url,  // Store the full URL with cookie
+                originalUrl: streamUrls[0]
             });
 
             console.log('✅ Preloaded successfully:', channel.name);
-
-            // Also preload the cookie if needed
-            if (typeof fetchCookie === 'function' && !cachedCookie) {
-                fetchCookie().catch(() => {});
-            }
 
             return manifestText;
 
@@ -1819,30 +1835,20 @@
 
     // Function to apply preload to all channel cards
     function setupPreloadOnCards() {
-        // Use MutationObserver to watch for new cards
         const observer = new MutationObserver(() => {
             attachPreloadListeners();
         });
 
-        // Observe the grid container
         const grid = document.getElementById('channelGrid');
         if (grid) {
-            observer.observe(grid, { 
-                childList: true, 
-                subtree: true 
-            });
+            observer.observe(grid, { childList: true, subtree: true });
         }
 
-        // Also observe last played grid
         const lastPlayedGrid = document.getElementById('lastPlayedGrid');
         if (lastPlayedGrid) {
-            observer.observe(lastPlayedGrid, { 
-                childList: true, 
-                subtree: true 
-            });
+            observer.observe(lastPlayedGrid, { childList: true, subtree: true });
         }
 
-        // Initial attachment
         attachPreloadListeners();
     }
 
@@ -1852,7 +1858,6 @@
             if (card.dataset.preloadAttached) return;
             card.dataset.preloadAttached = 'true';
             
-            // Get channel data
             let channel = null;
             try {
                 const raw = card.dataset.channel;
@@ -1863,17 +1868,14 @@
 
             if (!channel) return;
 
-            // Hover event - start preload after delay
             card.addEventListener('mouseenter', function(e) {
                 const ch = channel;
                 
-                // Clear any existing timeout
                 if (hoverTimeout) {
                     clearTimeout(hoverTimeout);
                     hoverTimeout = null;
                 }
 
-                // If already preloaded recently, skip
                 const channelId = ch.id || ch.name;
                 if (preloadCache.has(channelId)) {
                     const cached = preloadCache.get(channelId);
@@ -1882,14 +1884,12 @@
                     }
                 }
 
-                // Set timeout to preload after user hovers for a moment
                 hoverTimeout = setTimeout(() => {
                     currentHoveredChannel = ch;
                     preloadChannel(ch).catch(() => {});
                 }, PRELOAD_DELAY);
             });
 
-            // Mouse leave - cancel preload
             card.addEventListener('mouseleave', function() {
                 if (hoverTimeout) {
                     clearTimeout(hoverTimeout);
@@ -1908,7 +1908,7 @@
             });
         });
 
-        // Also attach to last played cards
+        // Last played cards
         document.querySelectorAll('.last-played-card').forEach(card => {
             if (card.dataset.preloadAttached) return;
             card.dataset.preloadAttached = 'true';
@@ -1962,7 +1962,7 @@
         });
     }
 
-    // Override playChannel to use preloaded data
+    // Override playChannel to use preloaded data with cookie
     const originalPlayChannel = window.playChannel;
     if (originalPlayChannel) {
         window.playChannel = async function(channel) {
@@ -1973,27 +1973,25 @@
             // Check if we have preloaded data
             if (preloadCache.has(channelId)) {
                 const cached = preloadCache.get(channelId);
-                console.log('🚀 Using preloaded data for:', channel.name);
+                console.log('🚀 INSTANT PLAY using preloaded data for:', channel.name);
                 
-                // Use the preloaded data - it's already in the cache
-                // The actual play will happen via shaka player
-                // But we can pass the preloaded manifest URL to save time
+                // Store the preloaded URL with cookie
                 if (cached.url) {
-                    // Store the preloaded URL for quick access
                     channel._preloadedUrl = cached.url;
                     channel._preloadedManifest = cached.data;
+                    
+                    // Use the preloaded URL directly
+                    // This will make shaka load instantly
+                    console.log('⚡ Using preloaded manifest with cookie');
                 }
-                
-                // Clean up cache after use (optional)
-                // setTimeout(() => preloadCache.delete(channelId), 5000);
             }
             
-            // Call original playChannel
+            // Call original playChannel with potentially enhanced channel
             return originalPlayChannel(channel);
         };
     }
 
-    // Clean up old cache entries periodically
+    // Clean up old cache entries
     setInterval(() => {
         const now = Date.now();
         for (const [key, value] of preloadCache) {
@@ -2003,9 +2001,8 @@
         }
     }, CACHE_MAX_AGE);
 
-    // Initialize after DOM is ready and channels are loaded
+    // Initialize
     function initPreload() {
-        // Wait for grid to be populated
         const checkGrid = setInterval(() => {
             const cards = document.querySelectorAll('.channel-card');
             if (cards.length > 0) {
@@ -2015,17 +2012,14 @@
             }
         }, 500);
 
-        // Also set up on channel updates (for search/filter)
         const originalRenderGrid = window.renderGrid;
         if (originalRenderGrid) {
             window.renderGrid = function() {
                 originalRenderGrid.apply(this, arguments);
-                // Reattach preload listeners after render
                 setTimeout(attachPreloadListeners, 100);
             };
         }
 
-        // Setup for last played updates
         const originalRenderLastPlayed = window.renderLastPlayed;
         if (originalRenderLastPlayed) {
             window.renderLastPlayed = function() {
@@ -2034,24 +2028,20 @@
             };
         }
 
-        // Fallback: also run after 3 seconds
         setTimeout(attachPreloadListeners, 3000);
-
-        console.log('⚡ Preload system active - hover over channels to preload MPD');
+        console.log('⚡ Preload system active (with cookie support)');
     }
 
-    // Start preload system
     if (document.readyState === 'complete') {
         setTimeout(initPreload, 100);
     } else {
         document.addEventListener('DOMContentLoaded', initPreload);
     }
 
-    // Expose useful functions for debugging
     window.preloadCache = preloadCache;
     window.manualPreload = preloadChannel;
 
-    console.log('⚡ Channel preload system active (hover to preload MPD)');
+    console.log('⚡ Channel preload system active (cookie attached to MPD)');
 })();
 </script>
 </body>
