@@ -676,6 +676,139 @@ html,body{
     transform: scale(1.05);
 }
 
+/* Disclaimer Overlay (full screen) */
+.disclaimer-overlay {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.88);
+    backdrop-filter: blur(12px);
+    z-index: 3000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.4s ease;
+    padding: 20px;
+}
+.disclaimer-modal {
+    background: linear-gradient(145deg, #1a1f2e, #10141e);
+    border-radius: 32px;
+    padding: 36px 32px 28px;
+    max-width: 540px;
+    width: 100%;
+    border: 1px solid rgba(59, 75, 255, 0.15);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+    animation: modalSlide 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    text-align: center;
+}
+.disclaimer-modal .disclaimer-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+.disclaimer-modal h2 {
+    color: #f0f2f5;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+.disclaimer-modal .disclaimer-text {
+    color: #b9c2d4;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    text-align: left;
+    background: rgba(0,0,0,0.25);
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.04);
+    margin-bottom: 20px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+.disclaimer-modal .disclaimer-text strong {
+    color: #e8edf5;
+}
+.disclaimer-modal .disclaimer-btn {
+    background: linear-gradient(135deg, #3b4bff, #6366f1);
+    border: none;
+    color: white;
+    padding: 12px 36px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 24px rgba(59, 75, 255, 0.3);
+    letter-spacing: 0.3px;
+}
+.disclaimer-modal .disclaimer-btn:hover {
+    transform: scale(1.04);
+    box-shadow: 0 8px 40px rgba(59, 75, 255, 0.4);
+}
+.disclaimer-modal .disclaimer-btn:active {
+    transform: scale(0.96);
+}
+
+/* channel info button (i) inside player */
+.channel-info-btn {
+    position: absolute;
+    bottom: 140px;
+    right: 24px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 1001;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.channel-info-btn:hover {
+    background: rgba(59, 75, 255, 0.3);
+    transform: scale(1.08);
+    border-color: rgba(59, 75, 255, 0.3);
+}
+.channel-info-btn i {
+    font-style: normal;
+    font-family: Georgia, serif;
+}
+
+/* small disclaimer popup inside player (not full screen) */
+.player-disclaimer-popup {
+    position: absolute;
+    bottom: 190px;
+    right: 24px;
+    background: rgba(10,14,23,0.92);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(59,75,255,0.15);
+    border-radius: 16px;
+    padding: 14px 18px;
+    max-width: 280px;
+    color: #c8d0e0;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    z-index: 1002;
+    animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: none;
+    pointer-events: none;
+}
+.player-disclaimer-popup.show {
+    display: block;
+}
+.player-disclaimer-popup strong {
+    color: #e8edf5;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .header { padding: 10px 14px; }
@@ -702,6 +835,10 @@ html,body{
     .last-played-card { flex: 0 0 100px; min-width: 80px; padding: 10px 6px; }
     .last-played-card .lp-logo { width: 40px; height: 40px; }
     .last-played-card .lp-name { font-size: 0.6rem; }
+    .disclaimer-modal { padding: 28px 20px 24px; }
+    .disclaimer-modal .disclaimer-text { font-size: 0.8rem; max-height: 160px; }
+    .channel-info-btn { bottom: 110px; right: 16px; width: 34px; height: 34px; font-size: 1rem; }
+    .player-disclaimer-popup { bottom: 160px; right: 16px; max-width: 220px; font-size: 0.65rem; padding: 10px 14px; }
 }
 
 @media (max-width: 480px) {
@@ -725,6 +862,10 @@ html,body{
     .last-played-card { flex: 0 0 80px; min-width: 70px; padding: 8px 4px; }
     .last-played-card .lp-logo { width: 35px; height: 35px; }
     .last-played-card .lp-name { font-size: 0.5rem; }
+    .disclaimer-modal { padding: 20px 16px 20px; }
+    .disclaimer-modal .disclaimer-text { font-size: 0.7rem; max-height: 120px; }
+    .channel-info-btn { bottom: 80px; right: 12px; width: 30px; height: 30px; font-size: 0.9rem; }
+    .player-disclaimer-popup { bottom: 120px; right: 12px; max-width: 180px; font-size: 0.6rem; padding: 8px 12px; }
 }
 </style>
 </head>
@@ -739,37 +880,46 @@ document.addEventListener('contextmenu', function(e) {
 
 // Disable keyboard shortcuts
 document.addEventListener('keydown', function(e) {
-    // F12
     if (e.key === 'F12' || e.keyCode === 123) {
         e.preventDefault();
         return false;
     }
-    
-    // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
     if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
         e.preventDefault();
         return false;
     }
-    
-    // Ctrl+U (view source)
     if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
         e.preventDefault();
         return false;
     }
-    
-    // Ctrl+S (save page)
     if (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
         e.preventDefault();
         return false;
     }
-    
-    // Ctrl+Shift+P (command palette)
     if (e.ctrlKey && e.shiftKey && (e.key === 'P' || e.keyCode === 80)) {
         e.preventDefault();
         return false;
     }
 });
 </script>
+
+<!-- DISCLAIMER OVERLAY (full screen, shown on load) -->
+<div class="disclaimer-overlay" id="disclaimerOverlay">
+    <div class="disclaimer-modal">
+        <div class="disclaimer-icon">⚠️</div>
+        <h2>Disclaimer</h2>
+        <div class="disclaimer-text">
+            <strong>Important Notice:</strong><br><br>
+            The channels listed on this website are obtained through <strong>unofficial sources</strong>.
+            We are <strong>not responsible</strong> for any legal issues, loss of property, damages, injuries, 
+            or even in case of death or issues arising due to utilizing content on this website.<br><br>
+            Users must use it with <strong>appropriate discretion</strong>.
+        </div>
+        <button class="disclaimer-btn" id="disclaimerAcceptBtn">✅ I am ready &amp; I am responsible for everything I do</button>
+    </div>
+</div>
+
+<!-- main UI -->
 <header class="header">
     <h1>Live TV</h1>
     <span class="channel-counter" id="channelCounter">0 channels</span>
@@ -788,6 +938,7 @@ document.addEventListener('keydown', function(e) {
 
 <div class="grid-container" id="channelGrid"></div>
 
+<!-- Player Overlay -->
 <div class="player-overlay" id="playerOverlay">
     <button class="back-btn" id="backBtn">
         <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -802,6 +953,13 @@ document.addEventListener('keydown', function(e) {
     <div class="player-info" id="playerInfo">
         <img id="playerLogo" src="" alt="logo" />
         <span class="channel-name-text" id="playerName">Channel</span>
+    </div>
+    <!-- i button for disclaimer inside player -->
+    <button class="channel-info-btn" id="channelInfoBtn"><i>i</i></button>
+    <!-- small disclaimer popup (not full screen) -->
+    <div class="player-disclaimer-popup" id="playerDisclaimerPopup">
+        <strong>⚠️ Disclaimer</strong><br>
+        We are not responsible for any issue arising from using this website.
     </div>
 </div>
 
@@ -838,6 +996,7 @@ let isErrorShowing = false;
 let lastPlayedChannels = [];
 let isPlaying = false;
 let playTimeout = null;
+let disclaimerAccepted = false;
 
 // ─── LOCAL STORAGE ────────────────────────────────────
 const STORAGE_KEY = 'liveTV_lastPlayed';
@@ -906,7 +1065,6 @@ function renderLastPlayed() {
                 
                 createRipple(x, y);
                 
-                // Create temporary card for animation
                 const tempCard = document.createElement('div');
                 tempCard.className = 'channel-card';
                 tempCard.style.cssText = `
@@ -961,6 +1119,30 @@ const playerLogo = document.getElementById('playerLogo');
 const errorOverlay = document.getElementById('errorOverlay');
 const errorRetry = document.getElementById('errorRetry');
 const errorClose = document.getElementById('errorClose');
+const disclaimerOverlay = document.getElementById('disclaimerOverlay');
+const disclaimerAcceptBtn = document.getElementById('disclaimerAcceptBtn');
+const channelInfoBtn = document.getElementById('channelInfoBtn');
+const playerDisclaimerPopup = document.getElementById('playerDisclaimerPopup');
+
+// ─── DISCLAIMER LOGIC ──────────────────────────────
+function showDisclaimer() {
+    disclaimerOverlay.style.display = 'flex';
+}
+
+function hideDisclaimer() {
+    disclaimerOverlay.style.display = 'none';
+    disclaimerAccepted = true;
+    // reveal website with animation
+    document.body.style.animation = 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+    // load channels if not loaded yet
+    if (allChannels.length === 0) {
+        fetchChannels();
+    }
+}
+
+disclaimerAcceptBtn.addEventListener('click', () => {
+    hideDisclaimer();
+});
 
 // ─── MEMORY OPTIMIZATION ─────────────────────────────
 function cleanupAnimations() {
@@ -1139,7 +1321,6 @@ function hideError() {
 errorRetry.addEventListener('click', () => {
     hideError();
     if (errorChannel) {
-        // Clear cookie cache to force fresh fetch
         cachedCookie = null;
         cookieTimestamp = 0;
         setTimeout(() => playChannel(errorChannel), 300);
@@ -1164,7 +1345,6 @@ errorOverlay.addEventListener('click', (e) => {
 
 // ─── FETCH COOKIE (FRESH EVERY TIME) ────────────────
 async function fetchCookie() {
-    // Always fetch fresh cookie on page reload
     const now = Date.now();
     if (cachedCookie && (now - cookieTimestamp) < COOKIE_MAX_AGE) {
         return cachedCookie;
@@ -1207,7 +1387,6 @@ async function fetchChannels() {
         applyFilters();
         updateCounter();
         
-        // Load last played after channels are loaded
         loadLastPlayed();
         renderLastPlayed();
     } catch (e) {
@@ -1322,10 +1501,8 @@ async function playChannel(channel) {
     playerName.textContent = channel.name || 'Channel';
     playerLogo.src = channel.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(channel.name) + '&background=1e2632&color=fff&size=40';
 
-    // Save to last played
     saveLastPlayed(channel);
 
-    // Destroy old player if exists
     destroyPlayer();
 
     try {
@@ -1341,7 +1518,6 @@ async function playChannel(channel) {
             new shaka.ui.Overlay(shakaPlayer, playerContainer, videoEl);
         } catch(e) { /* ignore */ }
 
-        // Set preferred audio language to Telugu
         shakaPlayer.configure({
             preferredAudioLanguage: 'te',
             preferredTextLanguage: 'en',
@@ -1368,7 +1544,6 @@ async function playChannel(channel) {
             });
         }
 
-        // Fetch fresh cookie
         const cookie = await fetchCookie();
         activeCookie = cookie || '';
 
@@ -1392,7 +1567,6 @@ async function playChannel(channel) {
             try {
                 await shakaPlayer.load(streamUrls[i]);
                 
-                // Try to select Telugu audio after a small delay
                 setTimeout(() => {
                     try {
                         const tracks = shakaPlayer.getAudioTracks();
@@ -1451,6 +1625,9 @@ function closePlayer() {
     playerOverlay.classList.remove('active');
     cleanupAnimations();
     
+    // hide disclaimer popup if visible
+    playerDisclaimerPopup.classList.remove('show');
+    
     createShrinkAnimation(() => {
         isClosing = false;
         currentChannel = null;
@@ -1478,7 +1655,6 @@ document.addEventListener('keydown', (e) => {
             closePlayer();
         }
     }
-    // Space for play/pause
     if (e.key === ' ' && playerOverlay.classList.contains('active')) {
         e.preventDefault();
         if (videoEl.paused) {
@@ -1489,26 +1665,42 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Handle memory cleanup on page unload
-window.addEventListener('beforeunload', () => {
-    destroyPlayer();
-    cleanupAnimations();
+// ─── CHANNEL INFO BUTTON (i) ────────────────────────
+channelInfoBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    playerDisclaimerPopup.classList.toggle('show');
+    // auto hide after 5 seconds
+    clearTimeout(window.popupTimeout);
+    window.popupTimeout = setTimeout(() => {
+        playerDisclaimerPopup.classList.remove('show');
+    }, 5000);
+});
+
+// click anywhere else to hide popup
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.channel-info-btn') && !e.target.closest('.player-disclaimer-popup')) {
+        playerDisclaimerPopup.classList.remove('show');
+    }
 });
 
 // ─── INIT ────────────────────────────────────────────
 // Load last played from storage
 loadLastPlayed();
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', fetchChannels);
-} else {
-    fetchChannels();
-}
+// Show disclaimer on load
+showDisclaimer();
+
+// If user somehow clicks away from disclaimer, force it
+// but we keep it modal-like
+
+// Fetch channels only after disclaimer accept
+// but we also keep a backup: if channels already loaded, show them
 
 console.log('🚀 Live TV loaded. Click any channel to play.');
 console.log('🎤 Audio will default to Telugu when available.');
 console.log('🕐 Last played channels are saved locally.');
 console.log('🍪 Cookie is fetched fresh on every page reload.');
+console.log('⚠️ Disclaimer shown on each page load.');
 </script>
 
 </body>
