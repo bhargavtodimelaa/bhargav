@@ -1551,5 +1551,181 @@
     showDisclaimer();
     console.log('🚀 Live TV (Google style) · loaded.');
   </script>
+  <script>
+// ─── OFFLINE DETECTION SYSTEM ──────────────────────────────
+(function() {
+    // Create overlay elements
+    const offlineOverlay = document.createElement('div');
+    offlineOverlay.id = 'offlineOverlay';
+    offlineOverlay.style.cssText = `
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.92);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 24px;
+        animation: fadeIn 0.3s ease;
+    `;
+
+    const offlineModal = document.createElement('div');
+    offlineModal.style.cssText = `
+        background: var(--bg-primary);
+        border-radius: 28px;
+        padding: 40px 32px 32px;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+        animation: scaleIn 0.35s ease;
+    `;
+
+    offlineModal.innerHTML = `
+        <span class="material-symbols-outlined" style="font-size: 4rem; color: #ea4335; display: block; margin-bottom: 12px;">wifi_off</span>
+        <h2 style="font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">No Internet Connection</h2>
+        <p style="color: var(--google-grey-600); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">
+            You are currently offline. Please check your internet connection and try again.
+        </p>
+        <button id="offlineRetryBtn" style="
+            background: var(--google-blue);
+            border: none;
+            color: #fff;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            box-shadow: 0 1px 3px rgba(26, 115, 232, 0.2);
+            width: 100%;
+        ">
+            <span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle;">refresh</span>
+            Retry Connection
+        </button>
+        <div style="margin-top: 12px; font-size: 0.75rem; color: var(--google-grey-600);">
+            Will auto-reconnect when connection is restored
+        </div>
+    `;
+
+    offlineOverlay.appendChild(offlineModal);
+    document.body.appendChild(offlineOverlay);
+
+    // Add keyframes if not already present
+    if (!document.getElementById('offlineStyles')) {
+        const styleSheet = document.createElement('style');
+        styleSheet.id = 'offlineStyles';
+        styleSheet.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes scaleIn {
+                from { transform: scale(0.92); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    }
+
+    // State
+    let isOffline = false;
+    let isPageHidden = false;
+
+    // Show offline overlay
+    function showOfflineOverlay() {
+        if (isOffline) return;
+        isOffline = true;
+        offlineOverlay.style.display = 'flex';
+        // Hide main content visually but keep it functional
+        document.body.style.overflow = 'hidden';
+        // Pause any playing video
+        const video = document.getElementById('video');
+        if (video && !video.paused) {
+            video.pause();
+        }
+    }
+
+    // Hide offline overlay
+    function hideOfflineOverlay() {
+        if (!isOffline) return;
+        isOffline = false;
+        offlineOverlay.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    // Check connection status
+    function checkConnection() {
+        if (navigator.onLine) {
+            if (isOffline) {
+                hideOfflineOverlay();
+                // Optionally reload channels if needed
+                if (typeof allChannels !== 'undefined' && allChannels.length === 0) {
+                    if (typeof fetchChannels === 'function') {
+                        fetchChannels();
+                    }
+                }
+            }
+        } else {
+            showOfflineOverlay();
+        }
+    }
+
+    // Retry button handler
+    document.getElementById('offlineRetryBtn').addEventListener('click', function() {
+        checkConnection();
+        // If still offline, show a brief feedback
+        if (isOffline) {
+            this.textContent = '⏳ Checking...';
+            setTimeout(() => {
+                this.innerHTML = `
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle;">refresh</span>
+                    Retry Connection
+                `;
+            }, 1500);
+        }
+    });
+
+    // Listen to online/offline events
+    window.addEventListener('online', function() {
+        // Small delay to ensure network is actually available
+        setTimeout(checkConnection, 500);
+    });
+
+    window.addEventListener('offline', function() {
+        showOfflineOverlay();
+    });
+
+    // Periodic check every 3 seconds when offline
+    setInterval(function() {
+        if (isOffline) {
+            checkConnection();
+        }
+    }, 3000);
+
+    // Initial check
+    setTimeout(checkConnection, 1000);
+
+    // Override fetch to catch network errors (optional but helpful)
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+        return originalFetch.apply(this, args).catch((error) => {
+            if (!navigator.onLine) {
+                showOfflineOverlay();
+            }
+            throw error;
+        });
+    };
+
+    console.log('📡 Offline detection system active.');
+})();
+</script>
 </body>
 </html>
