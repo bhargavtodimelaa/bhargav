@@ -941,33 +941,144 @@
         font-size: 1.1rem;
       }
     }
+    /* --- Disagree Animation --- */
+.disagree-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 24px;
+  animation: fadeIn 0.4s ease;
+}
+
+.disagree-modal {
+  background: var(--bg-primary);
+  border-radius: 28px;
+  padding: 40px 32px 32px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+  animation: scaleIn 0.4s ease;
+  overflow: hidden;
+}
+
+.disagree-modal .emoji {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.disagree-modal h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.disagree-modal p {
+  color: var(--google-grey-600);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.loading-bar-container {
+  width: 100%;
+  height: 4px;
+  background: var(--google-grey-200);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.loading-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ea4335, #fbbc04, #34a853, #1a73e8);
+  border-radius: 4px;
+  animation: loadingProgress 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes loadingProgress {
+  0% { width: 0%; }
+  20% { width: 15%; }
+  40% { width: 35%; }
+  60% { width: 55%; }
+  80% { width: 80%; }
+  100% { width: 100%; }
+}
+
+.disagree-modal .redirect-text {
+  font-size: 0.85rem;
+  color: var(--google-grey-600);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
   </style>
 </head>
 <body>
 
   <!-- ===== DISCLAIMER OVERLAY (Google style) ===== -->
-  <div class="disclaimer-overlay" id="disclaimerOverlay">
-    <div class="disclaimer-modal">
-      <div class="disclaimer-icon">🔞</div>
-      <h1>18+ &amp; Disclaimer</h1>
-      <div class="disclaimer-text">
-        <p><strong>This website is for adults (18+).</strong></p>
-        <p>By continuing you confirm that:</p>
-        <ul>
-          <li>You are at least <strong>18 years old</strong>.</li>
-          <li>You understand that all channel streams are from <strong>unofficial third-party sources</strong>.</li>
-          <li>You accept full responsibility for your use, including legal, financial, or any other consequences.</li>
-          <li>You agree to use this site at your own risk and discretion.</li>
-        </ul>
-        <p><strong>If you are under 18 or access is illegal in your region, leave now.</strong></p>
-      </div>
-      <button class="disclaimer-btn" id="disclaimerAcceptBtn">
-        <span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle;">check_circle</span>
-        I am 18+ &amp; accept responsibility
-      </button>
+ <div class="disclaimer-modal">
+  <div class="disclaimer-icon">🔞</div>
+  <h1>18+ &amp; Disclaimer</h1>
+  <div class="disclaimer-text">
+    <p><strong>This website is for adults (18+).</strong></p>
+    <p>By continuing you confirm that:</p>
+    <ul>
+      <li>You are at least <strong>18 years old</strong>.</li>
+      <li>You understand that all channel streams are from <strong>unofficial third-party sources</strong>.</li>
+      <li>You accept full responsibility for your use, including legal, financial, or any other consequences.</li>
+      <li>You agree to use this site at your own risk and discretion.</li>
+    </ul>
+    <p><strong>If you are under 18 or access is illegal in your region, leave now.</strong></p>
+  </div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <button class="disclaimer-btn" id="disclaimerAcceptBtn" style="flex:1; min-width:140px;">
+      <span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle;">check_circle</span>
+      I am 18+
+    </button>
+    <button class="disclaimer-btn" id="disclaimerDisagreeBtn" style="flex:1; min-width:140px; background:#ea4335; box-shadow: 0 1px 3px rgba(234, 67, 53, 0.2);">
+      <span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle;">close</span>
+      Disagree
+    </button>
+  </div>
+</div>
+<!-- ===== DISAGREE OVERLAY ===== -->
+<div class="disagree-overlay" id="disagreeOverlay">
+  <div class="disagree-modal">
+    <span class="emoji">😢</span>
+    <h2>Sorry to see you go!</h2>
+    <p>We understand. If you change your mind, you're always welcome back.</p>
+    <div class="loading-bar-container">
+      <div class="loading-bar"></div>
+    </div>
+    <div class="redirect-text">
+      <span class="material-symbols-outlined" style="font-size:1rem;vertical-align:middle;animation:spin 0.8s linear infinite;">autorenew</span>
+      Redirecting to Google...
     </div>
   </div>
-
+</div>
   <!-- ===== HEADER ===== -->
   <header class="header">
     <div class="header-brand">
@@ -1156,6 +1267,55 @@ async function startBackgroundPreload() {
 }
 
 disclaimerAcceptBtn.addEventListener('click', hideDisclaimer);
+  // ─── DISAGREE FUNCTIONALITY ──────────────────────────────
+const disagreeOverlay = document.getElementById('disagreeOverlay');
+const disagreeBtn = document.getElementById('disclaimerDisagreeBtn');
+let redirectTimeout = null;
+
+function handleDisagree() {
+  // Hide the disclaimer
+  disclaimerOverlay.style.display = 'none';
+  disclaimerAccepted = false;
+  
+  // Show the disagree overlay
+  disagreeOverlay.style.display = 'flex';
+  
+  // Reset animation
+  const loadingBar = document.querySelector('.loading-bar');
+  if (loadingBar) {
+    loadingBar.style.animation = 'none';
+    // Trigger reflow
+    void loadingBar.offsetWidth;
+    loadingBar.style.animation = 'loadingProgress 3s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+  }
+  
+  // Redirect after 3 seconds
+  if (redirectTimeout) clearTimeout(redirectTimeout);
+  redirectTimeout = setTimeout(() => {
+    window.location.href = 'https://www.google.com';
+  }, 3000);
+}
+
+// Event listener for disagree button
+if (disagreeBtn) {
+  disagreeBtn.addEventListener('click', handleDisagree);
+}
+
+// Handle Escape key to close disagree (redirects immediately)
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && disagreeOverlay.style.display === 'flex') {
+    clearTimeout(redirectTimeout);
+    window.location.href = 'https://www.google.com';
+  }
+});
+
+// Click on overlay background also redirects
+disagreeOverlay.addEventListener('click', function(e) {
+  if (e.target === disagreeOverlay) {
+    clearTimeout(redirectTimeout);
+    window.location.href = 'https://www.google.com';
+  }
+});
 
 // ─── LAST PLAYED ──────────────────────────────────────────
 function loadLastPlayed() {
