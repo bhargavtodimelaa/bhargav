@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Live TV · Google style</title>
+  <title>Live TV</title>
 
-  <!-- Google Font & Material Icons (SVG/Google style) -->
+  <!-- Google Font & Material Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
@@ -16,12 +16,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" />
 
   <style>
-    /* ----- Google reset & variables ----- */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
     }
 
     :root {
@@ -31,30 +29,24 @@
       --google-grey-200: #e8eaed;
       --google-grey-300: #dadce0;
       --google-grey-600: #5f6368;
-      --google-grey-800: #3c4043;
-      --google-grey-900: #202124;
       --bg-primary: #ffffff;
       --bg-secondary: #f8f9fa;
       --text-primary: #202124;
       --text-secondary: #5f6368;
       --surface-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
       --card-radius: 12px;
-      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition: 0.2s ease;
     }
 
-    html,
-    body {
+    html, body {
       background: var(--bg-secondary);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: var(--text-primary);
       width: 100%;
       min-height: 100vh;
       overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* ----- Scrollbar (Google-style thin) ----- */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -70,36 +62,7 @@
       background: var(--google-grey-600);
     }
 
-    /* ----- ripple container (Google Ripple) ----- */
-    .ripple-container {
-      position: fixed;
-      pointer-events: none;
-      z-index: 999;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-    .ripple-effect {
-      position: absolute;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(26, 115, 232, 0.25) 0%, rgba(26, 115, 232, 0.05) 70%, transparent 100%);
-      transform: scale(0);
-      animation: rippleAnim 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-    @keyframes rippleAnim {
-      0% {
-        transform: scale(0);
-        opacity: 0.7;
-      }
-      100% {
-        transform: scale(20);
-        opacity: 0;
-      }
-    }
-
-    /* ----- Header (Google Material) ----- */
+    /* Header */
     .header {
       background: var(--bg-primary);
       padding: 12px 24px;
@@ -110,8 +73,6 @@
       position: sticky;
       top: 0;
       z-index: 10;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       box-shadow: var(--surface-shadow);
     }
     .header-brand {
@@ -122,13 +83,11 @@
     .header-brand .material-symbols-outlined {
       font-size: 28px;
       color: var(--google-blue);
-      font-variation-settings: 'FILL' 1;
     }
     .header h1 {
       font-size: 1.3rem;
       font-weight: 600;
       color: var(--text-primary);
-      letter-spacing: -0.3px;
     }
     .header .channel-counter {
       background: var(--google-grey-100);
@@ -138,11 +97,10 @@
       font-weight: 500;
       color: var(--google-grey-600);
       border: 1px solid var(--google-grey-200);
-      transition: var(--transition);
       white-space: nowrap;
     }
 
-    /* ----- Filter bar (Google) ----- */
+    /* Filter bar */
     .filter-bar {
       background: var(--bg-primary);
       padding: 8px 24px;
@@ -154,8 +112,6 @@
       position: sticky;
       top: 64px;
       z-index: 9;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
     }
     .filter-bar .search-wrap {
       flex: 1 1 200px;
@@ -164,7 +120,6 @@
       background: var(--google-grey-100);
       border-radius: 24px;
       padding: 4px 12px 4px 16px;
-      transition: var(--transition);
       border: 1px solid transparent;
     }
     .filter-bar .search-wrap:focus-within {
@@ -221,7 +176,7 @@
       box-shadow: 0 1px 3px rgba(26, 115, 232, 0.3);
     }
 
-    /* ----- Last Played (Google chips) ----- */
+    /* Last Played */
     .last-played-section {
       padding: 16px 24px 4px;
       max-width: 1440px;
@@ -231,7 +186,6 @@
     }
     .last-played-section.visible {
       display: block;
-      animation: fadeUp 0.3s ease;
     }
     .last-played-section .section-title {
       font-size: 0.8rem;
@@ -272,7 +226,6 @@
       box-shadow: var(--surface-shadow);
     }
     .last-played-card:hover {
-      transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       border-color: var(--google-blue);
     }
@@ -317,7 +270,7 @@
       letter-spacing: 0.3px;
     }
 
-    /* ----- Grid (Google cards) ----- */
+    /* Grid */
     .grid-container {
       padding: 16px 24px 30px;
       display: grid;
@@ -326,20 +279,9 @@
       max-width: 1440px;
       margin: 0 auto;
       width: 100%;
-      animation: fadeUp 0.4s ease;
-    }
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
-    /* ----- Channel Card (Google Material) ----- */
+    /* Channel Card */
     .channel-card {
       background: var(--bg-primary);
       border-radius: var(--card-radius);
@@ -354,21 +296,8 @@
       padding: 16px 8px 14px;
       position: relative;
       box-shadow: var(--surface-shadow);
-      animation: cardPop 0.3s ease both;
-      animation-delay: calc(var(--index, 0) * 0.02s);
-    }
-    @keyframes cardPop {
-      from {
-        opacity: 0;
-        transform: scale(0.94);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
     }
     .channel-card:hover {
-      transform: translateY(-3px);
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
       border-color: var(--google-blue);
     }
@@ -384,11 +313,6 @@
       overflow: hidden;
       border: 1px solid var(--google-grey-200);
       flex-shrink: 0;
-      transition: var(--transition);
-    }
-    .channel-card:hover .logo-wrapper {
-      border-color: var(--google-blue);
-      transform: scale(1.04);
     }
     .channel-card img {
       max-width: 100%;
@@ -422,7 +346,6 @@
       border: 1px solid var(--google-grey-200);
     }
 
-    /* empty state */
     .empty-box {
       grid-column: 1 / -1;
       text-align: center;
@@ -439,7 +362,7 @@
       margin-bottom: 8px;
     }
 
-    /* ----- Player Overlay (Google dark) ----- */
+    /* Player Overlay */
     .player-overlay {
       display: none;
       position: fixed;
@@ -469,7 +392,7 @@
       background: #000;
     }
 
-    /* ----- Player controls (Google style) ----- */
+    /* Player controls */
     .player-top-bar {
       position: absolute;
       top: 0;
@@ -488,8 +411,6 @@
     }
     .player-btn {
       background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.06);
       color: #fff;
       padding: 8px 16px;
@@ -506,11 +427,9 @@
     }
     .player-btn .material-symbols-outlined {
       font-size: 20px;
-      font-variation-settings: 'FILL' 0;
     }
     .player-btn:hover {
       background: rgba(255, 255, 255, 0.15);
-      transform: scale(1.02);
     }
     .player-btn-close {
       width: 40px;
@@ -521,7 +440,6 @@
       align-items: center;
       justify-content: center;
       background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       color: #fff;
       cursor: pointer;
@@ -530,7 +448,6 @@
     .player-btn-close:hover {
       background: rgba(255, 59, 59, 0.3);
       border-color: #ff3b3b;
-      transform: scale(1.06);
     }
     .player-btn-close .material-symbols-outlined {
       font-size: 24px;
@@ -542,8 +459,6 @@
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       padding: 6px 20px 6px 14px;
       border-radius: 50px;
       border: 1px solid rgba(255, 255, 255, 0.06);
@@ -556,7 +471,6 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
       pointer-events: none;
       white-space: nowrap;
-      animation: fadeUp 0.3s ease;
     }
     .player-info img {
       width: 28px;
@@ -572,66 +486,7 @@
       text-overflow: ellipsis;
     }
 
-    /* channel info "i" button (Google style) */
-    .channel-info-btn {
-      position: absolute;
-      bottom: 140px;
-      right: 24px;
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      color: #fff;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      z-index: 1001;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-      font-family: inherit;
-    }
-    .channel-info-btn .material-symbols-outlined {
-      font-size: 22px;
-      font-variation-settings: 'FILL' 0;
-    }
-    .channel-info-btn:hover {
-      background: rgba(26, 115, 232, 0.3);
-      border-color: var(--google-blue);
-      transform: scale(1.06);
-    }
-
-    .player-disclaimer-popup {
-      position: absolute;
-      bottom: 190px;
-      right: 24px;
-      background: var(--bg-primary);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--google-grey-200);
-      border-radius: 16px;
-      padding: 16px 20px;
-      max-width: 280px;
-      color: var(--text-primary);
-      font-size: 0.75rem;
-      line-height: 1.5;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-      z-index: 1002;
-      animation: fadeUp 0.25s ease;
-      display: none;
-      pointer-events: none;
-    }
-    .player-disclaimer-popup.show {
-      display: block;
-    }
-    .player-disclaimer-popup strong {
-      color: var(--text-primary);
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    /* ----- Error Modal (Google) ----- */
+    /* Error Modal */
     .error-overlay {
       display: none;
       position: fixed;
@@ -640,22 +495,12 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(8px);
       z-index: 2000;
       justify-content: center;
       align-items: center;
-      animation: fadeIn 0.2s ease;
     }
     .error-overlay.active {
       display: flex;
-    }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
     }
     .error-modal {
       background: var(--bg-primary);
@@ -665,17 +510,6 @@
       width: 90%;
       text-align: center;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-      animation: scaleIn 0.25s ease;
-    }
-    @keyframes scaleIn {
-      from {
-        transform: scale(0.92);
-        opacity: 0;
-      }
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
     }
     .error-modal .material-symbols-outlined {
       font-size: 3rem;
@@ -717,7 +551,6 @@
     }
     .error-btn.primary:hover {
       background: var(--google-blue-dark);
-      transform: scale(1.02);
     }
     .error-btn.secondary {
       background: var(--google-grey-100);
@@ -727,9 +560,8 @@
     .error-btn.secondary:hover {
       background: var(--google-grey-200);
     }
-    
 
-    /* ----- responsive tweaks ----- */
+    /* Responsive */
     @media (max-width: 768px) {
       .header {
         padding: 10px 16px;
@@ -766,15 +598,6 @@
         padding: 6px 12px;
         font-size: 0.75rem;
       }
-      .channel-info-btn {
-        bottom: 110px;
-        width: 34px;
-        height: 34px;
-      }
-      .channel-info-btn .material-symbols-outlined {
-        font-size: 18px;
-
-    
       .last-played-card {
         flex: 0 0 90px;
         min-width: 70px;
@@ -826,21 +649,12 @@
       .player-btn-close .material-symbols-outlined {
         font-size: 18px;
       }
-      .channel-info-btn {
-        bottom: 80px;
-        right: 12px;
-        width: 30px;
-        height: 30px;
-      }
-      .channel-info-btn .material-symbols-outlined {
-        font-size: 16px;
-      }
     }
   </style>
 </head>
 <body>
 
-  <!-- ===== HEADER ===== -->
+  <!-- HEADER -->
   <header class="header">
     <div class="header-brand">
       <span class="material-symbols-outlined">live_tv</span>
@@ -849,7 +663,7 @@
     <span class="channel-counter" id="channelCounter">0 channels</span>
   </header>
 
-  <!-- ===== FILTER BAR ===== -->
+  <!-- FILTER BAR -->
   <div class="filter-bar">
     <div class="search-wrap">
       <span class="material-symbols-outlined">search</span>
@@ -858,18 +672,17 @@
     <div class="category-group" id="categoryGroup"></div>
   </div>
 
-  <!-- ===== LAST PLAYED ===== -->
+  <!-- LAST PLAYED -->
   <div class="last-played-section" id="lastPlayedSection">
     <div class="section-title">🕐 Recently played</div>
     <div class="last-played-grid" id="lastPlayedGrid"></div>
   </div>
 
-  <!-- ===== CHANNEL GRID ===== -->
+  <!-- CHANNEL GRID -->
   <div class="grid-container" id="channelGrid"></div>
 
-  <!-- ===== PLAYER OVERLAY ===== -->
+  <!-- PLAYER OVERLAY -->
   <div class="player-overlay" id="playerOverlay">
-    <!-- top bar with controls -->
     <div class="player-top-bar">
       <button class="player-btn" id="backBtn">
         <span class="material-symbols-outlined">arrow_back</span> Back
@@ -883,20 +696,13 @@
       <video id="video" controls playsinline autoplay></video>
     </div>
 
-    <!-- player info -->
     <div class="player-info" id="playerInfo">
       <img id="playerLogo" src="" alt="logo" />
       <span class="channel-name-text" id="playerName">Channel</span>
     </div>
+  </div>
 
-    <!-- info button (i) -->
-    <button class="channel-info-btn" id="channelInfoBtn">
-      <span class="material-symbols-outlined">info</span>
-    </button>
-
-
-
-  <!-- ===== ERROR MODAL ===== -->
+  <!-- ERROR MODAL -->
   <div class="error-overlay" id="errorOverlay">
     <div class="error-modal">
       <span class="material-symbols-outlined">error</span>
@@ -927,20 +733,14 @@ let cachedCookie = null;
 let cookieTimestamp = 0;
 const COOKIE_MAX_AGE = 5 * 60 * 1000;
 let activeCookie = null;
-let expandElement = null;
 let isClosing = false;
 let shakaPlayer = null;
 let currentChannel = null;
-let currentCardRect = null;
 let errorChannel = null;
 let isErrorShowing = false;
 let lastPlayedChannels = [];
 let isPlaying = false;
 let playTimeout = null;
-let disclaimerAccepted = false;
-let channelsPreloaded = false;
-let disclaimerShowing = true;
-let preloadPromise = null;
 const STORAGE_KEY = 'liveTV_lastPlayed';
 
 // ─── DOM REFS ──────────────────────────────────────────────
@@ -958,40 +758,6 @@ const playerLogo = document.getElementById('playerLogo');
 const errorOverlay = document.getElementById('errorOverlay');
 const errorRetry = document.getElementById('errorRetry');
 const errorClose = document.getElementById('errorClose');
-const disclaimerOverlay = document.getElementById('disclaimerOverlay');
-const disclaimerAcceptBtn = document.getElementById('disclaimerAcceptBtn');
-const channelInfoBtn = document.getElementById('channelInfoBtn');
-const playerDisclaimerPopup = document.getElementById('playerDisclaimerPopup');
-
-
-  
-  if (allChannels.length > 0) {
-    console.log('⚡ Channels already preloaded, rendering instantly...');
-    applyFilters();
-    updateCounter();
-    loadLastPlayed();
-    renderLastPlayed();
-  } else {
-    console.log('⏳ Waiting for channels to load...');
-    if (preloadPromise) {
-      preloadPromise.then(() => {
-        applyFilters();
-        updateCounter();
-        loadLastPlayed();
-        renderLastPlayed();
-      });
-    } else {
-      fetchChannels();
-    }
-  }
-}
-
-
-  preloadPromise = fetchChannels(true);
-  await preloadPromise;
- 
-
-
 
 // ─── LAST PLAYED ──────────────────────────────────────────
 function loadLastPlayed() {
@@ -1037,143 +803,10 @@ function renderLastPlayed() {
       const raw = card.dataset.channel;
       try {
         const ch = JSON.parse(raw);
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX || rect.left + rect.width / 2;
-        const y = e.clientY || rect.top + rect.height / 2;
-        createRipple(x, y);
-        const tempCard = buildTempCard(ch, rect);
-        document.body.appendChild(tempCard);
-        createExpandAnimation(tempCard);
-        setTimeout(() => { if (tempCard.parentNode) tempCard.remove(); }, 600);
-        setTimeout(() => playChannel(ch), 450);
+        setTimeout(() => playChannel(ch), 100);
       } catch (_) {}
     });
   });
-}
-
-function buildTempCard(ch, rect) {
-  const el = document.createElement('div');
-  el.className = 'channel-card';
-  el.style.cssText = `
-    width:${rect.width}px; height:${rect.height}px;
-    position:fixed; left:${rect.left}px; top:${rect.top}px;
-    background:var(--bg-primary); border-radius:var(--card-radius);
-    display:flex; flex-direction:column; align-items:center;
-    justify-content:center; padding:14px 8px;
-    border:1px solid var(--google-grey-200); z-index:998;
-    box-shadow:var(--surface-shadow);
-  `;
-  el.innerHTML = `
-    <div class="logo-wrapper" style="width:72px;height:72px;background:var(--google-grey-100);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:8px;overflow:hidden;border:1px solid var(--google-grey-200);">
-      <img src="${ch.logo || 'https://ui-avatars.com/api/?name='+encodeURIComponent(ch.name)+'&background=e8eaed&color=202124&size=80'}" style="max-width:100%;max-height:100%;object-fit:contain;padding:5px;" />
-    </div>
-    <div class="channel-name" style="font-size:0.85rem;font-weight:500;color:var(--text-primary);">${ch.name}</div>
-    <span class="channel-category" style="font-size:0.6rem;color:var(--google-grey-600);margin-top:4px;background:var(--google-grey-100);padding:2px 12px;border-radius:40px;border:1px solid var(--google-grey-200);">${ch.category || 'General'}</span>
-  `;
-  return el;
-}
-
-// ─── RIPPLE (Google) ─────────────────────────────────────
-function createRipple(x, y) {
-  const container = document.createElement('div');
-  container.className = 'ripple-container';
-  const ripple = document.createElement('div');
-  ripple.className = 'ripple-effect';
-  const size = Math.min(window.innerWidth, window.innerHeight) * 0.18;
-  ripple.style.cssText = `width:${size}px;height:${size}px;left:${x - size/2}px;top:${y - size/2}px;`;
-  container.appendChild(ripple);
-  document.body.appendChild(container);
-  setTimeout(() => { if (container.parentNode) container.remove(); }, 700);
-}
-
-// ─── EXPAND / SHRINK ANIMATIONS ──────────────────────────
-function createExpandAnimation(card) {
-  cleanupAnimations();
-  const rect = card.getBoundingClientRect();
-  currentCardRect = rect;
-  expandElement = document.createElement('div');
-  expandElement.className = 'video-expand';
-  expandElement.style.cssText = `
-    width:${rect.width}px; height:${rect.height}px;
-    left:${rect.left}px; top:${rect.top}px;
-    background:var(--bg-primary); border-radius:var(--card-radius);
-    display:flex; flex-direction:column; align-items:center;
-    justify-content:center; padding:20px;
-    position:fixed; z-index:999; overflow:hidden;
-    box-shadow:0 8px 30px rgba(0,0,0,0.15);
-    transition:all 0.45s cubic-bezier(0.4,0,0.2,1);
-  `;
-  const clone = card.cloneNode(true);
-  clone.style.cssText = 'width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:transparent;border:none;box-shadow:none;';
-  const w = clone.querySelector('.logo-wrapper');
-  if (w) { w.style.width = '100px'; w.style.height = '100px'; }
-  const n = clone.querySelector('.channel-name');
-  if (n) n.style.fontSize = '1.2rem';
-  expandElement.appendChild(clone);
-  document.body.appendChild(expandElement);
-  
-  requestAnimationFrame(() => {
-    expandElement.style.width = '100%';
-    expandElement.style.height = '100%';
-    expandElement.style.left = '0';
-    expandElement.style.top = '0';
-    expandElement.style.borderRadius = '0';
-  });
-  
-  setTimeout(() => {
-    if (expandElement) { 
-      expandElement.style.opacity = '0';
-      setTimeout(() => {
-        if (expandElement && expandElement.parentNode) 
-          expandElement.remove();
-        expandElement = null;
-      }, 200);
-    }
-    playerOverlay.classList.add('active');
-  }, 350);
-}
-
-function createShrinkAnimation(callback) {
-  if (!currentCardRect) { if (callback) callback(); return; }
-  const rect = currentCardRect;
-  const shrinkEl = document.createElement('div');
-  shrinkEl.className = 'video-shrink';
-  shrinkEl.style.cssText = `
-    width:100%; height:100%; left:0; top:0;
-    background:#000; display:flex; align-items:center;
-    justify-content:center; position:fixed; z-index:1000;
-    transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
-    border-radius:0; overflow:hidden;
-  `;
-  const snap = document.createElement('div');
-  snap.style.cssText = 'width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg-secondary);';
-  const logo = currentChannel?.logo || '';
-  const name = currentChannel?.name || 'Channel';
-  snap.innerHTML = `
-    <img src="${logo}" style="width:70px;height:70px;border-radius:50%;object-fit:contain;background:var(--google-grey-100);padding:8px;border:1px solid var(--google-grey-200);margin-bottom:12px;" />
-    <div style="color:var(--text-primary);font-size:1rem;font-weight:500;">${name}</div>
-  `;
-  shrinkEl.appendChild(snap);
-  document.body.appendChild(shrinkEl);
-  requestAnimationFrame(() => {
-    shrinkEl.style.width = rect.width + 'px';
-    shrinkEl.style.height = rect.height + 'px';
-    shrinkEl.style.left = rect.left + 'px';
-    shrinkEl.style.top = rect.top + 'px';
-    shrinkEl.style.borderRadius = '12px';
-    shrinkEl.style.boxShadow = '0 8px 30px rgba(0,0,0,0.15)';
-    snap.style.transform = 'scale(0.75)';
-    snap.style.opacity = '0.6';
-  });
-  setTimeout(() => {
-    if (shrinkEl) shrinkEl.remove();
-    if (callback) callback();
-  }, 450);
-}
-
-function cleanupAnimations() {
-  if (expandElement) { expandElement.remove(); expandElement = null; }
-  document.querySelectorAll('.ripple-container, .video-expand, .video-shrink').forEach(el => { if (el.parentNode) el.remove(); });
 }
 
 // ─── ERROR HANDLING ──────────────────────────────────────
@@ -1214,7 +847,7 @@ async function fetchCookie() {
 }
 
 // ─── FETCH CHANNELS ──────────────────────────────────────
-async function fetchChannels(silent = false) {
+async function fetchChannels() {
   try {
     const res = await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/channels', {
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
@@ -1224,17 +857,13 @@ async function fetchChannels(silent = false) {
     allChannels = Array.isArray(data) ? data : (data.channels || []);
     allChannels = allChannels.filter(c => c && typeof c === 'object' && c.name);
     extractCategories();
-    if (!silent) {
-      applyFilters();
-      updateCounter();
-      loadLastPlayed();
-      renderLastPlayed();
-    }
+    applyFilters();
+    updateCounter();
+    loadLastPlayed();
+    renderLastPlayed();
     return allChannels;
   } catch (_) {
-    if (!silent) {
-      grid.innerHTML = `<div class="empty-box"><span class="material-symbols-outlined">wifi_off</span>Could not load channels. Please refresh.</div>`;
-    }
+    grid.innerHTML = `<div class="empty-box"><span class="material-symbols-outlined">wifi_off</span>Could not load channels. Please refresh.</div>`;
     return [];
   }
 }
@@ -1278,7 +907,7 @@ function renderGrid() {
   filteredChannels.forEach((ch, idx) => {
     const logo = ch.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(ch.name) + '&background=e8eaed&color=202124&size=80';
     html += `
-      <div class="channel-card" style="--index:${idx}" data-channel='${JSON.stringify(ch).replace(/'/g,"&#39;")}'>
+      <div class="channel-card" data-channel='${JSON.stringify(ch).replace(/'/g,"&#39;")}'>
         <div class="logo-wrapper">
           <img src="${logo}" alt="${ch.name}" loading="lazy"
                onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=e8eaed&color=202124&size=80';" />
@@ -1292,16 +921,11 @@ function renderGrid() {
   document.querySelectorAll('.channel-card').forEach(card => {
     card.addEventListener('click', (e) => {
       if (isClosing || isPlaying) return;
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX || rect.left + rect.width / 2;
-      const y = e.clientY || rect.top + rect.height / 2;
-      createRipple(x, y);
-      createExpandAnimation(card);
       const raw = card.dataset.channel;
       try {
         const ch = JSON.parse(raw);
         if (playTimeout) clearTimeout(playTimeout);
-        playTimeout = setTimeout(() => playChannel(ch), 450);
+        playTimeout = setTimeout(() => playChannel(ch), 100);
       } catch (_) {}
     });
   });
@@ -1323,6 +947,7 @@ async function playChannel(channel) {
   playerLogo.src = channel.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(channel.name) + '&background=e8eaed&color=202124&size=40';
   saveLastPlayed(channel);
   destroyPlayer();
+  playerOverlay.classList.add('active');
   try {
     shaka.polyfill.installAll();
     if (!shaka.Player.isBrowserSupported()) { showError(channel); isPlaying = false; return; }
@@ -1391,14 +1016,11 @@ function closePlayer() {
   videoEl.pause();
   videoEl.src = '';
   playerOverlay.classList.remove('active');
-  cleanupAnimations();
-  playerDisclaimerPopup.classList.remove('show');
-  createShrinkAnimation(() => {
+  setTimeout(() => {
     isClosing = false;
     currentChannel = null;
     activeCookie = null;
-    currentCardRect = null;
-  });
+  }, 200);
 }
 
 function destroyPlayer() {
@@ -1420,771 +1042,10 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-channelInfoBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  playerDisclaimerPopup.classList.toggle('show');
-  clearTimeout(window.popupTimeout);
-  window.popupTimeout = setTimeout(() => playerDisclaimerPopup.classList.remove('show'), 5000);
-});
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.channel-info-btn') && !e.target.closest('.player-disclaimer-popup')) {
-    playerDisclaimerPopup.classList.remove('show');
-  }
-});
-
-// ─── OFFLINE DETECTION ──────────────────────────────────
-(function() {
-  const offlineOverlay = document.createElement('div');
-  offlineOverlay.id = 'offlineOverlay';
-  offlineOverlay.style.cssText = `
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    z-index: 9999; justify-content: center; align-items: center; flex-direction: column;
-    padding: 24px; animation: fadeIn 0.3s ease;
-  `;
-  const offlineModal = document.createElement('div');
-  offlineModal.style.cssText = `
-    background: var(--bg-primary); border-radius: 28px; padding: 40px 32px 32px;
-    max-width: 420px; width: 100%; text-align: center;
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3); animation: scaleIn 0.35s ease;
-  `;
-  offlineModal.innerHTML = `
-    <span class="material-symbols-outlined" style="font-size: 4rem; color: #ea4335; display: block; margin-bottom: 12px;">wifi_off</span>
-    <h2 style="font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">No Internet Connection</h2>
-    <p style="color: var(--google-grey-600); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">
-      You are currently offline. Please check your internet connection and try again.
-    </p>
-    <button id="offlineRetryBtn" style="
-      background: var(--google-blue); border: none; color: #fff; padding: 12px 32px;
-      border-radius: 50px; font-size: 1rem; font-weight: 500; cursor: pointer;
-      transition: var(--transition); font-family: inherit;
-      box-shadow: 0 1px 3px rgba(26, 115, 232, 0.2); width: 100%;
-    ">
-      <span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle;">refresh</span>
-      Retry Connection
-    </button>
-    <div style="margin-top: 12px; font-size: 0.75rem; color: var(--google-grey-600);">
-      Will auto-reconnect when connection is restored
-    </div>
-  `;
-  offlineOverlay.appendChild(offlineModal);
-  document.body.appendChild(offlineOverlay);
-
-  let isOffline = false;
-  function showOfflineOverlay() {
-    if (isOffline) return;
-    isOffline = true;
-    offlineOverlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    const video = document.getElementById('video');
-    if (video && !video.paused) { video.pause(); }
-  }
-  function hideOfflineOverlay() {
-    if (!isOffline) return;
-    isOffline = false;
-    offlineOverlay.style.display = 'none';
-    document.body.style.overflow = '';
-  }
-  function checkConnection() {
-    if (navigator.onLine) {
-      if (isOffline) { hideOfflineOverlay(); }
-    } else { showOfflineOverlay(); }
-  }
-  document.getElementById('offlineRetryBtn').addEventListener('click', function() {
-    checkConnection();
-    if (isOffline) {
-      this.textContent = '⏳ Checking...';
-      setTimeout(() => {
-        this.innerHTML = `<span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle;">refresh</span> Retry Connection`;
-      }, 1500);
-    }
-  });
-  window.addEventListener('online', () => setTimeout(checkConnection, 500));
-  window.addEventListener('offline', showOfflineOverlay);
-  setInterval(() => { if (isOffline) checkConnection(); }, 3000);
-  setTimeout(checkConnection, 1000);
-  const originalFetch = window.fetch;
-  window.fetch = function(...args) {
-    return originalFetch.apply(this, args).catch((error) => {
-      if (!navigator.onLine) showOfflineOverlay();
-      throw error;
-    });
-  };
-  console.log('📡 Offline detection system active.');
-})();
-
-// ─── PRELOAD MPD ON HOVER ──────────────────────────────
-(function() {
-  const preloadCache = new Map();
-  const abortControllers = new Map();
-  let hoverTimeout = null;
-  let currentHoveredChannel = null;
-  const PRELOAD_DELAY = 300;
-  const CACHE_MAX_AGE = 60000;
-
-  async function getCookie() {
-    if (typeof fetchCookie === 'function') return await fetchCookie();
-    return null;
-  }
-
-  async function preloadChannel(channel) {
-    if (!channel || !channel.url) return;
-    const channelId = channel.id || channel.name;
-    if (preloadCache.has(channelId)) {
-      const cached = preloadCache.get(channelId);
-      if (Date.now() - cached.timestamp < CACHE_MAX_AGE) {
-        console.log('📦 Using cached preload for:', channel.name);
-        return cached.data;
-      }
-    }
-    if (abortControllers.has(channelId)) {
-      abortControllers.get(channelId).abort();
-      abortControllers.delete(channelId);
-    }
-    const controller = new AbortController();
-    abortControllers.set(channelId, controller);
-    console.log('⏳ Preloading:', channel.name);
-    try {
-      const streamUrls = [channel.url, channel.url1, channel.url2, channel.url3]
-        .filter(Boolean)
-        .map(u => u.replace(/bpk-tv\/\//g, 'bpk-tv/'));
-      if (!streamUrls.length) return;
-      const cookie = await getCookie();
-      let url = streamUrls[0];
-      if (cookie) {
-        url = url.split('?')[0];
-        url = url + '?' + cookie;
-      }
-      const response = await fetch(url, {
-        signal: controller.signal,
-        headers: { 'Referer': 'https://www.jiotv.com/', 'User-Agent': 'plaYtv/7.1.5' }
-      });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const manifestText = await response.text();
-      preloadCache.set(channelId, {
-        data: manifestText,
-        timestamp: Date.now(),
-        url: url,
-        originalUrl: streamUrls[0]
-      });
-      console.log('✅ Preloaded successfully:', channel.name);
-      return manifestText;
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        console.log('⏹️ Preload cancelled for:', channel.name);
-      } else {
-        console.warn('⚠️ Preload failed for:', channel.name, error.message);
-      }
-      return null;
-    } finally {
-      abortControllers.delete(channelId);
-    }
-  }
-
-  function attachPreloadListeners() {
-    document.querySelectorAll('.channel-card, .last-played-card').forEach(card => {
-      if (card.dataset.preloadAttached) return;
-      card.dataset.preloadAttached = 'true';
-      let channel = null;
-      try {
-        const raw = card.dataset.channel;
-        if (raw) channel = JSON.parse(raw);
-      } catch (_) {}
-      if (!channel) return;
-
-      card.addEventListener('mouseenter', function(e) {
-        const ch = channel;
-        if (hoverTimeout) { clearTimeout(hoverTimeout); hoverTimeout = null; }
-        const channelId = ch.id || ch.name;
-        if (preloadCache.has(channelId)) {
-          const cached = preloadCache.get(channelId);
-          if (Date.now() - cached.timestamp < CACHE_MAX_AGE) return;
-        }
-        hoverTimeout = setTimeout(() => {
-          currentHoveredChannel = ch;
-          preloadChannel(ch).catch(() => {});
-        }, PRELOAD_DELAY);
-      });
-
-      card.addEventListener('mouseleave', function() {
-        if (hoverTimeout) { clearTimeout(hoverTimeout); hoverTimeout = null; }
-        const ch = channel;
-        if (ch) {
-          const channelId = ch.id || ch.name;
-          if (abortControllers.has(channelId)) {
-            abortControllers.get(channelId).abort();
-            abortControllers.delete(channelId);
-          }
-        }
-        currentHoveredChannel = null;
-      });
-    });
-  }
-
-  const originalPlayChannel = window.playChannel;
-  if (originalPlayChannel) {
-    window.playChannel = async function(channel) {
-      if (!channel) return originalPlayChannel(channel);
-      const channelId = channel.id || channel.name;
-      if (preloadCache.has(channelId)) {
-        const cached = preloadCache.get(channelId);
-        console.log('🚀 INSTANT PLAY using preloaded data for:', channel.name);
-        if (cached.url) {
-          channel._preloadedUrl = cached.url;
-          channel._preloadedManifest = cached.data;
-        }
-      }
-      return originalPlayChannel(channel);
-    };
-  }
-
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, value] of preloadCache) {
-      if (now - value.timestamp > CACHE_MAX_AGE) {
-        preloadCache.delete(key);
-      }
-    }
-  }, CACHE_MAX_AGE);
-
-  function initPreload() {
-    const checkGrid = setInterval(() => {
-      const cards = document.querySelectorAll('.channel-card');
-      if (cards.length > 0) {
-        clearInterval(checkGrid);
-        attachPreloadListeners();
-        console.log('🎯 Preload system initialized with', cards.length, 'channels');
-      }
-    }, 500);
-
-    const originalRenderGrid = window.renderGrid;
-    if (originalRenderGrid) {
-      window.renderGrid = function() {
-        originalRenderGrid.apply(this, arguments);
-        setTimeout(attachPreloadListeners, 100);
-      };
-    }
-
-    const originalRenderLastPlayed = window.renderLastPlayed;
-    if (originalRenderLastPlayed) {
-      window.renderLastPlayed = function() {
-        originalRenderLastPlayed.apply(this, arguments);
-        setTimeout(attachPreloadListeners, 100);
-      };
-    }
-
-    setTimeout(attachPreloadListeners, 3000);
-    console.log('⚡ Preload system active (with cookie support)');
-  }
-
-  if (document.readyState === 'complete') {
-    setTimeout(initPreload, 100);
-  } else {
-    document.addEventListener('DOMContentLoaded', initPreload);
-  }
-
-  window.preloadCache = preloadCache;
-  window.manualPreload = preloadChannel;
-  console.log('⚡ Channel preload system active (cookie attached to MPD)');
-})();
-
 // ─── INIT ─────────────────────────────────────────────────
 loadLastPlayed();
 fetchChannels();
-console.log('🚀 Live TV (Google style) · loaded.');
-</script>
-  <script>
-// ─── OFFLINE DETECTION SYSTEM ──────────────────────────────
-(function() {
-    // Create overlay elements
-    const offlineOverlay = document.createElement('div');
-    offlineOverlay.id = 'offlineOverlay';
-    offlineOverlay.style.cssText = `
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.92);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        z-index: 9999;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        padding: 24px;
-        animation: fadeIn 0.3s ease;
-    `;
-
-    const offlineModal = document.createElement('div');
-    offlineModal.style.cssText = `
-        background: var(--bg-primary);
-        border-radius: 28px;
-        padding: 40px 32px 32px;
-        max-width: 420px;
-        width: 100%;
-        text-align: center;
-        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
-        animation: scaleIn 0.35s ease;
-    `;
-
-    offlineModal.innerHTML = `
-        <span class="material-symbols-outlined" style="font-size: 4rem; color: #ea4335; display: block; margin-bottom: 12px;">wifi_off</span>
-        <h2 style="font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">No Internet Connection</h2>
-        <p style="color: var(--google-grey-600); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">
-            You are currently offline. Please check your internet connection and try again.
-        </p>
-        <button id="offlineRetryBtn" style="
-            background: var(--google-blue);
-            border: none;
-            color: #fff;
-            padding: 12px 32px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
-            box-shadow: 0 1px 3px rgba(26, 115, 232, 0.2);
-            width: 100%;
-        ">
-            <span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle;">refresh</span>
-            Retry Connection
-        </button>
-        <div style="margin-top: 12px; font-size: 0.75rem; color: var(--google-grey-600);">
-            Will auto-reconnect when connection is restored
-        </div>
-    `;
-
-    offlineOverlay.appendChild(offlineModal);
-    document.body.appendChild(offlineOverlay);
-
-    // Add keyframes if not already present
-    if (!document.getElementById('offlineStyles')) {
-        const styleSheet = document.createElement('style');
-        styleSheet.id = 'offlineStyles';
-        styleSheet.textContent = `
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-            @keyframes scaleIn {
-                from { transform: scale(0.92); opacity: 0; }
-                to { transform: scale(1); opacity: 1; }
-            }
-        `;
-        document.head.appendChild(styleSheet);
-    }
-
-    // State
-    let isOffline = false;
-    let isPageHidden = false;
-
-    // Show offline overlay
-    function showOfflineOverlay() {
-        if (isOffline) return;
-        isOffline = true;
-        offlineOverlay.style.display = 'flex';
-        // Hide main content visually but keep it functional
-        document.body.style.overflow = 'hidden';
-        // Pause any playing video
-        const video = document.getElementById('video');
-        if (video && !video.paused) {
-            video.pause();
-        }
-    }
-
-    // Hide offline overlay
-    function hideOfflineOverlay() {
-        if (!isOffline) return;
-        isOffline = false;
-        offlineOverlay.style.display = 'none';
-        document.body.style.overflow = '';
-    }
-
-    // Check connection status
-    function checkConnection() {
-        if (navigator.onLine) {
-            if (isOffline) {
-                hideOfflineOverlay();
-                // Optionally reload channels if needed
-                if (typeof allChannels !== 'undefined' && allChannels.length === 0) {
-                    if (typeof fetchChannels === 'function') {
-                        fetchChannels();
-                    }
-                }
-            }
-        } else {
-            showOfflineOverlay();
-        }
-    }
-
-    // Retry button handler
-    document.getElementById('offlineRetryBtn').addEventListener('click', function() {
-        checkConnection();
-        // If still offline, show a brief feedback
-        if (isOffline) {
-            this.textContent = '⏳ Checking...';
-            setTimeout(() => {
-                this.innerHTML = `
-                    <span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle;">refresh</span>
-                    Retry Connection
-                `;
-            }, 1500);
-        }
-    });
-
-    // Listen to online/offline events
-    window.addEventListener('online', function() {
-        // Small delay to ensure network is actually available
-        setTimeout(checkConnection, 500);
-    });
-
-    window.addEventListener('offline', function() {
-        showOfflineOverlay();
-    });
-
-    // Periodic check every 3 seconds when offline
-    setInterval(function() {
-        if (isOffline) {
-            checkConnection();
-        }
-    }, 3000);
-
-    // Initial check
-    setTimeout(checkConnection, 1000);
-
-    // Override fetch to catch network errors (optional but helpful)
-    const originalFetch = window.fetch;
-    window.fetch = function(...args) {
-        return originalFetch.apply(this, args).catch((error) => {
-            if (!navigator.onLine) {
-                showOfflineOverlay();
-            }
-            throw error;
-        });
-    };
-
-    console.log('📡 Offline detection system active.');
-})();
-</script>
- <script>
-// ─── PRELOAD MPD ON HOVER (WITH COOKIE) ──────────────────
-(function() {
-    // Store preload promises and abort controllers
-    const preloadCache = new Map();
-    const abortControllers = new Map();
-    let hoverTimeout = null;
-    let currentHoveredChannel = null;
-
-    // Configuration
-    const PRELOAD_DELAY = 300;
-    const CACHE_MAX_AGE = 60000;
-
-    // Get the cookie (uses existing fetchCookie function)
-    async function getCookie() {
-        if (typeof fetchCookie === 'function') {
-            return await fetchCookie();
-        }
-        return null;
-    }
-
-    // Preload function with cookie attached
-    async function preloadChannel(channel) {
-        if (!channel || !channel.url) return;
-
-        const channelId = channel.id || channel.name;
-        
-        // Skip if already preloaded recently
-        if (preloadCache.has(channelId)) {
-            const cached = preloadCache.get(channelId);
-            if (Date.now() - cached.timestamp < CACHE_MAX_AGE) {
-                console.log('📦 Using cached preload for:', channel.name);
-                return cached.data;
-            }
-        }
-
-        // Cancel any existing preload for this channel
-        if (abortControllers.has(channelId)) {
-            abortControllers.get(channelId).abort();
-            abortControllers.delete(channelId);
-        }
-
-        const controller = new AbortController();
-        abortControllers.set(channelId, controller);
-
-        console.log('⏳ Preloading:', channel.name);
-
-        try {
-            // Get the stream URL
-            const streamUrls = [channel.url, channel.url1, channel.url2, channel.url3]
-                .filter(Boolean)
-                .map(u => u.replace('bpk-tv//', 'bpk-tv/'));
-
-            if (!streamUrls.length) return;
-
-            // Get fresh cookie
-            const cookie = await getCookie();
-            let url = streamUrls[0];
-            
-            // Attach cookie as query parameter (like in playChannel)
-            if (cookie) {
-                // Remove any existing query params
-                url = url.split('?')[0];
-                // Add cookie as parameter
-                url = url + '?' + cookie;
-                console.log('🍪 Cookie attached to preload for:', channel.name);
-            }
-
-            // Preload the MPD manifest with cookie
-            const response = await fetch(url, {
-                signal: controller.signal,
-                headers: {
-                    'Referer': 'https://www.jiotv.com/',
-                    'User-Agent': 'plaYtv/7.1.5'
-                }
-            });
-
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-            // Read the manifest as text
-            const manifestText = await response.text();
-            
-            // Cache the result with the URL that includes cookie
-            preloadCache.set(channelId, {
-                data: manifestText,
-                timestamp: Date.now(),
-                url: url,  // Store the full URL with cookie
-                originalUrl: streamUrls[0]
-            });
-
-            console.log('✅ Preloaded successfully:', channel.name);
-
-            return manifestText;
-
-        } catch (error) {
-            if (error.name === 'AbortError') {
-                console.log('⏹️ Preload cancelled for:', channel.name);
-            } else {
-                console.warn('⚠️ Preload failed for:', channel.name, error.message);
-            }
-            return null;
-        } finally {
-            abortControllers.delete(channelId);
-        }
-    }
-
-    // Function to apply preload to all channel cards
-    function setupPreloadOnCards() {
-        const observer = new MutationObserver(() => {
-            attachPreloadListeners();
-        });
-
-        const grid = document.getElementById('channelGrid');
-        if (grid) {
-            observer.observe(grid, { childList: true, subtree: true });
-        }
-
-        const lastPlayedGrid = document.getElementById('lastPlayedGrid');
-        if (lastPlayedGrid) {
-            observer.observe(lastPlayedGrid, { childList: true, subtree: true });
-        }
-
-        attachPreloadListeners();
-    }
-
-    function attachPreloadListeners() {
-        // Channel cards
-        document.querySelectorAll('.channel-card').forEach(card => {
-            if (card.dataset.preloadAttached) return;
-            card.dataset.preloadAttached = 'true';
-            
-            let channel = null;
-            try {
-                const raw = card.dataset.channel;
-                if (raw) {
-                    channel = JSON.parse(raw);
-                }
-            } catch (_) {}
-
-            if (!channel) return;
-
-            card.addEventListener('mouseenter', function(e) {
-                const ch = channel;
-                
-                if (hoverTimeout) {
-                    clearTimeout(hoverTimeout);
-                    hoverTimeout = null;
-                }
-
-                const channelId = ch.id || ch.name;
-                if (preloadCache.has(channelId)) {
-                    const cached = preloadCache.get(channelId);
-                    if (Date.now() - cached.timestamp < CACHE_MAX_AGE) {
-                        return;
-                    }
-                }
-
-                hoverTimeout = setTimeout(() => {
-                    currentHoveredChannel = ch;
-                    preloadChannel(ch).catch(() => {});
-                }, PRELOAD_DELAY);
-            });
-
-            card.addEventListener('mouseleave', function() {
-                if (hoverTimeout) {
-                    clearTimeout(hoverTimeout);
-                    hoverTimeout = null;
-                }
-                
-                const ch = channel;
-                if (ch) {
-                    const channelId = ch.id || ch.name;
-                    if (abortControllers.has(channelId)) {
-                        abortControllers.get(channelId).abort();
-                        abortControllers.delete(channelId);
-                    }
-                }
-                currentHoveredChannel = null;
-            });
-        });
-
-        // Last played cards
-        document.querySelectorAll('.last-played-card').forEach(card => {
-            if (card.dataset.preloadAttached) return;
-            card.dataset.preloadAttached = 'true';
-            
-            let channel = null;
-            try {
-                const raw = card.dataset.channel;
-                if (raw) {
-                    channel = JSON.parse(raw);
-                }
-            } catch (_) {}
-
-            if (!channel) return;
-
-            card.addEventListener('mouseenter', function(e) {
-                const ch = channel;
-                if (hoverTimeout) {
-                    clearTimeout(hoverTimeout);
-                    hoverTimeout = null;
-                }
-
-                const channelId = ch.id || ch.name;
-                if (preloadCache.has(channelId)) {
-                    const cached = preloadCache.get(channelId);
-                    if (Date.now() - cached.timestamp < CACHE_MAX_AGE) {
-                        return;
-                    }
-                }
-
-                hoverTimeout = setTimeout(() => {
-                    currentHoveredChannel = ch;
-                    preloadChannel(ch).catch(() => {});
-                }, PRELOAD_DELAY);
-            });
-
-            card.addEventListener('mouseleave', function() {
-                if (hoverTimeout) {
-                    clearTimeout(hoverTimeout);
-                    hoverTimeout = null;
-                }
-                const ch = channel;
-                if (ch) {
-                    const channelId = ch.id || ch.name;
-                    if (abortControllers.has(channelId)) {
-                        abortControllers.get(channelId).abort();
-                        abortControllers.delete(channelId);
-                    }
-                }
-                currentHoveredChannel = null;
-            });
-        });
-    }
-
-    // Override playChannel to use preloaded data with cookie
-    const originalPlayChannel = window.playChannel;
-    if (originalPlayChannel) {
-        window.playChannel = async function(channel) {
-            if (!channel) return originalPlayChannel(channel);
-            
-            const channelId = channel.id || channel.name;
-            
-            // Check if we have preloaded data
-            if (preloadCache.has(channelId)) {
-                const cached = preloadCache.get(channelId);
-                console.log('🚀 INSTANT PLAY using preloaded data for:', channel.name);
-                
-                // Store the preloaded URL with cookie
-                if (cached.url) {
-                    channel._preloadedUrl = cached.url;
-                    channel._preloadedManifest = cached.data;
-                    
-                    // Use the preloaded URL directly
-                    // This will make shaka load instantly
-                    console.log('⚡ Using preloaded manifest with cookie');
-                }
-            }
-            
-            // Call original playChannel with potentially enhanced channel
-            return originalPlayChannel(channel);
-        };
-    }
-
-    // Clean up old cache entries
-    setInterval(() => {
-        const now = Date.now();
-        for (const [key, value] of preloadCache) {
-            if (now - value.timestamp > CACHE_MAX_AGE) {
-                preloadCache.delete(key);
-            }
-        }
-    }, CACHE_MAX_AGE);
-
-    // Initialize
-    function initPreload() {
-        const checkGrid = setInterval(() => {
-            const cards = document.querySelectorAll('.channel-card');
-            if (cards.length > 0) {
-                clearInterval(checkGrid);
-                setupPreloadOnCards();
-                console.log('🎯 Preload system initialized with', cards.length, 'channels');
-            }
-        }, 500);
-
-        const originalRenderGrid = window.renderGrid;
-        if (originalRenderGrid) {
-            window.renderGrid = function() {
-                originalRenderGrid.apply(this, arguments);
-                setTimeout(attachPreloadListeners, 100);
-            };
-        }
-
-        const originalRenderLastPlayed = window.renderLastPlayed;
-        if (originalRenderLastPlayed) {
-            window.renderLastPlayed = function() {
-                originalRenderLastPlayed.apply(this, arguments);
-                setTimeout(attachPreloadListeners, 100);
-            };
-        }
-
-        setTimeout(attachPreloadListeners, 3000);
-        console.log('⚡ Preload system active (with cookie support)');
-    }
-
-    if (document.readyState === 'complete') {
-        setTimeout(initPreload, 100);
-    } else {
-        document.addEventListener('DOMContentLoaded', initPreload);
-    }
-
-    window.preloadCache = preloadCache;
-    window.manualPreload = preloadChannel;
-
-    console.log('⚡ Channel preload system active (cookie attached to MPD)');
-})();
+console.log('🚀 Live TV loaded.');
 </script>
 </body>
 </html>
