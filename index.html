@@ -727,88 +727,7 @@
     .error-btn.secondary:hover {
       background: var(--google-grey-200);
     }
-
-    /* ----- Disclaimer Overlay (Google) ----- */
-    .disclaimer-overlay {
-      display: flex;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(12px);
-      z-index: 3000;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      animation: fadeIn 0.3s ease;
-    }
-    .disclaimer-modal {
-      background: var(--bg-primary);
-      border-radius: 28px;
-      padding: 32px 28px 28px;
-      max-width: 540px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2);
-      animation: scaleIn 0.35s ease;
-    }
-    .disclaimer-modal .disclaimer-icon {
-      text-align: center;
-      font-size: 2.8rem;
-      margin-bottom: 8px;
-    }
-    .disclaimer-modal h1 {
-      font-size: 1.4rem;
-      font-weight: 600;
-      text-align: center;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-    }
-    .disclaimer-modal .disclaimer-text {
-      font-size: 0.9rem;
-      line-height: 1.6;
-      color: var(--text-secondary);
-      background: var(--google-grey-100);
-      padding: 16px 18px;
-      border-radius: 16px;
-      margin-bottom: 20px;
-      max-height: 280px;
-      overflow-y: auto;
-    }
-    .disclaimer-modal .disclaimer-text p {
-      margin-bottom: 10px;
-    }
-    .disclaimer-modal .disclaimer-text ul {
-      padding-left: 20px;
-      margin: 8px 0 12px;
-    }
-    .disclaimer-modal .disclaimer-text ul li {
-      margin-bottom: 6px;
-    }
-    .disclaimer-modal .disclaimer-text strong {
-      color: var(--text-primary);
-    }
-    .disclaimer-modal .disclaimer-btn {
-      background: var(--google-blue);
-      border: none;
-      color: #fff;
-      padding: 12px 32px;
-      border-radius: 50px;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition);
-      width: 100%;
-      font-family: inherit;
-      box-shadow: 0 1px 3px rgba(26, 115, 232, 0.2);
-    }
-    .disclaimer-modal .disclaimer-btn:hover {
-      background: var(--google-blue-dark);
-      transform: scale(1.01);
-    }
+    
 
     /* ----- responsive tweaks ----- */
     @media (max-width: 768px) {
@@ -854,22 +773,8 @@
       }
       .channel-info-btn .material-symbols-outlined {
         font-size: 18px;
-      }
-      .player-disclaimer-popup {
-        bottom: 160px;
-        right: 16px;
-        max-width: 200px;
-        font-size: 0.65rem;
-        padding: 12px 14px;
-      }
-      .disclaimer-modal {
-        padding: 24px 18px 20px;
-      }
-      .disclaimer-modal .disclaimer-text {
-        font-size: 0.8rem;
-        max-height: 200px;
-        padding: 12px 14px;
-      }
+
+    
       .last-played-card {
         flex: 0 0 90px;
         min-width: 70px;
@@ -930,43 +835,10 @@
       .channel-info-btn .material-symbols-outlined {
         font-size: 16px;
       }
-      .player-disclaimer-popup {
-        bottom: 120px;
-        right: 12px;
-        max-width: 160px;
-        font-size: 0.6rem;
-        padding: 8px 10px;
-      }
-      .disclaimer-modal h1 {
-        font-size: 1.1rem;
-      }
     }
   </style>
 </head>
 <body>
-
-  <!-- ===== DISCLAIMER OVERLAY (Google style) ===== -->
-  <div class="disclaimer-overlay" id="disclaimerOverlay">
-    <div class="disclaimer-modal">
-      <div class="disclaimer-icon">🔞</div>
-      <h1>18+ &amp; Disclaimer</h1>
-      <div class="disclaimer-text">
-        <p><strong>This website is for adults (18+).</strong></p>
-        <p>By continuing you confirm that:</p>
-        <ul>
-          <li>You are at least <strong>18 years old</strong>.</li>
-          <li>You understand that all channel streams are from <strong>unofficial third-party sources</strong>.</li>
-          <li>You accept full responsibility for your use, including legal, financial, or any other consequences.</li>
-          <li>You agree to use this site at your own risk and discretion.</li>
-        </ul>
-        <p><strong>If you are under 18 or access is illegal in your region, leave now.</strong></p>
-      </div>
-      <button class="disclaimer-btn" id="disclaimerAcceptBtn">
-        <span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle;">check_circle</span>
-        I am 18+ &amp; accept responsibility
-      </button>
-    </div>
-  </div>
 
   <!-- ===== HEADER ===== -->
   <header class="header">
@@ -1022,12 +894,7 @@
       <span class="material-symbols-outlined">info</span>
     </button>
 
-    <!-- small disclaimer popup -->
-    <div class="player-disclaimer-popup" id="playerDisclaimerPopup">
-      <strong>⚠️ Disclaimer</strong>
-      We are not responsible for any issues arising from using this website.
-    </div>
-  </div>
+
 
   <!-- ===== ERROR MODAL ===== -->
   <div class="error-overlay" id="errorOverlay">
@@ -1096,18 +963,7 @@ const disclaimerAcceptBtn = document.getElementById('disclaimerAcceptBtn');
 const channelInfoBtn = document.getElementById('channelInfoBtn');
 const playerDisclaimerPopup = document.getElementById('playerDisclaimerPopup');
 
-// ─── OPTIMIZED DISCLAIMER WITH BACKGROUND PRELOAD ──────
-function showDisclaimer() {
-  disclaimerOverlay.style.display = 'flex';
-  disclaimerShowing = true;
-  startBackgroundPreload();
-}
 
-function hideDisclaimer() {
-  disclaimerOverlay.style.display = 'none';
-  disclaimerAccepted = true;
-  disclaimerShowing = false;
-  document.body.style.animation = 'fadeUp 0.4s ease';
   
   if (allChannels.length > 0) {
     console.log('⚡ Channels already preloaded, rendering instantly...');
@@ -1130,32 +986,12 @@ function hideDisclaimer() {
   }
 }
 
-async function startBackgroundPreload() {
-  console.log('📡 Starting background channel preload...');
-  const disclaimerBtn = document.getElementById('disclaimerAcceptBtn');
-  if (disclaimerBtn) {
-    disclaimerBtn.innerHTML = `
-      <span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle;animation:spin 1s linear infinite;">autorenew</span>
-      Loading channels...
-    `;
-    disclaimerBtn.disabled = true;
-    disclaimerBtn.style.opacity = '0.7';
-  }
-  
+
   preloadPromise = fetchChannels(true);
   await preloadPromise;
-  
-  if (disclaimerBtn && !disclaimerAccepted) {
-    disclaimerBtn.innerHTML = `
-      <span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle;">check_circle</span>
-      I am 18+ &amp; accept responsibility
-    `;
-    disclaimerBtn.disabled = false;
-    disclaimerBtn.style.opacity = '1';
-  }
-}
+ 
 
-disclaimerAcceptBtn.addEventListener('click', hideDisclaimer);
+
 
 // ─── LAST PLAYED ──────────────────────────────────────────
 function loadLastPlayed() {
@@ -1854,7 +1690,7 @@ document.addEventListener('click', (e) => {
 
 // ─── INIT ─────────────────────────────────────────────────
 loadLastPlayed();
-showDisclaimer();
+fetchChannels();
 console.log('🚀 Live TV (Google style) · loaded.');
 </script>
   <script>
