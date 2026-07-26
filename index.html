@@ -1173,104 +1173,7 @@ html, body {
 </div>
 
 <script>
-// ─── OFFLINE DETECTION ─────────────────────────────────────
-let isOnline = navigator.onLine;
-const offlineOverlay = document.getElementById('offlineOverlay');
-const retryBtn = document.getElementById('retryConnection');
-
-function checkOnlineStatus() {
-  isOnline = navigator.onLine;
-  if (isOnline) {
-    offlineOverlay.classList.remove('active');
-    document.body.style.overflow = 'auto';
-    // Refresh channels if offline was shown
-    if (allChannels.length === 0) {
-      fetchChannels();
-    }
-  } else {
-    offlineOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    // Close player if open
-    if (playerOverlay.classList.contains('active')) {
-      closePlayer();
-    }
-  }
-  updateWifiStatus();
-}
-
-function updateWifiStatus() {
-  const wifiIcon = document.querySelector('.wifi-icon');
-  if (wifiIcon) {
-    wifiIcon.textContent = isOnline ? 'wifi' : 'wifi_off';
-    wifiIcon.style.color = isOnline ? '#22c55e' : '#ef4444';
-  }
-}
-
-// Listen for online/offline events
-window.addEventListener('online', checkOnlineStatus);
-window.addEventListener('offline', checkOnlineStatus);
-
-retryBtn.addEventListener('click', () => {
-  checkOnlineStatus();
-  if (!isOnline) {
-    // Show a toast or message
-    alert('Still offline. Please check your connection.');
-  }
-});
-
-// Initial check
-checkOnlineStatus();
-
-// ─── LOCATION DETECTION ──────────────────────────────────
-function detectLocation() {
-  const locationText = document.getElementById('locationText');
-  
-  if (!navigator.geolocation) {
-    locationText.textContent = 'Location unavailable';
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    async (position) => {
-      const { latitude, longitude } = position.coords;
-      try {
-        // Using free reverse geocoding API
-        const response = await fetch(
-          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-        );
-        const data = await response.json();
-        
-        const city = data.city || data.locality || 'Unknown';
-        const country = data.countryName || '';
-        locationText.textContent = `${city}${country ? ', ' + country : ''}`;
-        
-        // Update status badge with location
-        const badge = document.getElementById('statusBadge');
-        badge.style.borderColor = 'rgba(34, 197, 94, 0.3)';
-      } catch (error) {
-        locationText.textContent = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-      }
-    },
-    (error) => {
-      console.warn('Location error:', error);
-      locationText.textContent = 'Location unavailable';
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 60000
-    }
-  );
-}
-
-// ─── MAIN APP LOGIC ──────────────────────────────────────
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => {
-  if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
-  if (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'P'].includes(e.key)) { e.preventDefault(); return false; }
-  if (e.ctrlKey && ['u', 'U', 's', 'S'].includes(e.key)) { e.preventDefault(); return false; }
-});
-
+// ─── VARIABLE DECLARATIONS (MUST BE FIRST) ──────────────
 let allChannels = [];
 let filteredChannels = [];
 let currentCategory = 'All';
@@ -1289,10 +1192,80 @@ let isPlaying = false;
 let playTimeout = null;
 const STORAGE_KEY = 'liveTV_lastPlayed';
 
-// Auto-hide controls variables
-let controlsTimeout = null;
-let isControlsVisible = true;
+// ─── OFFLINE DETECTION ─────────────────────────────────────
+let isOnline = navigator.onLine;
+const offlineOverlay = document.getElementById('offlineOverlay');
+const retryBtn = document.getElementById('retryConnection');
 
+function checkOnlineStatus() {
+  isOnline = navigator.onLine;
+  if (isOnline) {
+    offlineOverlay.classList.remove('active');
+    document.body.style.overflow = 'auto';
+    // Refresh channels if offline was shown
+    if (allChannels.length === 0) {
+      fetchChannels();
+    }
+  } else {
+    offlineOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    // Close player if open
+    if (playerOverlay && playerOverlay.classList.contains('active')) {
+      closePlayer();
+    }
+  }
+  updateWifiStatus();
+}
+
+function updateWifiStatus() {
+  const wifiIcon = document.querySelector('.wifi-icon');
+  if (wifiIcon) {
+    wifiIcon.textContent = isOnline ? 'wifi' : 'wifi_off';
+    wifiIcon.style.color = isOnline ? '#22c55e' : '#ef4444';
+  }
+}
+
+// ─── LOCATION DETECTION ──────────────────────────────────
+function detectLocation() {
+  const locationText = document.getElementById('locationText');
+  
+  if (!navigator.geolocation) {
+    locationText.textContent = 'Location unavailable';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const { latitude, longitude } = position.coords;
+      try {
+        const response = await fetch(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+        );
+        const data = await response.json();
+        
+        const city = data.city || data.locality || 'Unknown';
+        const country = data.countryName || '';
+        locationText.textContent = `${city}${country ? ', ' + country : ''}`;
+        
+        const badge = document.getElementById('statusBadge');
+        if (badge) badge.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+      } catch (error) {
+        locationText.textContent = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+      }
+    },
+    (error) => {
+      console.warn('Location error:', error);
+      locationText.textContent = 'Location unavailable';
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 60000
+    }
+  );
+}
+
+// ─── DOM REFERENCES ──────────────────────────────────────
 const grid = document.getElementById('grid');
 const searchInput = document.getElementById('search');
 const categoryGroup = document.getElementById('cats');
@@ -1310,7 +1283,10 @@ const errorClose = document.getElementById('errclose');
 const topBar = document.getElementById('topBar');
 const pinfo = document.getElementById('pinfo');
 
-// Auto-hide controls function - hides EVERYTHING
+// ─── AUTO-HIDE CONTROLS ──────────────────────────────────
+let controlsTimeout = null;
+let isControlsVisible = true;
+
 function toggleControls(show) {
   if (show) {
     topBar.classList.remove('hidden');
@@ -1332,23 +1308,33 @@ function toggleControls(show) {
   }
 }
 
-// Show controls on mouse move or touch
 function showControlsTemporarily() {
   if (playerOverlay.classList.contains('active')) {
     toggleControls(true);
   }
 }
 
-// Listen for mouse movement and touch on player
+// ─── EVENT LISTENERS ──────────────────────────────────────
+// Online/Offline
+window.addEventListener('online', checkOnlineStatus);
+window.addEventListener('offline', checkOnlineStatus);
+
+retryBtn.addEventListener('click', () => {
+  checkOnlineStatus();
+  if (!isOnline) {
+    alert('Still offline. Please check your connection.');
+  }
+});
+
+// Player controls
 playerOverlay.addEventListener('mousemove', showControlsTemporarily);
 playerOverlay.addEventListener('touchstart', showControlsTemporarily);
 playerOverlay.addEventListener('touchmove', showControlsTemporarily);
-
-// Also show controls when video is interacted with
 videoEl.addEventListener('play', showControlsTemporarily);
 videoEl.addEventListener('pause', showControlsTemporarily);
 videoEl.addEventListener('click', showControlsTemporarily);
 
+// ─── CORE FUNCTIONS ──────────────────────────────────────
 function loadLastPlayed() {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
@@ -1556,10 +1542,8 @@ async function playChannel(channel) {
   destroyPlayer();
   playerOverlay.classList.add('active');
   
-  // Show controls initially
   toggleControls(true);
   
-  // Auto fullscreen
   try {
     if (document.documentElement.requestFullscreen) {
       await document.documentElement.requestFullscreen();
@@ -1638,13 +1622,11 @@ function closePlayer() {
   videoEl.src = '';
   playerOverlay.classList.remove('active');
   
-  // Clear controls timeout
   clearTimeout(controlsTimeout);
   topBar.classList.remove('hidden');
   pinfo.classList.remove('hidden');
   isControlsVisible = true;
   
-  // Exit fullscreen
   try {
     if (document.fullscreenElement) {
       document.exitFullscreen();
@@ -1671,6 +1653,7 @@ function destroyPlayer() {
   }
 }
 
+// ─── EVENT LISTENERS FOR CLOSE ──────────────────────────
 closePlayerBtn.addEventListener('click', closePlayer);
 backBtn.addEventListener('click', closePlayer);
 playerContainer.addEventListener('click', (e) => { 
@@ -1693,11 +1676,25 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// ─── SECURITY ────────────────────────────────────────────
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+  if (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'P'].includes(e.key)) { e.preventDefault(); return false; }
+  if (e.ctrlKey && ['u', 'U', 's', 'S'].includes(e.key)) { e.preventDefault(); return false; }
+});
+
 // ─── INIT ─────────────────────────────────────────────────
+// Initial check for online status
+checkOnlineStatus();
+
+// Load data and start app
 loadLastPlayed();
 fetchChannels();
 detectLocation();
+
 console.log('🚀 StreamHub Premium loaded with offline detection, location, and auto-hide controls.');
+console.log('📡 Status:', isOnline ? 'Online' : 'Offline');
 </script>
 </body>
 </html>
