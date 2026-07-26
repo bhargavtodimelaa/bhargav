@@ -199,6 +199,37 @@
     .pinfo .live-badge { background: linear-gradient(135deg, #EF4444, #DC2626); padding: 2px 12px; border-radius: 60px; font-size: 0.55rem; font-weight: 700; text-transform: uppercase; animation: livePulse 1.5s infinite; }
     @keyframes livePulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
 
+    /* buffering indicator */
+    .buffering-indicator {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1002;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(10px);
+      padding: 20px 30px;
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      font-size: 0.9rem;
+      align-items: center;
+      gap: 14px;
+      pointer-events: none;
+    }
+    .buffering-indicator.active { display: flex; }
+    .buffering-indicator .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--glass-border);
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .buffering-indicator .progress-text { font-weight: 500; }
+
     /* error */
     .err { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); backdrop-filter: blur(24px); z-index: 2000; justify-content: center; align-items: center; animation: fadeIn 0.3s ease; }
     .err.active { display: flex; }
@@ -291,7 +322,13 @@
     <button class="pbtn" id="back"><span class="material-symbols-outlined">arrow_back</span> Back</button>
     <button class="pclose" id="close"><span class="material-symbols-outlined">close</span></button>
   </div>
-  <div id="pc"><video id="video" controls playsinline autoplay></video></div>
+  <div id="pc">
+    <video id="video" controls playsinline autoplay></video>
+    <div class="buffering-indicator" id="bufferingIndicator">
+      <div class="spinner"></div>
+      <span class="progress-text" id="bufferProgress">Buffering...</span>
+    </div>
+  </div>
   <div class="pinfo" id="pinfo">
     <img id="plogo" src="" alt="logo"><span class="pname" id="pname">Channel</span><span class="live-badge">● LIVE</span>
   </div>
@@ -351,6 +388,8 @@
   const playerLogo = document.getElementById('plogo'), errorOverlay = document.getElementById('err');
   const errorRetry = document.getElementById('retry'), errorClose = document.getElementById('errclose');
   const topBar = document.getElementById('topBar'), pinfo = document.getElementById('pinfo');
+  const bufferingIndicator = document.getElementById('bufferingIndicator');
+  const bufferProgress = document.getElementById('bufferProgress');
 
   // auto-hide controls
   let controlsTimeout = null, isControlsVisible = true;
@@ -454,50 +493,202 @@
   function updateCounter() { channelCounter.textContent = `${filteredChannels.length} / ${allChannels.length} channels`; }
   searchInput.addEventListener('input', (e) => { searchTerm = e.target.value; applyFilters(); });
 
-  // player core
+  // ─── ENHANCED PLAYER WITH AGGRESSIVE BUFFERING ──────────────────
+  
+  // Buffering indicator helper
+  function showBuffering(show, progress = '') {
+    if (show) {
+      bufferingIndicator.classList.add('active');
+      if (progress) bufferProgress.textContent = progress;
+      else bufferProgress.textContent = 'Buffering...';
+    } else {
+      bufferingIndicator.classList.remove('active');
+    }
+  }
+
   async function playChannel(channel) {
     if (!channel || isClosing) return;
     if (isPlaying) { console.warn('Already playing'); return; }
-    isPlaying = true; currentChannel = channel;
+    isPlaying = true;
+    currentChannel = channel;
     playerName.textContent = channel.name || 'Channel';
     playerLogo.src = channel.logo || 'https://ui-avatars.com/api/?name='+encodeURIComponent(channel.name)+'&background=0063e5&color=ffffff&size=40';
     saveLastPlayed(channel);
     destroyPlayer();
     playerOverlay.classList.add('active');
+    
+    // Configure video element for aggressive caching
+    videoEl.preload = 'auto';
+    videoEl.crossOrigin = 'anonymous';
+    
     toggleControls(true);
+    showBuffering(true, 'Initializing...');
+    
     try { if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch {}
+    
     try {
       shaka.polyfill.installAll();
-      if (!shaka.Player.isBrowserSupported()) { showError(channel); isPlaying = false; return; }
+      if (!shaka.Player.isBrowserSupported()) { showError(channel); isPlaying = false; showBuffering(false); return; }
       shakaPlayer = new shaka.Player(videoEl);
       try { new shaka.ui.Overlay(shakaPlayer, playerContainer, videoEl); } catch {}
-      shakaPlayer.configure({ preferredAudioLanguage: 'te', preferredTextLanguage: 'en', drm: {}, streaming: { lowLatencyMode: true, rebufferingGoal: 2, bufferBehind: 30 } });
+      
+      // ===== ENHANCED BUFFERING CONFIGURATION =====
+      shakaPlayer.configure({
+        preferredAudioLanguage: 'te',
+        preferredTextLanguage: 'en',
+        drm: {},
+        streaming: {
+          lowLatencyMode: false,        // Disable low-latency for better buffering
+          rebufferingGoal: 15,           // Wait for 15 seconds of buffer before playing
+          bufferBehind: 120,             // Keep 120 seconds buffered behind
+          bufferAhead: 120,              // Buffer 120 seconds ahead aggressively
+          retryParameters: {
+            maxAttempts: 15,             // More retry attempts
+            timeout: 45000,              // 45 second timeout
+            baseDelay: 500,
+            backoffFactor: 2
+          },
+          liveDelay: 20,                 // 20 second live delay for more buffer
+          segmentPrefetchLimit: 15,      // Prefetch 15 segments ahead
+          maxDisabledTime: 60,           // Keep disabled tracks for 60 seconds
+          startAtSegmentBoundary: false,
+          ignoreManifestTimestamps: true // Ignore timestamps for smoother buffering
+        },
+        manifest: {
+          retryParameters: {
+            maxAttempts: 15,
+            timeout: 45000
+          }
+        },
+        abr: {
+          enabled: true,
+          defaultBandwidthEstimate: 20000000, // Higher bandwidth estimate for better quality
+          switchInterval: 2,
+          bandwidthUpgradeTarget: 0.85,
+          bandwidthDowngradeTarget: 0.95
+        }
+      });
+      
       const keyId = channel.keyId && channel.keyId !== 'null' ? channel.keyId : null;
       const key = channel.key && channel.key !== 'null' ? channel.key : null;
-      if (keyId && key) shakaPlayer.configure({ drm: { clearKeys: { [keyId]: key } }, streaming: { lowLatencyMode: true } });
-      else shakaPlayer.configure({ drm: { clearKeys: {} }, streaming: { lowLatencyMode: true } });
+      if (keyId && key) shakaPlayer.configure({ drm: { clearKeys: { [keyId]: key } }, streaming: { lowLatencyMode: false } });
+      else shakaPlayer.configure({ drm: { clearKeys: {} }, streaming: { lowLatencyMode: false } });
+      
       const cookie = await fetchCookie();
       activeCookie = cookie || '';
+      
+      // ===== ENHANCED NETWORKING =====
       if (shakaPlayer.getNetworkingEngine) {
         const engine = shakaPlayer.getNetworkingEngine();
+        engine.setMaxParallelDownloads(15); // Download more segments in parallel
         engine.registerRequestFilter((type, request) => {
           request.headers["Referer"] = "https://www.jiotv.com/";
           request.headers["User-Agent"] = "plaYtv/7.1.5";
-          if (activeCookie && (type === 0 || type === 1)) request.uris[0] = request.uris[0].split("?")[0] + "?" + activeCookie;
+          request.headers["Accept-Encoding"] = "gzip, deflate, br";
+          request.headers["Connection"] = "keep-alive";
+          request.retryParameters = {
+            maxAttempts: 15,
+            timeout: 45000,
+            baseDelay: 500,
+            backoffFactor: 2
+          };
+          if (activeCookie && (type === 0 || type === 1)) {
+            request.uris[0] = request.uris[0].split("?")[0] + "?" + activeCookie;
+          }
         });
       }
+      
+      // Listen for buffering events
+      let bufferingStart = null;
+      let bufferCheckInterval = null;
+      
+      videoEl.addEventListener('waiting', () => {
+        bufferingStart = Date.now();
+        showBuffering(true, 'Buffering...');
+      });
+      
+      videoEl.addEventListener('canplaythrough', () => {
+        showBuffering(false);
+        if (bufferCheckInterval) clearInterval(bufferCheckInterval);
+      });
+      
       const streamUrls = [channel.url, channel.url1, channel.url2, channel.url3].filter(Boolean).map(u => u.replace(/bpk-tv\/\//g, 'bpk-tv/'));
       let loaded = false;
+      
       for (let i=0; i<streamUrls.length; i++) {
         try {
+          showBuffering(true, `Loading stream ${i+1}/${streamUrls.length}...`);
           await shakaPlayer.load(streamUrls[i]);
-          setTimeout(() => { try { const tracks = shakaPlayer.getAudioTracks(); if (tracks && tracks.length) { let tel = tracks.find(t => t.language === 'te') || tracks.find(t => ['hi','ta','ml','kn','mr','bn'].includes(t.language)); if (tel) shakaPlayer.selectAudioTrack(tel); } } catch {} }, 500);
+          
+          // ===== AGGRESSIVE PRE-BUFFERING =====
+          showBuffering(true, 'Pre-buffering segments...');
+          
+          // Wait for significant buffer before playing
+          let bufferReady = false;
+          let bufferAttempts = 0;
+          const maxBufferAttempts = 60; // 30 seconds max wait
+          
+          while (!bufferReady && bufferAttempts < maxBufferAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            bufferAttempts++;
+            
+            const buffered = videoEl.buffered;
+            if (buffered.length > 0) {
+              const bufferedEnd = buffered.end(buffered.length - 1);
+              const duration = videoEl.duration;
+              const bufferedSeconds = duration > 0 ? bufferedEnd : 0;
+              
+              // Update progress
+              const progress = Math.min(100, Math.round((bufferedSeconds / 20) * 100));
+              showBuffering(true, `Buffering ${progress}% (${Math.round(bufferedSeconds)}s)`);
+              
+              // Ready when we have at least 20 seconds buffered or buffered to end
+              if (bufferedSeconds >= 20 || (duration > 0 && bufferedEnd >= duration * 0.8)) {
+                bufferReady = true;
+                console.log(`✅ Buffered ${Math.round(bufferedSeconds)}s, ready to play`);
+              }
+            }
+          }
+          
+          if (!bufferReady) {
+            console.warn('Buffer wait timeout, playing anyway');
+          }
+          
+          // Set audio track
+          setTimeout(() => { 
+            try { 
+              const tracks = shakaPlayer.getAudioTracks(); 
+              if (tracks && tracks.length) { 
+                let tel = tracks.find(t => t.language === 'te') || tracks.find(t => ['hi','ta','ml','kn','mr','bn'].includes(t.language)); 
+                if (tel) shakaPlayer.selectAudioTrack(tel); 
+              } 
+            } catch {} 
+          }, 500);
+          
+          showBuffering(true, 'Starting playback...');
           await videoEl.play();
-          loaded = true; isPlaying = false; break;
-        } catch {}
+          loaded = true;
+          isPlaying = false;
+          showBuffering(false);
+          console.log('✅ Playing with aggressive buffering:', channel.name);
+          break;
+        } catch (loadError) {
+          console.warn('Stream load failed, trying next...', loadError);
+          showBuffering(true, `Retrying stream ${i+2}...`);
+        }
       }
-      if (!loaded) { showError(channel); isPlaying = false; }
-    } catch { showError(channel); isPlaying = false; }
+      
+      if (!loaded) { 
+        showError(channel); 
+        isPlaying = false;
+        showBuffering(false);
+      }
+    } catch (error) {
+      console.error('Player error:', error);
+      showError(channel);
+      isPlaying = false;
+      showBuffering(false);
+    }
   }
 
   function closePlayer() {
@@ -507,11 +698,13 @@
     destroyPlayer();
     videoEl.pause(); videoEl.src = '';
     playerOverlay.classList.remove('active');
+    showBuffering(false);
     clearTimeout(controlsTimeout);
     topBar.classList.remove('hidden'); pinfo.classList.remove('hidden'); isControlsVisible = true;
     try { if (document.fullscreenElement) document.exitFullscreen(); } catch {}
     setTimeout(() => { isClosing = false; currentChannel = null; activeCookie = null; }, 200);
   }
+  
   function destroyPlayer() { if (shakaPlayer) { try { shakaPlayer.destroy(); } catch {} shakaPlayer = null; } }
 
   closePlayerBtn.addEventListener('click', closePlayer);
@@ -522,7 +715,7 @@
     if (e.key === ' ' && playerOverlay.classList.contains('active')) { e.preventDefault(); videoEl.paused ? videoEl.play().catch(()=>{}) : videoEl.pause(); showControlsTemporarily(); }
   });
 
-  // ─── DEVTOOLS WARNING POPUP ──────────────────────────────
+  // ─── DEVTOOLS WARNING ──────────────────────────────
   function showDevToolsWarning() {
     if (document.getElementById('devtoolsWarning')) return;
     const warning = document.createElement('div');
@@ -560,7 +753,7 @@
   loadLastPlayed();
   fetchChannels();
   detectLocation();
-  console.log('🚀 StreamHub Premium · Modern UI with ripple & glassmorphism');
+  console.log('🚀 StreamHub Premium · Aggressive buffering enabled - 120s ahead buffer');
 </script>
 </body>
 </html>
