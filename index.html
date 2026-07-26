@@ -627,7 +627,7 @@ html, body {
   margin-bottom: 16px;
 }
 
-/* Player - Cinematic */
+/* Player - Cinematic with Brightness Fix */
 .player {
   display: none;
   position: fixed;
@@ -635,14 +635,14 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.95);
+  background: #000;
   z-index: 1000;
   flex-direction: column;
   animation: playerIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes playerIn {
-  from { opacity: 0; transform: scale(0.9); }
+  from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
 
@@ -660,15 +660,9 @@ html, body {
   position: relative;
 }
 
+/* Remove dark overlay that was reducing brightness */
 #pc::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.3));
-  pointer-events: none;
+  display: none;
 }
 
 #video {
@@ -676,9 +670,11 @@ html, body {
   height: 100%;
   max-height: 100vh;
   background: #000;
+  /* Ensure video is bright */
+  filter: brightness(1) contrast(1.05);
 }
 
-/* Player Controls - Premium */
+/* Player Controls - Premium with Auto-Hide */
 .top-bar {
   position: absolute;
   top: 0;
@@ -691,10 +687,18 @@ html, body {
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
   z-index: 1001;
   pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 .top-bar > * {
   pointer-events: auto;
+}
+
+/* Auto-hide controls */
+.top-bar.hidden {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
 }
 
 .pbtn {
@@ -770,11 +774,18 @@ html, body {
   pointer-events: none;
   white-space: nowrap;
   animation: infoSlide 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 @keyframes infoSlide {
   from { opacity: 0; transform: translateX(-50%) translateY(30px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.pinfo.hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(20px);
+  pointer-events: none;
 }
 
 .pinfo img {
@@ -993,7 +1004,7 @@ html, body {
 <div class="grid" id="grid"></div>
 
 <div class="player" id="player">
-  <div class="top-bar">
+  <div class="top-bar" id="topBar">
     <button class="pbtn" id="back">
       <span class="material-symbols-outlined">arrow_back</span> Back
     </button>
@@ -1049,6 +1060,10 @@ let isPlaying = false;
 let playTimeout = null;
 const STORAGE_KEY = 'liveTV_lastPlayed';
 
+// Auto-hide controls variables
+let controlsTimeout = null;
+let isControlsVisible = true;
+
 const grid = document.getElementById('grid');
 const searchInput = document.getElementById('search');
 const categoryGroup = document.getElementById('cats');
@@ -1063,6 +1078,47 @@ const playerLogo = document.getElementById('plogo');
 const errorOverlay = document.getElementById('err');
 const errorRetry = document.getElementById('retry');
 const errorClose = document.getElementById('errclose');
+const topBar = document.getElementById('topBar');
+const pinfo = document.getElementById('pinfo');
+
+// Auto-hide controls function
+function toggleControls(show) {
+  if (show) {
+    topBar.classList.remove('hidden');
+    pinfo.classList.remove('hidden');
+    isControlsVisible = true;
+    clearTimeout(controlsTimeout);
+    controlsTimeout = setTimeout(() => {
+      if (isControlsVisible && playerOverlay.classList.contains('active')) {
+        topBar.classList.add('hidden');
+        pinfo.classList.add('hidden');
+        isControlsVisible = false;
+      }
+    }, 3000);
+  } else {
+    topBar.classList.add('hidden');
+    pinfo.classList.add('hidden');
+    isControlsVisible = false;
+    clearTimeout(controlsTimeout);
+  }
+}
+
+// Show controls on mouse move or touch
+function showControlsTemporarily() {
+  if (playerOverlay.classList.contains('active')) {
+    toggleControls(true);
+  }
+}
+
+// Listen for mouse movement and touch on player
+playerOverlay.addEventListener('mousemove', showControlsTemporarily);
+playerOverlay.addEventListener('touchstart', showControlsTemporarily);
+playerOverlay.addEventListener('touchmove', showControlsTemporarily);
+
+// Also show controls when video is interacted with
+videoEl.addEventListener('play', showControlsTemporarily);
+videoEl.addEventListener('pause', showControlsTemporarily);
+videoEl.addEventListener('click', showControlsTemporarily);
 
 function loadLastPlayed() {
   try {
@@ -1267,6 +1323,9 @@ async function playChannel(channel) {
   destroyPlayer();
   playerOverlay.classList.add('active');
   
+  // Show controls initially
+  toggleControls(true);
+  
   // Auto fullscreen
   try {
     if (document.documentElement.requestFullscreen) {
@@ -1346,6 +1405,12 @@ function closePlayer() {
   videoEl.src = '';
   playerOverlay.classList.remove('active');
   
+  // Clear controls timeout
+  clearTimeout(controlsTimeout);
+  topBar.classList.remove('hidden');
+  pinfo.classList.remove('hidden');
+  isControlsVisible = true;
+  
   // Exit fullscreen
   try {
     if (document.fullscreenElement) {
@@ -1391,13 +1456,14 @@ document.addEventListener('keydown', (e) => {
   if (e.key === ' ' && playerOverlay.classList.contains('active')) {
     e.preventDefault();
     videoEl.paused ? videoEl.play().catch(() => {}) : videoEl.pause();
+    showControlsTemporarily();
   }
 });
 
 // ─── INIT ─────────────────────────────────────────────────
 loadLastPlayed();
 fetchChannels();
-console.log('🚀 Live TV Premium loaded.');
+console.log('🚀 Live TV Premium loaded with auto-hide controls and enhanced brightness.');
 </script>
 </body>
 </html>
