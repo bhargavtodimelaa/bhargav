@@ -431,7 +431,7 @@ const closeBtn = document.getElementById('closeDisclaimer');
 const timerBar = document.getElementById('timerBar');
 const timerCount = document.getElementById('timerCount');
 let timerInterval = null;
-let remaining = 7;
+let remaining = 20;
 
 function closeDisclaimer() {
     if (timerInterval) clearInterval(timerInterval);
@@ -462,13 +462,10 @@ acceptBtn.addEventListener('click', closeDisclaimer);
 closeBtn.addEventListener('click', closeDisclaimer);
 
 // Check if disclaimer was already shown
-if (!localStorage.getItem('disclaimer_shown')) {
-    document.body.style.overflow = 'hidden';
-    startTimer();
-    localStorage.setItem('disclaimer_shown', 'true');
-} else {
-    disclaimer.style.display = 'none';
-}
+// ALWAYS show disclaimer on refresh - remove localStorage check
+document.body.style.overflow = 'hidden';
+startTimer();
+// Remove this line: localStorage.setItem('disclaimer_shown', 'true');
   </script>
 </body>
 </html>
