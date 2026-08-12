@@ -9,6 +9,155 @@
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
   <link rel="dns-prefetch" href="https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev">
   <style>
+    /* DISCLAIMER OVERLAY */
+.disclaimer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.disclaimer-overlay.hidden {
+    animation: slideOut 0.7s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideOut {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-100%); }
+}
+
+.disclaimer-box {
+    background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    backdrop-filter: blur(30px);
+    border-radius: 24px;
+    padding: 40px 32px 32px;
+    max-width: 520px;
+    width: 92%;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.disclaimer-box .icon-warning {
+    width: 64px;
+    height: 64px;
+    background: rgba(239, 68, 68, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.disclaimer-box .icon-warning svg {
+    width: 32px;
+    height: 32px;
+    fill: #EF4444;
+}
+
+.disclaimer-box h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 60%, #EF4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.disclaimer-box p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-align: left;
+    padding: 0 4px;
+}
+
+.disclaimer-box .timer-wrap {
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.disclaimer-box .timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #EF4444);
+    border-radius: 10px;
+    width: 100%;
+    transition: width 0.1s linear;
+}
+
+.disclaimer-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.disclaimer-actions .dbtn {
+    padding: 10px 32px;
+    border-radius: 50px;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.disclaimer-actions .dbtn.primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+}
+
+.disclaimer-actions .dbtn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(124, 58, 237, 0.4);
+}
+
+.disclaimer-actions .dbtn.secondary {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-primary);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.disclaimer-actions .dbtn.secondary:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.disclaimer-box .timer-text {
+    color: var(--text-tertiary);
+    font-size: 0.65rem;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+}
+
+@media(max-width:480px) {
+    .disclaimer-box { padding: 28px 18px 22px; }
+    .disclaimer-box h2 { font-size: 1.1rem; }
+    .disclaimer-box p { font-size: 0.78rem; }
+}
     *{margin:0;padding:0;box-sizing:border-box}
     :root{--primary:#7C3AED;--bg-primary:#0F0A1A;--glass-bg:rgba(255,255,255,0.05);--glass-border:rgba(255,255,255,0.08);--text-primary:#fff;--text-secondary:rgba(255,255,255,0.7);--text-tertiary:rgba(255,255,255,0.4);--radius:20px;--radius-sm:12px}
     html,body{background:var(--bg-primary);color:var(--text-primary);width:100%;min-height:100vh;overflow-x:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,sans-serif}
@@ -82,6 +231,22 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" defer></script>
 </head>
 <body>
+  <!-- DISCLAIMER OVERLAY -->
+<div class="disclaimer-overlay" id="disclaimer">
+    <div class="disclaimer-box">
+        <div class="icon-warning">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        </div>
+        <h2>⚠️ Disclaimer</h2>
+        <p>The content you are viewing on this website are purely sourced from third party sources and original author and developer is not responsible for any harm / consequences caused by using this website and author is not responsible for any such things happening including death, because third party provider availability is not guaranteed all the time. Some channels may not play and render an error. Use with discretion and cautiously.</p>
+        <div class="timer-wrap"><div class="timer-bar" id="timerBar"></div></div>
+        <div class="disclaimer-actions">
+            <button class="dbtn primary" id="acceptDisclaimer">I Understand</button>
+            <button class="dbtn secondary" id="closeDisclaimer">Close</button>
+        </div>
+        <div class="timer-text" id="timerText">Closing automatically in <span id="timerCount">7</span>s</div>
+    </div>
+</div>
   <header class="header">
     <div class="header-brand">
       <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3c-1.1 0-2 .89-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.11-.9-2-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg></div>
@@ -259,6 +424,51 @@
     closePlayerBtn.addEventListener('click',closePlayer); backBtn.addEventListener('click',closePlayer); playerContainer.addEventListener('click',e=>{ if(e.target===playerContainer) closePlayer(); });
     document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(errorOverlay.classList.contains('active')){ hideError(); if(playerOverlay.classList.contains('active')) closePlayer(); } else { closePlayer(); } } if(e.key===' ' && playerOverlay.classList.contains('active')){ e.preventDefault(); videoEl.paused?videoEl.play().catch(()=>{}):videoEl.pause(); } });
     loadLastPlayed(); fetchChannels();
+    // ===== DISCLAIMER =====
+const disclaimer = document.getElementById('disclaimer');
+const acceptBtn = document.getElementById('acceptDisclaimer');
+const closeBtn = document.getElementById('closeDisclaimer');
+const timerBar = document.getElementById('timerBar');
+const timerCount = document.getElementById('timerCount');
+let timerInterval = null;
+let remaining = 7;
+
+function closeDisclaimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    disclaimer.classList.add('hidden');
+    setTimeout(() => {
+        disclaimer.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 700);
+}
+
+function startTimer() {
+    remaining = 7;
+    timerCount.textContent = remaining;
+    timerBar.style.width = '100%';
+    timerInterval = setInterval(() => {
+        remaining--;
+        const percent = (remaining / 7) * 100;
+        timerBar.style.width = percent + '%';
+        timerCount.textContent = remaining;
+        if (remaining <= 0) {
+            clearInterval(timerInterval);
+            closeDisclaimer();
+        }
+    }, 1000);
+}
+
+acceptBtn.addEventListener('click', closeDisclaimer);
+closeBtn.addEventListener('click', closeDisclaimer);
+
+// Check if disclaimer was already shown
+if (!localStorage.getItem('disclaimer_shown')) {
+    document.body.style.overflow = 'hidden';
+    startTimer();
+    localStorage.setItem('disclaimer_shown', 'true');
+} else {
+    disclaimer.style.display = 'none';
+}
   </script>
 </body>
 </html>
