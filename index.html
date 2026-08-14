@@ -2,51 +2,520 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirecting...</title>
-  
-  <!-- Meta refresh redirect -->
-  <meta http-equiv="refresh" content="0; url=https://livetv-rouge.vercel.app/">
-  
-  <!-- JavaScript redirect (backup) -->
-  <script>
-    window.location.replace('https://livetv-rouge.vercel.app/');
-  </script>
-</head>
-<body>
-  <div style="
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Live TV</title>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev">
+  <style>
+    /* DISCLAIMER OVERLAY */
+.disclaimer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    background: #0F0A1A;
-    color: #fff;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    flex-direction: column;
-    gap: 20px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.disclaimer-overlay.hidden {
+    animation: slideOut 0.7s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideOut {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-100%); }
+}
+
+.disclaimer-box {
+    background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    backdrop-filter: blur(30px);
+    border-radius: 24px;
+    padding: 40px 32px 32px;
+    max-width: 520px;
+    width: 92%;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
     text-align: center;
-    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.disclaimer-box .icon-warning {
+    width: 64px;
+    height: 64px;
+    background: rgba(239, 68, 68, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.disclaimer-box .icon-warning svg {
+    width: 32px;
+    height: 32px;
+    fill: #EF4444;
+}
+
+.disclaimer-box h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 60%, #EF4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.disclaimer-box p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-align: left;
+    padding: 0 4px;
+}
+
+.disclaimer-box .timer-wrap {
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.disclaimer-box .timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #EF4444);
+    border-radius: 10px;
+    width: 100%;
+    transition: width 0.1s linear;
+}
+
+.disclaimer-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.disclaimer-actions .dbtn {
+    padding: 10px 32px;
+    border-radius: 50px;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.disclaimer-actions .dbtn.primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+}
+
+.disclaimer-actions .dbtn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(124, 58, 237, 0.4);
+}
+
+.disclaimer-actions .dbtn.secondary {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-primary);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.disclaimer-actions .dbtn.secondary:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.disclaimer-box .timer-text {
+    color: var(--text-tertiary);
+    font-size: 0.65rem;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+}
+
+@media(max-width:480px) {
+    .disclaimer-box { padding: 28px 18px 22px; }
+    .disclaimer-box h2 { font-size: 1.1rem; }
+    .disclaimer-box p { font-size: 0.78rem; }
+}
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--primary:#7C3AED;--bg-primary:#0F0A1A;--glass-bg:rgba(255,255,255,0.05);--glass-border:rgba(255,255,255,0.08);--text-primary:#fff;--text-secondary:rgba(255,255,255,0.7);--text-tertiary:rgba(255,255,255,0.4);--radius:20px;--radius-sm:12px}
+    html,body{background:var(--bg-primary);color:var(--text-primary);width:100%;min-height:100vh;overflow-x:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,sans-serif}
+    ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:rgba(255,255,255,0.02)}::-webkit-scrollbar-thumb{background:var(--primary);border-radius:10px}
+    .header{background:rgba(15,10,26,0.95);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--glass-border);position:sticky;top:0;z-index:100}
+    .header-brand{display:flex;align-items:center;gap:12px}
+    .header-brand .logo-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--primary);border-radius:var(--radius-sm)}
+    .header-brand .logo-icon svg{width:24px;height:24px;fill:#fff}
+    .header-brand .logo-text .title{font-size:1.2rem;font-weight:700;color:#fff}
+    .header-brand .logo-text .subtitle{font-size:0.5rem;font-weight:400;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px}
+    .header .counter{background:var(--glass-bg);padding:6px 16px;border-radius:50px;font-size:0.7rem;font-weight:600;color:var(--text-secondary);border:1px solid var(--glass-border);display:flex;align-items:center;gap:6px}
+    .header .counter .dot{width:5px;height:5px;border-radius:50%;background:#06B6D4}
+    .filter-bar{background:rgba(15,10,26,0.95);padding:10px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;border-bottom:1px solid var(--glass-border);position:sticky;top:60px;z-index:99}
+    .filter-bar .search{flex:1 1 180px;display:flex;align-items:center;background:var(--glass-bg);border-radius:50px;padding:4px 16px 4px 20px;border:1px solid var(--glass-border)}
+    .filter-bar .search svg{width:18px;height:18px;fill:var(--text-secondary);margin-right:10px;flex-shrink:0}
+    .filter-bar input{flex:1;background:transparent;border:none;padding:8px 4px;font-size:0.85rem;font-family:inherit;color:var(--text-primary);outline:none;min-width:60px}
+    .filter-bar input::placeholder{color:var(--text-tertiary)}
+    .filter-bar .cats{display:flex;flex-wrap:wrap;gap:4px}
+    .filter-bar .cat{background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-secondary);padding:4px 14px;border-radius:50px;font-size:0.7rem;font-weight:500;cursor:pointer;white-space:nowrap;font-family:inherit}
+    .filter-bar .cat.active{background:var(--primary);border-color:var(--primary);color:#fff}
+    .last-section{padding:16px 24px 4px;max-width:1440px;margin:0 auto;width:100%;display:none}
+    .last-section.visible{display:block}
+    .last-section .title{font-size:0.7rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .last-section .title .badge{background:var(--primary);padding:1px 10px;border-radius:50px;font-size:0.5rem;color:#fff}
+    .last-grid{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px}
+    .last-grid::-webkit-scrollbar{height:2px}
+    .last-grid::-webkit-scrollbar-thumb{background:var(--primary);border-radius:10px}
+    .last-card{flex:0 0 110px;background:var(--glass-bg);border-radius:var(--radius);padding:12px 8px;border:1px solid var(--glass-border);cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center}
+    .last-card .lp-logo{width:48px;height:48px;border-radius:50%;background:var(--glass-bg);display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--glass-border);margin-bottom:8px}
+    .last-card .lp-logo img{max-width:100%;max-height:100%;object-fit:contain;padding:4px}
+    .last-card .lp-name{font-size:0.7rem;font-weight:500;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2;max-height:2.4em}
+    .last-card .lp-badge{font-size:0.45rem;color:var(--text-secondary);padding:1px 10px;border-radius:50px;margin-top:4px;border:1px solid var(--glass-border)}
+    .grid{padding:16px 24px 32px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;max-width:1440px;margin:0 auto;width:100%}
+    .ch-card{background:var(--glass-bg);border-radius:var(--radius);overflow:hidden;border:1px solid var(--glass-border);cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 12px 16px}
+    .ch-card .logo{width:72px;height:72px;background:var(--glass-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:10px;overflow:hidden;border:1px solid var(--glass-border)}
+    .ch-card img{max-width:100%;max-height:100%;object-fit:contain;padding:8px}
+    .ch-card .name{font-size:0.85rem;font-weight:600;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;max-height:2.4em}
+    .ch-card .cat{font-size:0.55rem;color:var(--text-secondary);margin-top:6px;background:var(--glass-bg);padding:2px 12px;border-radius:50px;border:1px solid var(--glass-border)}
+    .empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-secondary);background:var(--glass-bg);border-radius:var(--radius);border:1px dashed var(--glass-border)}
+    .empty svg{width:56px;height:56px;fill:var(--text-tertiary);display:block;margin:0 auto 12px}
+    .player{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:1000;flex-direction:column}
+    .player.active{display:flex}
+    #pc{width:100%;height:100%;background:#000;display:flex;align-items:center;justify-content:center;position:relative}
+    #video{width:100%;height:100%;max-height:100vh;background:#000}
+    .top-bar{position:absolute;top:0;left:0;right:0;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(0,0,0,0.7)0%,transparent 100%);z-index:1001;pointer-events:none}
+    .top-bar>*{pointer-events:auto}
+    .pbtn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 18px;border-radius:50px;display:flex;align-items:center;gap:8px;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:inherit}
+    .pbtn svg{width:20px;height:20px;fill:#fff}
+    .pclose{width:40px;height:40px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;cursor:pointer}
+    .pclose svg{width:24px;height:24px;fill:#fff}
+    .pinfo{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);backdrop-filter:blur(20px);padding:8px 20px 8px 12px;border-radius:50px;border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:0.85rem;font-weight:500;display:flex;align-items:center;gap:10px;pointer-events:none;white-space:nowrap}
+    .pinfo img{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.1);padding:4px;border:1px solid rgba(255,255,255,0.1)}
+    .pinfo .pname{max-width:200px;overflow:hidden;text-overflow:ellipsis}
+    .pinfo .live-badge{background:#EF4444;padding:1px 10px;border-radius:50px;font-size:0.5rem;font-weight:700;text-transform:uppercase}
+    .err{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:2000;justify-content:center;align-items:center}
+    .err.active{display:flex}
+    .err-modal{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border-radius:24px;padding:40px 32px 32px;max-width:400px;width:90%;text-align:center;border:1px solid rgba(255,255,255,0.1)}
+    .err-modal svg{width:56px;height:56px;fill:#EF4444;margin-bottom:12px}
+    .err-modal h2{font-size:1.2rem;font-weight:700;margin-bottom:8px}
+    .err-modal p{color:var(--text-secondary);font-size:0.9rem;line-height:1.5;margin-bottom:24px}
+    .err-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    .ebtn{padding:10px 28px;border-radius:50px;border:none;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit}
+    .ebtn.primary{background:var(--primary);color:#fff}
+    .ebtn.secondary{background:rgba(255,255,255,0.1);color:var(--text-primary);border:1px solid rgba(255,255,255,0.1)}
+    #preview-box{position:fixed;bottom:30px;right:30px;width:280px;height:180px;background:#000;border-radius:16px;z-index:500;border:2px solid var(--primary);box-shadow:0 20px 60px rgba(0,0,0,0.8);display:none;overflow:hidden;pointer-events:none}
+    #preview-box video{width:100%;height:100%;object-fit:contain;background:#000}
+    @media(max-width:768px){.header{padding:10px 16px}.header-brand .logo-text .title{font-size:1rem}.header-brand .logo-icon{width:30px;height:30px}.header-brand .logo-icon svg{width:20px;height:20px}.filter-bar{padding:8px 16px;top:52px}.filter-bar .search{padding:2px 12px 2px 16px}.grid{padding:12px 16px 20px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}.ch-card .logo{width:60px;height:60px}.ch-card{padding:16px 10px 12px}.pinfo{bottom:60px;font-size:0.75rem;padding:6px 16px 6px 10px}.pinfo img{width:26px;height:26px}.pbtn{padding:6px 14px;font-size:0.7rem}.last-card{flex:0 0 90px;padding:10px 6px}.last-card .lp-logo{width:40px;height:40px}.last-section{padding:12px 16px 0}}
+    @media(max-width:480px){.grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;padding:10px 12px 16px}.ch-card .logo{width:50px;height:50px}.ch-card .name{font-size:0.75rem}.ch-card{padding:12px 6px 10px}.filter-bar .cat{font-size:0.6rem;padding:3px 10px}.pinfo{bottom:50px;font-size:0.65rem;padding:4px 12px 4px 8px}.pinfo img{width:22px;height:22px}.pbtn{padding:4px 10px;font-size:0.65px}.pbtn svg{width:16px;height:16px}.pclose{width:34px;height:34px}.pclose svg{width:20px;height:20px}.header-brand .logo-text .subtitle{display:none}.header .counter{font-size:0.6rem;padding:4px 10px}.last-card{flex:0 0 80px;padding:8px 4px}.last-card .lp-logo{width:34px;height:34px}#preview-box{width:160px;height:110px;bottom:16px;right:16px}}
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" defer></script>
+</head>
+<body>
+  <!-- DISCLAIMER OVERLAY -->
+<div class="disclaimer-overlay" id="disclaimer">
+    <div class="disclaimer-box">
+        <div class="icon-warning">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        </div>
+        <h2>⚠️ Disclaimer</h2>
+        <p>The content you are viewing on this website are purely sourced from third party sources and original author and developer is not responsible for any harm / consequences caused by using this website and author is not responsible for any such things happening including death, because third party provider availability is not guaranteed all the time. Some channels may not play and render an error. Use with discretion and cautiously.</p>
+        <div class="timer-wrap"><div class="timer-bar" id="timerBar"></div></div>
+        <div class="disclaimer-actions">
+            <button class="dbtn primary" id="acceptDisclaimer">I Understand</button>
+            <button class="dbtn secondary" id="closeDisclaimer">Close</button>
+        </div>
+        <div class="timer-text" id="timerText">Closing automatically in <span id="timerCount">7</span>s</div>
+    </div>
+</div>
+  <header class="header">
+    <div class="header-brand">
+      <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3c-1.1 0-2 .89-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.11-.9-2-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg></div>
+      <div class="logo-text"><span class="title">Live TV</span><span class="subtitle">Streaming</span></div>
+    </div>
+    <span class="counter"><span class="dot"></span><span id="counter">0</span></span>
+  </header>
+  <div style="
+    text-align: center;
+    padding: 30px 20px 20px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    margin-top: 10px;
+    background: rgba(15,10,26,0.8);
   ">
     <div style="
-      width: 50px;
-      height: 50px;
-      border: 3px solid rgba(124, 58, 237, 0.2);
-      border-top-color: #7C3AED;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      font-size: clamp(2rem, 6vw, 4.5rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #7C3AED, #EC4899, #F59E0B, #7C3AED);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 4s ease-in-out infinite;
+      letter-spacing: 3px;
+      line-height: 1.2;
+    ">
+      ❤️ Made with Love ❤️
+    </div>
+    <div style="
+      font-size: clamp(0.8rem, 1.8vw, 1.3rem);
+      color: rgba(255,255,255,0.6);
+      margin-top: 6px;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+    ">
+      <span style="color: rgba(255,255,255,0.8); font-weight: 600;">Bhargav Todimela</span>
+    </div>
+    <div style="
+      font-size: clamp(0.6rem, 1.2vw, 0.9rem);
+      color: rgba(255,255,255,0.35);
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+    ">
+      ⚡ KL University · Vijayawada ⚡
+    </div>
+    <div style="
+      margin-top: 12px;
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7C3AED, transparent);
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 10px;
     "></div>
-    <div>
-      <h2 style="font-size: 1.3rem; margin-bottom: 6px; background: linear-gradient(135deg, #7C3AED, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Redirecting...</h2>
-      <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">
-        If not redirected, <a href="https://livetv-rouge.vercel.app/" style="color: #7C3AED; text-decoration: none; font-weight: 600;">click here</a>
-      </p>
+  </div>
+ 
+</div>
+  <div class="filter-bar">
+    <div class="search"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><input type="text" id="search" placeholder="Search..."></div>
+    <div class="cats" id="cats"></div>
+  </div>
+  <div class="last-section" id="lastSection"><div class="title">⏱️ Recent <span class="badge">PLAYED</span></div><div class="last-grid" id="lastGrid"></div></div>
+  <div class="grid" id="grid"></div>
+  <div class="player" id="player">
+    <div class="top-bar">
+      <button class="pbtn" id="back"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg> Back</button>
+      <button class="pclose" id="close"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+    </div>
+    <div id="pc">
+      <video id="video" playsinline autoplay></video>
+    </div>
+    <div class="pinfo" id="pinfo">
+      <img id="plogo" src="" alt="">
+      <span class="pname" id="pname">Channel</span>
+      <span class="live-badge">LIVE</span>
     </div>
   </div>
+  <div class="err" id="err">
+    <div class="err-modal">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      <h2>Connection Lost</h2>
+      <p>Channel unavailable. Please try again.</p>
+      <div class="err-actions">
+        <button class="ebtn primary" id="retry">Retry</button>
+        <button class="ebtn secondary" id="errclose">Close</button>
+      </div>
+    </div>
+  </div>
+  <div id="preview-box"><video id="preview-video" playsinline muted></video></div>
+  <script>
+    document.addEventListener('contextmenu',e=>e.preventDefault());
+    document.addEventListener('keydown',e=>{if(e.key==='F12'||e.keyCode===123){e.preventDefault();return false;}if(e.ctrlKey&&e.shiftKey&&['I','J','C','P'].includes(e.key)){e.preventDefault();return false;}if(e.ctrlKey&&['u','U','s','S'].includes(e.key)){e.preventDefault();return false;}});
+    let allChannels=[],filteredChannels=[],currentCategory='All',searchTerm='';
+    let cachedCookie=null,cookieTimestamp=0,COOKIE_MAX_AGE=5*60*1000;
+    let activeCookie=null,isClosing=!1,shakaPlayer=null;
+    let currentChannel=null,errorChannel=null,isErrorShowing=!1;
+    let lastPlayedChannels=[],isPlaying=!1,playTimeout=null;
+    const STORAGE_KEY='liveTV_lastPlayed';
+    const grid=document.getElementById('grid'),searchInput=document.getElementById('search'),categoryGroup=document.getElementById('cats'),channelCounter=document.getElementById('counter'),playerOverlay=document.getElementById('player'),closePlayerBtn=document.getElementById('close'),backBtn=document.getElementById('back'),videoEl=document.getElementById('video'),playerContainer=document.getElementById('pc'),playerName=document.getElementById('pname'),playerLogo=document.getElementById('plogo'),errorOverlay=document.getElementById('err'),errorRetry=document.getElementById('retry'),errorClose=document.getElementById('errclose');
+    const previewBox=document.getElementById('preview-box');
+    const previewVideo=document.getElementById('preview-video');
+    let previewShaka=null,previewActive=!1,previewTimeout=null;
 
-  <style>
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    function loadLastPlayed(){try{const data=localStorage.getItem(STORAGE_KEY);if(data){lastPlayedChannels=JSON.parse(data).filter(ch=>ch&&ch.id&&ch.name);return lastPlayedChannels}}catch(_){}return[]}
+    function saveLastPlayed(channel){if(!channel||!channel.id)return;lastPlayedChannels=lastPlayedChannels.filter(ch=>ch.id!==channel.id);lastPlayedChannels.unshift(channel);lastPlayedChannels=lastPlayedChannels.slice(0,10);try{localStorage.setItem(STORAGE_KEY,JSON.stringify(lastPlayedChannels))}catch(_){}renderLastPlayed()}
+    function renderLastPlayed(){const section=document.getElementById('lastSection'),gridEl=document.getElementById('lastGrid');if(!lastPlayedChannels.length){section.classList.remove('visible');return}section.classList.add('visible');gridEl.innerHTML=lastPlayedChannels.map(ch=>`<div class="last-card" data-channel='${JSON.stringify(ch).replace(/'/g,"&#39;")}'><div class="lp-logo"><img src="${ch.logo||'https://ui-avatars.com/api/?name='+encodeURIComponent(ch.name)+'&background=7C3AED&color=ffffff&size=40'}" alt="${ch.name}" loading="lazy" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=7C3AED&color=ffffff&size=40';" /></div><div class="lp-name">${ch.name}</div><div class="lp-badge">▶</div></div>`).join('');
+      gridEl.querySelectorAll('.last-card').forEach(card=>{
+        card.addEventListener('click',e=>{if(isClosing||isPlaying)return;try{const ch=JSON.parse(card.dataset.channel);setTimeout(()=>playChannel(ch),50)}catch(_){}});
+        // preview on hover for recent
+        card.addEventListener('mouseenter', function(e){ if(isPlaying || playerOverlay.classList.contains('active')) return; try{ const ch=JSON.parse(this.dataset.channel); startPreview(ch); }catch(_){} });
+        card.addEventListener('mouseleave', function(e){ stopPreview(); });
+      });
     }
-  </style>
+    function showError(channel){if(isErrorShowing)return;isErrorShowing=!0;errorChannel=channel;errorOverlay.classList.add('active')}
+    function hideError(){isErrorShowing=!1;errorOverlay.classList.remove('active');errorChannel=null}
+    errorRetry.addEventListener('click',()=>{hideError();if(errorChannel){cachedCookie=null;cookieTimestamp=0;setTimeout(()=>playChannel(errorChannel),200)}});
+    errorClose.addEventListener('click',()=>{hideError();if(playerOverlay.classList.contains('active'))closePlayer()});
+    errorOverlay.addEventListener('click',e=>{if(e.target===errorOverlay){hideError();if(playerOverlay.classList.contains('active'))closePlayer()}});
+    async function fetchCookie(){const now=Date.now();if(cachedCookie&&(now-cookieTimestamp)<COOKIE_MAX_AGE)return cachedCookie;try{const res=await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/cookies',{cache:'no-cache',headers:{'Cache-Control':'no-cache'}});const data=await res.json();const cookieObj=data.find(item=>item.cookie);if(cookieObj&&cookieObj.cookie){cachedCookie=cookieObj.cookie;cookieTimestamp=now;return cachedCookie}return null}catch(_){return null}}
+    async function fetchChannels(){try{const res=await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/channels',{headers:{'X-Requested-With':'XMLHttpRequest'},cache:'no-cache'});const data=await res.json();allChannels=Array.isArray(data)?data:(data.channels||[]);allChannels=allChannels.filter(c=>c&&typeof c==='object'&&c.name);extractCategories();applyFilters();updateCounter();loadLastPlayed();renderLastPlayed();return allChannels}catch(_){grid.innerHTML=`<div class="empty"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.59-13h-1.18v6.07l4.69 2.77.59-1-4.1-2.42V7z"/></svg>Failed to load channels</div>`;return[]}}
+    function extractCategories(){const cats=new Set(['All']);allChannels.forEach(c=>{if(c.category&&c.category.trim())cats.add(c.category.trim())});const sorted=['All',...Array.from(cats).filter(c=>c!=='All').sort()];categoryGroup.innerHTML=sorted.map(cat=>`<button class="cat ${cat==='All'?'active':''}" data-cat="${cat}">${cat}</button>`).join('');document.querySelectorAll('.cat').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.cat').forEach(b=>b.classList.remove('active'));btn.classList.add('active');currentCategory=btn.dataset.cat;applyFilters()});});}
+    function applyFilters(){const term=searchTerm.toLowerCase().trim();filteredChannels=allChannels.filter(ch=>{const matchName=ch.name.toLowerCase().includes(term);const matchCat=currentCategory==='All'||ch.category===currentCategory;return matchName&&matchCat});renderGrid();updateCounter()}
+    function renderGrid(){if(!filteredChannels.length){grid.innerHTML=`<div class="empty"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>No channels</div>`;return}let html='';filteredChannels.forEach(ch=>{const logo=ch.logo||'https://ui-avatars.com/api/?name='+encodeURIComponent(ch.name)+'&background=7C3AED&color=ffffff&size=72';html+=`<div class="ch-card" data-channel='${JSON.stringify(ch).replace(/'/g,"&#39;")}'><div class="logo"><img src="${logo}" alt="${ch.name}" loading="lazy" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=7C3AED&color=ffffff&size=72';" /></div><div class="name">${ch.name}</div><span class="cat">${ch.category||'General'}</span></div>`});grid.innerHTML=html;
+      document.querySelectorAll('.ch-card').forEach(card=>{
+        card.addEventListener('click',e=>{if(isClosing||isPlaying)return;try{const ch=JSON.parse(card.dataset.channel);if(playTimeout)clearTimeout(playTimeout);playTimeout=setTimeout(()=>playChannel(ch),50)}catch(_){}});
+        card.addEventListener('mouseenter', function(e){ if(isPlaying || playerOverlay.classList.contains('active')) return; try{ const ch=JSON.parse(this.dataset.channel); startPreview(ch); }catch(_){} });
+        card.addEventListener('mouseleave', function(e){ stopPreview(); });
+      });
+    }
+    function updateCounter(){channelCounter.textContent=filteredChannels.length}
+    searchInput.addEventListener('input',e=>{searchTerm=e.target.value;applyFilters()});
+
+    // ---- preview ----
+    async function startPreview(channel){
+      if(!channel || previewActive) return;
+      if(previewTimeout) clearTimeout(previewTimeout);
+      previewTimeout = setTimeout(async ()=>{
+        try {
+          stopPreview();
+          previewActive = true;
+          previewBox.style.display = 'block';
+          previewVideo.muted = true;
+          previewVideo.controls = false;
+          shaka.polyfill.installAll();
+          if(!shaka.Player.isBrowserSupported()) { stopPreview(); return; }
+          previewShaka = new shaka.Player(previewVideo);
+          previewShaka.configure({ preferredAudioLanguage:'te', drm:{}, streaming:{ lowLatencyMode:true, rebufferingGoal:2, bufferBehind:30 } });
+          const keyId = channel.keyId && channel.keyId!=='null' ? channel.keyId : null;
+          const key = channel.key && channel.key!=='null' ? channel.key : null;
+          if(keyId && key){ previewShaka.configure({ drm:{ clearKeys:{[keyId]:key} }, streaming:{ lowLatencyMode:true } }); }
+          const cookie = await fetchCookie();
+          activeCookie = cookie || '';
+          if(previewShaka.getNetworkingEngine){
+            const engine = previewShaka.getNetworkingEngine();
+            engine.registerRequestFilter((type, request)=>{
+              request.headers["Referer"]="https://www.jiotv.com/";
+              request.headers["User-Agent"]="plaYtv/7.1.5";
+              if(activeCookie && (type===0||type===1)){
+                request.uris[0] = request.uris[0].split("?")[0] + "?" + activeCookie;
+              }
+            });
+          }
+          const streamUrls = [channel.url, channel.url1, channel.url2, channel.url3].filter(Boolean).map(u=>u.replace(/bpk-tv\/\//g,'bpk-tv/'));
+          let loaded=false;
+          for(let i=0;i<streamUrls.length;i++){
+            try{ await previewShaka.load(streamUrls[i]); await previewVideo.play(); loaded=true; break; }catch(_){}
+          }
+          if(!loaded){ stopPreview(); }
+        } catch(_){ stopPreview(); }
+      }, 300);
+    }
+    function stopPreview(){
+      if(previewTimeout){ clearTimeout(previewTimeout); previewTimeout=null; }
+      previewActive = false;
+      if(previewShaka){ try{ previewShaka.destroy(); }catch(_){} previewShaka=null; }
+      previewVideo.pause();
+      previewVideo.src='';
+      previewBox.style.display = 'none';
+    }
+
+    // ---- main play ----
+    async function playChannel(channel){
+      if(!channel || isClosing) return;
+      if(isPlaying) return;
+      isPlaying=!0;
+      currentChannel=channel;
+      playerName.textContent=channel.name||'Channel';
+      playerLogo.src=channel.logo||'https://ui-avatars.com/api/?name='+encodeURIComponent(channel.name)+'&background=7C3AED&color=ffffff&size=32';
+      saveLastPlayed(channel);
+      destroyPlayer();
+      stopPreview();
+      playerOverlay.classList.add('active');
+      try{ if(document.documentElement.requestFullscreen){ await document.documentElement.requestFullscreen() } else if(document.documentElement.webkitRequestFullscreen){ await document.documentElement.webkitRequestFullscreen() } }catch(_){}
+      try{
+        shaka.polyfill.installAll();
+        if(!shaka.Player.isBrowserSupported()){ showError(channel); isPlaying=!1; return; }
+        shakaPlayer = new shaka.Player(videoEl);
+        try{ const uiConfig={ controlPanelElements:['time_and_duration','mute','volume','fullscreen','overflow_menu'], overflowMenuButtons:['captions','quality','language','playback_rate'] }; new shaka.ui.Overlay(shakaPlayer, playerContainer, videoEl, uiConfig); videoEl.controls=!1; }catch(_){ videoEl.controls=!0; }
+        shakaPlayer.configure({ preferredAudioLanguage:'te', preferredTextLanguage:'en', drm:{}, streaming:{ lowLatencyMode:!0, rebufferingGoal:2, bufferBehind:30 } });
+        const keyId = channel.keyId && channel.keyId!=='null' ? channel.keyId : null;
+        const key = channel.key && channel.key!=='null' ? channel.key : null;
+        if(keyId && key){ shakaPlayer.configure({ drm:{ clearKeys:{[keyId]:key} }, streaming:{ lowLatencyMode:!0 } }); } else { shakaPlayer.configure({ drm:{ clearKeys:{} }, streaming:{ lowLatencyMode:!0 } }); }
+        const cookie = await fetchCookie();
+        activeCookie = cookie || '';
+        if(shakaPlayer.getNetworkingEngine){
+          const engine = shakaPlayer.getNetworkingEngine();
+          engine.registerRequestFilter((type, request)=>{
+            request.headers["Referer"]="https://www.jiotv.com/";
+            request.headers["User-Agent"]="plaYtv/7.1.5";
+            if(activeCookie && (type===0||type===1)){
+              request.uris[0]=request.uris[0].split("?")[0]+"?"+activeCookie;
+            }
+          });
+        }
+        const streamUrls=[channel.url, channel.url1, channel.url2, channel.url3].filter(Boolean).map(u=>u.replace(/bpk-tv\/\//g,'bpk-tv/'));
+        let loaded=!1;
+        for(let i=0;i<streamUrls.length;i++){
+          try{ await shakaPlayer.load(streamUrls[i]); setTimeout(()=>{ try{ const tracks=shakaPlayer.getAudioTracks(); if(tracks&&tracks.length){ let tel=tracks.find(t=>t.language==='te')||tracks.find(t=>['hi','ta','ml','kn','mr','bn'].includes(t.language)); if(tel)shakaPlayer.selectAudioTrack(tel); } }catch(_){} },300); await videoEl.play(); loaded=!0; isPlaying=!1; break; }catch(_){}
+        }
+        if(!loaded){ showError(channel); isPlaying=!1; }
+      }catch(_){ showError(channel); isPlaying=!1; }
+    }
+    function closePlayer(){ if(isClosing)return; isClosing=!0; hideError(); isPlaying=!1; if(playTimeout){ clearTimeout(playTimeout); playTimeout=null; } destroyPlayer(); videoEl.pause(); videoEl.src=''; videoEl.controls=!0; playerOverlay.classList.remove('active'); stopPreview(); try{ if(document.fullscreenElement){ document.exitFullscreen() } else if(document.webkitFullscreenElement){ document.webkitExitFullscreen() } }catch(_){} setTimeout(()=>{ isClosing=!1; currentChannel=null; activeCookie=null; },150); }
+    function destroyPlayer(){ if(shakaPlayer){ try{ shakaPlayer.destroy() }catch(_){} shakaPlayer=null; } }
+    closePlayerBtn.addEventListener('click',closePlayer); backBtn.addEventListener('click',closePlayer); playerContainer.addEventListener('click',e=>{ if(e.target===playerContainer) closePlayer(); });
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(errorOverlay.classList.contains('active')){ hideError(); if(playerOverlay.classList.contains('active')) closePlayer(); } else { closePlayer(); } } if(e.key===' ' && playerOverlay.classList.contains('active')){ e.preventDefault(); videoEl.paused?videoEl.play().catch(()=>{}):videoEl.pause(); } });
+    loadLastPlayed(); fetchChannels();
+    // ===== DISCLAIMER =====
+const disclaimer = document.getElementById('disclaimer');
+const acceptBtn = document.getElementById('acceptDisclaimer');
+const closeBtn = document.getElementById('closeDisclaimer');
+const timerBar = document.getElementById('timerBar');
+const timerCount = document.getElementById('timerCount');
+let timerInterval = null;
+let remaining = 20;
+
+function closeDisclaimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    disclaimer.classList.add('hidden');
+    setTimeout(() => {
+        disclaimer.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 700);
+}
+
+function startTimer() {
+    remaining = 20;
+    timerCount.textContent = remaining;
+    timerBar.style.width = '100%';
+    timerInterval = setInterval(() => {
+        remaining--;
+        const percent = (remaining / 7) * 100;
+        timerBar.style.width = percent + '%';
+        timerCount.textContent = remaining;
+        if (remaining <= 0) {
+            clearInterval(timerInterval);
+            closeDisclaimer();
+        }
+    }, 1000);
+}
+
+acceptBtn.addEventListener('click', closeDisclaimer);
+closeBtn.addEventListener('click', closeDisclaimer);
+
+// Check if disclaimer was already shown
+// ALWAYS show disclaimer on refresh - remove localStorage check
+document.body.style.overflow = 'hidden';
+startTimer();
+// Remove this line: localStorage.setItem('disclaimer_shown', 'true');
+  </script>
 </body>
 </html>
