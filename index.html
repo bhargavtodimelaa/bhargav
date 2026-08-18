@@ -535,72 +535,6 @@
             font-weight: 700;
             text-transform: uppercase
         }
-        .er {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center
-        }
-        .er.a {
-            display: flex
-        }
-        .er .em {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 40px 32px 32px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1)
-        }
-        .er .em svg {
-            width: 56px;
-            height: 56px;
-            fill: #EF4444;
-            margin-bottom: 12px
-        }
-        .er .em h2 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 8px
-        }
-        .er .em p {
-            color: var(--ts);
-            font-size: 0.9rem;
-            line-height: 1.5;
-            margin-bottom: 24px
-        }
-        .ea {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap
-        }
-        .eb {
-            padding: 10px 28px;
-            border-radius: 50px;
-            border: none;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: inherit
-        }
-        .eb.p {
-            background: var(--p);
-            color: #fff
-        }
-        .eb.s {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--t);
-            border: 1px solid rgba(255, 255, 255, 0.1)
-        }
         #pv {
             position: fixed;
             bottom: 30px;
@@ -765,12 +699,6 @@
         </div>
         <span class="c"><span class="d"></span><span id="co">0</span></span>
     </header>
-    <div style="text-align:center;padding:30px 20px 20px;border-top:1px solid rgba(255,255,255,0.05);margin-top:10px;background:rgba(15,10,26,0.8)">
-        <div style="font-size:clamp(2rem,6vw,4.5rem);font-weight:900;background:linear-gradient(135deg,#7C3AED,#EC4899,#F59E0B,#7C3AED);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gs 4s ease-in-out infinite;letter-spacing:3px;line-height:1.2">❤️ Made with Love ❤️</div>
-        <div style="font-size:clamp(0.8rem,1.8vw,1.3rem);color:rgba(255,255,255,0.6);margin-top:6px;font-weight:400;letter-spacing:1.5px"><span style="color:rgba(255,255,255,0.8);font-weight:600">Bhargav Todimela</span></div>
-        <div style="font-size:clamp(0.6rem,1.2vw,0.9rem);color:rgba(255,255,255,0.35);margin-top:4px;letter-spacing:0.5px">⚡ KL University · Vijayawada ⚡</div>
-        <div style="margin-top:12px;width:80px;height:2px;background:linear-gradient(90deg,transparent,#7C3AED,transparent);margin-left:auto;margin-right:auto;border-radius:10px"></div>
-    </div>
     <div class="f">
         <div class="s">
             <svg viewBox="0 0 24 24">
@@ -785,7 +713,6 @@
         <div class="lg" id="lg"></div>
     </div>
     <div class="gr" id="gr">
-        <!-- Loading indicator for channels -->
         <div class="gr-loading" id="gl">
             <div class="spinner"></div>
             <div class="lt">Loading channels...</div>
@@ -806,7 +733,6 @@
         </div>
         <div id="pc">
             <video id="v" playsinline autoplay></video>
-            <!-- Buffering overlay -->
             <div class="buf" id="buf">
                 <div class="bw"></div>
                 <div class="bt">Buffering...</div>
@@ -816,19 +742,6 @@
             <img id="plo" src="" alt="">
             <span class="pn" id="pn">Channel</span>
             <span class="lb">LIVE</span>
-        </div>
-    </div>
-    <div class="er" id="er">
-        <div class="em">
-            <svg viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-            </svg>
-            <h2>Connection Lost</h2>
-            <p>Channel unavailable. Please try again.</p>
-            <div class="ea">
-                <button class="eb p" id="re">Retry</button>
-                <button class="eb s" id="ec">Close</button>
-            </div>
         </div>
     </div>
     <div id="pv">
@@ -908,8 +821,40 @@
         const ea = [];
         let hg = null;
         let hl = null;
+        let initialUrlChannelAttempted = false;
 
-        // Show/hide grid loading
+        function updateUrlWithChannel(ch) {
+            if (!ch || !ch.name) return;
+            const slug = ch.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            if (slug) {
+                const newUrl = window.location.origin + window.location.pathname + '?channel=' + encodeURIComponent(slug);
+                window.history.pushState({ channel: ch.id, name: ch.name }, '', newUrl);
+            }
+        }
+
+        function resetUrlToBase() {
+            const base = window.location.origin + window.location.pathname;
+            if (window.location.search) {
+                window.history.pushState({}, '', base);
+            }
+        }
+
+        function getChannelFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const slug = params.get('channel');
+            if (!slug) return null;
+            const decoded = decodeURIComponent(slug).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            if (!decoded) return null;
+            for (let ch of a) {
+                if (!ch.name) continue;
+                const chSlug = ch.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                if (chSlug === decoded) {
+                    return ch;
+                }
+            }
+            return null;
+        }
+
         function showGridLoading(show) {
             if (show) {
                 gl.style.display = 'flex';
@@ -920,7 +865,6 @@
             }
         }
 
-        // Show/hide buffering
         function showBuffering(show) {
             if (show) {
                 buf.classList.add('a');
@@ -973,39 +917,6 @@
             ).join('');
         }
 
-        function se2(ch) {
-            if (ie) return;
-            ie = !0;
-            ec = ch;
-            eo.classList.add('a');
-            showBuffering(false);
-        }
-
-        function he() {
-            ie = !1;
-            eo.classList.remove('a');
-            ec = null;
-        }
-        er.addEventListener('click', () => {
-            he();
-            if (ec) {
-                ck = null;
-                ct = 0;
-                showBuffering(true);
-                setTimeout(() => pc2(ec), 200);
-            }
-        });
-        ecb.addEventListener('click', () => {
-            he();
-            if (po.classList.contains('a')) cp();
-        });
-        eo.addEventListener('click', e => {
-            if (e.target === eo) {
-                he();
-                if (po.classList.contains('a')) cp();
-            }
-        });
-
         async function fc2() {
             const n = Date.now();
             if (ck && (n - ct) < ca) return ck;
@@ -1053,6 +964,15 @@
                 llp();
                 rlp();
                 showGridLoading(false);
+                if (!initialUrlChannelAttempted) {
+                    initialUrlChannelAttempted = true;
+                    const urlCh = getChannelFromUrl();
+                    if (urlCh) {
+                        setTimeout(() => {
+                            pc2(urlCh);
+                        }, 400);
+                    }
+                }
                 return a;
             } catch (_) {
                 showGridLoading(false);
@@ -1350,7 +1270,10 @@
             const ch = Number.isFinite(idx) ? f[idx] : null;
             if (!ch) return;
             if (pt) clearTimeout(pt);
-            pt = setTimeout(() => pc2(ch), 40);
+            pt = setTimeout(() => {
+                updateUrlWithChannel(ch);
+                pc2(ch);
+            }, 40);
         });
 
         gr.addEventListener('mouseover', e => {
@@ -1388,7 +1311,10 @@
             if (!c || cl || ip) return;
             const id = c.dataset.id;
             const ch = (id && lm.get(String(id))) || lp[Number(c.dataset.i) || 0];
-            if (ch) setTimeout(() => pc2(ch), 50);
+            if (ch) {
+                updateUrlWithChannel(ch);
+                setTimeout(() => pc2(ch), 50);
+            }
         });
 
         lg.addEventListener('mouseover', e => {
@@ -1510,7 +1436,6 @@
             try {
                 shaka.polyfill.installAll();
                 if (!shaka.Player.isBrowserSupported()) {
-                    se2(ch);
                     ip = !1;
                     showBuffering(false);
                     return;
@@ -1535,7 +1460,6 @@
                     streaming: { lowLatencyMode: !0, rebufferingGoal: 2, bufferBehind: 30 }
                 });
 
-                // Add buffering event listeners
                 sp.addEventListener('buffering', (event) => {
                     if (event.buffering) {
                         showBuffering(true);
@@ -1544,7 +1468,6 @@
                     }
                 });
 
-                // Also hide buffering on loaded
                 sp.addEventListener('loaded', () => {
                     showBuffering(false);
                 });
@@ -1599,12 +1522,10 @@
                     } catch (_) {}
                 }
                 if (!l) {
-                    se2(ch);
                     ip = !1;
                     showBuffering(false);
                 }
             } catch (_) {
-                se2(ch);
                 ip = !1;
                 showBuffering(false);
             }
@@ -1613,7 +1534,6 @@
         function cp() {
             if (cl) return;
             cl = !0;
-            he();
             ip = !1;
             showBuffering(false);
             if (pt) {
@@ -1626,6 +1546,7 @@
             ve.controls = !0;
             po.classList.remove('a');
             sp3();
+            resetUrlToBase();
             try {
                 if (document.fullscreenElement) {
                     document.exitFullscreen();
@@ -1655,18 +1576,45 @@
 
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') {
-                if (eo.classList.contains('a')) {
-                    he();
-                    if (po.classList.contains('a')) cp();
-                } else {
-                    cp();
-                }
+                cp();
             }
             if (e.key === ' ' && po.classList.contains('a')) {
                 e.preventDefault();
                 ve.paused ? ve.play().catch(() => {}) : ve.pause();
             }
         });
+
+        window.addEventListener('popstate', (event) => {
+            if (po.classList.contains('a')) {
+                cp();
+            } else {
+                const ch = getChannelFromUrl();
+                if (ch) {
+                    setTimeout(() => pc2(ch), 200);
+                }
+            }
+        });
+
+        // Ensure video plays automatically when player opens
+        document.addEventListener('click', function(e) {
+            if (po.classList.contains('a') && ve.paused) {
+                ve.play().catch(() => {});
+            }
+        }, { passive: true });
+
+        // Also try to play when player becomes visible
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'class' && po.classList.contains('a')) {
+                    setTimeout(() => {
+                        if (ve.paused) {
+                            ve.play().catch(() => {});
+                        }
+                    }, 500);
+                }
+            });
+        });
+        observer.observe(po, { attributes: true });
 
         llp();
         fc();
