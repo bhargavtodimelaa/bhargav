@@ -108,8 +108,8 @@
     [data-theme="light"] .search-box{border-color:rgba(0,0,0,.06);box-shadow:inset 0 1px 1px rgba(255,255,255,.9),0 10px 35px rgba(0,0,0,.06)}
     .search-box:focus-within{background:rgba(255,255,255,.14);box-shadow:inset 0 1px 1px rgba(255,255,255,.12),0 15px 45px rgba(0,0,0,.35);transform:scale(1.015)}
     [data-theme="light"] .search-box:focus-within{background:rgba(0,0,0,.06);box-shadow:inset 0 1px 1px rgba(255,255,255,.9),0 15px 45px rgba(0,0,0,.08)}
-    .search-icon{width:20px;height:20px;margin-left:15px;margin-right:9px;flex-shrink:0;fill:var(--text-tertiary);opacity:.65;transition:transform .35s var(--spring-curve),opacity .3s ease}
-    .search-box:focus-within .search-icon{opacity:.9;fill:var(--accent);transform:scale(1.08)}
+    .search-icon{width:20px;height:20px;margin-left:15px;margin-right:9px;flex-shrink:0;color:var(--text-tertiary);stroke:var(--text-tertiary);opacity:.65;transition:transform .35s var(--spring-curve),opacity .3s ease}
+    .search-box:focus-within .search-icon{opacity:.9;color:var(--accent);stroke:var(--accent);transform:scale(1.08)}
     .search-box input{flex:1;background:transparent;border:none;padding:8px 4px;font-size:17px;font-weight:400;letter-spacing:-.2px;font-family:var(--font);color:var(--text-primary);outline:none;min-width:60px}
     .search-box input::placeholder{color:var(--text-tertiary);transition:opacity .25s ease}
     .search-box input:focus::placeholder{opacity:.45}
@@ -200,6 +200,23 @@
     .grid-pill.active{opacity:1;transform:scale(1)}
     .grid-pill-sweep{position:absolute;inset:0;background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.25),transparent 65%);transform:rotate(-8deg) translateX(-15%)}
     .grid-pill-highlight{position:absolute;top:6px;left:20%;width:60%;height:4px;border-radius:10px;background:rgba(255,255,255,.5);pointer-events:none}
+    [data-theme="light"] .channel-card{border-color:var(--border);background:var(--bg-card);box-shadow:var(--shadow-md)}
+    [data-theme="light"] .channel-card:hover{border-color:var(--border-hover);box-shadow:var(--shadow-xl)}
+    [data-theme="light"] .channel-card .card-glass::before{background:linear-gradient(120deg,rgba(0,0,0,.04),transparent 32%,transparent 70%,rgba(0,0,0,.02))}
+    [data-theme="light"] .channel-card .card-glass::after{background:rgba(0,0,0,.12)}
+    [data-theme="light"] .channel-card .card-pill{background:linear-gradient(145deg,rgba(0,0,0,.08),rgba(0,0,0,.02));border-color:rgba(0,0,0,.08)}
+    [data-theme="light"] .channel-card .card-pill::before{background:linear-gradient(110deg,transparent 25%,rgba(0,0,0,.06),transparent 65%)}
+    [data-theme="light"] .channel-card .card-pill::after{background:rgba(0,0,0,.15)}
+    [data-theme="light"] .grid-pill{background:linear-gradient(145deg,rgba(0,0,0,.06),rgba(0,0,0,.02));border-color:var(--border)}
+    [data-theme="light"] .grid-pill-sweep{background:linear-gradient(110deg,transparent 25%,rgba(0,0,0,.05),transparent 65%)}
+    [data-theme="light"] .grid-pill-highlight{background:rgba(0,0,0,.15)}
+    [data-theme="light"] .liq-nav{background:linear-gradient(135deg,rgba(0,0,0,.08),rgba(0,0,0,.02));border-color:var(--border);box-shadow:0 4px 20px rgba(0,0,0,.08),inset 0 1px 1px rgba(255,255,255,.8),inset 0 -1px 2px rgba(0,0,0,.03)}
+    [data-theme="light"] .liq-nav::before{background:linear-gradient(120deg,rgba(0,0,0,.05),transparent 32%,transparent 70%,rgba(0,0,0,.02))}
+    [data-theme="light"] .liq-indicator{background:linear-gradient(145deg,rgba(0,0,0,.12),rgba(0,0,0,.04));border-color:var(--border-hover);box-shadow:inset 0 1px 1px rgba(255,255,255,.8),inset 0 -2px 4px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.1)}
+    [data-theme="light"] .liq-indicator::after{background:rgba(0,0,0,.15)}
+    [data-theme="light"] .liq-btn{color:var(--muted)}
+    [data-theme="light"] .liq-btn:hover{color:var(--text-primary)}
+    [data-theme="light"] .liq-btn.active{color:var(--text-primary)}
     .channel-card.card-in{opacity:1;transform:translateY(0)}
     .channel-card:hover{transform:translateY(-6px) scale(1.03);border-color:rgba(255,255,255,.28);box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 1px 1px rgba(255,255,255,.55),inset 0 -1px 2px rgba(0,0,0,.15)}
     .channel-card:hover .card-glass::after{opacity:1}
@@ -369,11 +386,10 @@
   </div>
 
   <div style="position:relative;z-index:1">
-    <div class="channel-grid" id="channelGrid" style="position:relative">
-      <div class="grid-pill" id="gridPill">
-        <div class="grid-pill-sweep"></div>
-        <div class="grid-pill-highlight"></div>
-      </div>
+    <div class="channel-grid" id="channelGrid" style="position:relative"></div>
+    <div class="grid-pill" id="gridPill">
+      <div class="grid-pill-sweep"></div>
+      <div class="grid-pill-highlight"></div>
     </div>
     <div class="loading-state" id="loadingState">
       <div class="ios-loader-wrap">
@@ -993,7 +1009,7 @@ function stopPip(){
 var spCookie = null;
 async function openPlayer(ch){
   if(!ch || isPlayerOpen || isLoadingPlayer || isClosingPlayer) return;
-  if(isPipActive) return;
+  if(isPipActive) stopPip();
   isLoadingPlayer = true;
   isPlayerOpen = true;
   showBuffering(true);
@@ -1001,7 +1017,6 @@ async function openPlayer(ch){
   playerLogoEl.src = ch._logo32 || ch.logo || ('https://ui-avatars.com/api/?name='+encodeURIComponent(ch.name)+'&background=7C3AED&color=ffffff&size=32');
   saveRecent(ch);
   destroyPlayer();
-  stopPip();
   overlayEl.classList.add('active');
   topbarEl.classList.add('show');
   try{
@@ -1111,7 +1126,7 @@ document.addEventListener('keydown', function(e){
 });
 window.addEventListener('popstate', function(){
   if(overlayEl.classList.contains('active')) closePlayer();
-  else{ var ch=getChannelFromUrl(); if(ch) setTimeout(function(){openPlayer(ch);},200); }
+  else{ if(isPipActive) stopPip(); var ch=getChannelFromUrl(); if(ch) setTimeout(function(){openPlayer(ch);},200); }
 });
 document.addEventListener('click', function(e){
   if(overlayEl.classList.contains('active') && videoEl.paused) videoEl.play().catch(function(){});
