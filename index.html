@@ -50,15 +50,20 @@
       --accent-subtle:rgba(124,58,237,0.06);
       --scrollbar-thumb:rgba(124,58,237,0.3);--scrollbar-track:rgba(0,0,0,0.04);
     }
-    html,body{
-      background:var(--bg-primary);color:var(--text-primary);
-      width:100%;min-height:100vh;overflow-x:hidden;font-family:var(--font);
-      transition:background var(--tr-med),color var(--tr-med);
+    html{
+      background:var(--bg-primary);
       -webkit-font-smoothing:antialiased;
-      -webkit-tap-highlight-color:transparent;
-      overscroll-behavior:none;
+      -webkit-text-size-adjust:100%;
     }
-    *{-webkit-tap-highlight-color:transparent}
+    body{
+      background:var(--bg-primary);color:var(--text-primary);
+      min-height:100vh;
+      font-family:var(--font);
+      transition:background var(--tr-med),color var(--tr-med);
+      -webkit-tap-highlight-color:transparent;
+      overflow-y:auto;
+    }
+    .player-overlay,.bg-orbs{max-width:100vw}
     @supports(padding:env(safe-area-inset-top)){
       .header{padding-top:calc(10px + env(safe-area-inset-top));padding-left:calc(14px + env(safe-area-inset-left));padding-right:calc(14px + env(safe-area-inset-right))}
       .player-topbar{padding-top:calc(12px + env(safe-area-inset-top))}
@@ -168,7 +173,7 @@
     @media(max-width:500px){.search-spinner-wrap{width:22px;height:22px}.search-popup{right:-10px}.search-box{height:42px}.search-box input{font-size:15px}.search-cancel{font-size:14px}}
 
     /* Liquid Glass Nav - EXACT from pasted code */
-    .liq-nav{position:relative;height:var(--nav-height);display:flex;padding:var(--nav-padding);border-radius:40px;background:linear-gradient(135deg,rgba(255,255,255,.20),rgba(255,255,255,.055));border:1px solid rgba(255,255,255,.24);backdrop-filter:blur(40px) saturate(190%);-webkit-backdrop-filter:blur(40px) saturate(190%);box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 1px 1px rgba(255,255,255,.55),inset 0 -1px 2px rgba(0,0,0,.15);isolation:isolate;user-select:none;-webkit-user-select:none;touch-action:pan-x;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;gap:6px;-webkit-overflow-scrolling:touch}
+    .liq-nav{position:relative;height:var(--nav-height);display:flex;padding:var(--nav-padding);border-radius:40px;background:linear-gradient(135deg,rgba(255,255,255,.20),rgba(255,255,255,.055));border:1px solid rgba(255,255,255,.24);backdrop-filter:blur(40px) saturate(190%);-webkit-backdrop-filter:blur(40px) saturate(190%);box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 1px 1px rgba(255,255,255,.55),inset 0 -1px 2px rgba(0,0,0,.15);isolation:isolate;user-select:none;-webkit-user-select:none;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;gap:6px;-webkit-overflow-scrolling:touch}
     .liq-nav::-webkit-scrollbar{display:none}
     .liq-nav::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.13),transparent 32%,transparent 70%,rgba(255,255,255,.05))}
     .liq-indicator{position:absolute;z-index:1;top:var(--nav-padding);left:var(--nav-padding);width:0;height:calc(var(--nav-height) - var(--nav-padding)*2);border-radius:34px;pointer-events:none;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,.40),rgba(255,255,255,.10));border:1px solid rgba(255,255,255,.34);backdrop-filter:blur(28px) saturate(200%);-webkit-backdrop-filter:blur(28px) saturate(200%);box-shadow:inset 0 1px 1px rgba(255,255,255,.72),inset 0 -2px 4px rgba(0,0,0,.12),0 12px 35px rgba(0,0,0,.22);will-change:left,width,transform;transform:translateZ(0);transition:left .65s var(--spring-curve),width .65s var(--spring-curve),transform .5s var(--spring-curve),border-radius .5s var(--spring-curve)}
@@ -338,14 +343,14 @@
     #pip-container video{width:100%;height:100%;object-fit:contain;background:#000}
 
     /* === CUSTOM PLAYER CONTROLS === */
-    .player-big-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1003;width:80px;height:80px;border-radius:50%;background:rgba(0,0,0,0.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s var(--tr-spring);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .player-big-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1003;width:80px;height:80px;border-radius:50%;background:rgba(0,0,0,0.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s var(--tr-spring);box-shadow:0 8px 32px rgba(0,0,0,0.3);touch-action:manipulation}
     .player-big-play.show{opacity:1;pointer-events:auto}
     .player-big-play:hover{background:rgba(124,58,237,0.65);border-color:var(--accent);transform:translate(-50%,-50%) scale(1.12);box-shadow:0 12px 40px rgba(124,58,237,0.35)}
     .player-controls{position:absolute;bottom:0;left:0;right:0;z-index:1004;padding:0 20px 16px;background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,0.4) 30%,rgba(0,0,0,0.85) 100%);opacity:0;transition:opacity .4s ease;pointer-events:none}
     .player-controls.visible{opacity:1;pointer-events:auto}
     .player-overlay.hide-cursor{cursor:none}
     .player-overlay.hide-cursor *{cursor:none!important}
-    .player-overlay{touch-action:none}
+    .player-overlay{touch-action:manipulation}
     /* Double-tap seek indicator */
     .dt-seek{position:absolute;top:50%;transform:translateY(-50%);z-index:1006;display:flex;flex-direction:column;align-items:center;gap:4px;opacity:0;pointer-events:none;transition:opacity .2s ease}
     .dt-seek.left{left:15%}
@@ -759,6 +764,7 @@
 })();
 
 // ===== STATE =====
+var isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
 var allChannels = [];
 var filtered = [];
 var currentCategory = 'All';
@@ -1035,18 +1041,20 @@ function buildCategories(){
   // Wire button-only events (re-created each build)
   liqButtons.forEach(function(btn,i){
     btn.addEventListener('click',function(){if(!liqDragMoved) liqSelect(i);});
-    btn.addEventListener('mouseenter',function(){
-      if(liqDragging) return;
-      var tab=liqTabInfo(i);var expansion=Math.min(28,tab.width*.20);
-      liqIndicator.style.left=(tab.left-expansion/2)+'px';
-      liqIndicator.style.width=(tab.width+expansion)+'px';
-      liqIndicator.style.transform='scaleY(1.05)';
-      liqIndicator.style.borderRadius='38px';
-      var navRect=liqNav.getBoundingClientRect();var btnRect=btn.getBoundingClientRect();
-      var distRight=navRect.right-btnRect.right;var distLeft=btnRect.left-navRect.left;
-      if(distRight<80) liqNav.scrollBy({left:Math.min(120,btnRect.width+10),behavior:'smooth'});
-      else if(distLeft<80) liqNav.scrollBy({left:-Math.min(120,btnRect.width+10),behavior:'smooth'});
-    });
+    if(!isTouchDevice){
+      btn.addEventListener('mouseenter',function(){
+        if(liqDragging) return;
+        var tab=liqTabInfo(i);var expansion=Math.min(28,tab.width*.20);
+        liqIndicator.style.left=(tab.left-expansion/2)+'px';
+        liqIndicator.style.width=(tab.width+expansion)+'px';
+        liqIndicator.style.transform='scaleY(1.05)';
+        liqIndicator.style.borderRadius='38px';
+        var navRect=liqNav.getBoundingClientRect();var btnRect=btn.getBoundingClientRect();
+        var distRight=navRect.right-btnRect.right;var distLeft=btnRect.left-navRect.left;
+        if(distRight<80) liqNav.scrollBy({left:Math.min(120,btnRect.width+10),behavior:'smooth'});
+        else if(distLeft<80) liqNav.scrollBy({left:-Math.min(120,btnRect.width+10),behavior:'smooth'});
+      });
+    }
   });
   requestAnimationFrame(function(){liqMoveTo(liqCurrentIndex,false);requestAnimationFrame(function(){liqIndicator.style.transition='';});});
 }
@@ -1167,6 +1175,12 @@ searchEl.addEventListener('input', function(e){
 });
 searchEl.addEventListener('focus', function(){
   searchWrapper.classList.add('active');
+  // On mobile, scroll search into view when keyboard appears
+  if(isTouchDevice){
+    setTimeout(function(){
+      searchEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 300);
+  }
 });
 document.addEventListener('click', function(e){
   if(searchWrapper.classList.contains('active') && !e.target.closest('.search-wrapper') && document.activeElement !== searchEl){
@@ -1232,26 +1246,28 @@ window.addEventListener('scroll',function(){
     gridPill.style.top = top + 'px';
   }
 },{passive:true});
-gridEl.addEventListener('mouseover', function(e){
-  var card = e.target.closest('.channel-card');
-  if(!card || isPipActive || overlayEl.classList.contains('active')) return;
-  if(card === hoverCard) return;
-  hoverCard = card;
-  moveGridPill(card);
-  var idx = Number(card.dataset.i);
-  var ch = Number.isFinite(idx) ? filtered[idx] : null;
-  if(ch) startPip(ch);
-});
-gridEl.addEventListener('mouseout', function(e){
-  var card = e.target.closest('.channel-card');
-  if(!card) return;
-  var related = e.relatedTarget;
-  var to = (related && related.closest) ? related.closest('.channel-card') : null;
-  if(card === to) return;
-  if(card === hoverCard) hoverCard = null;
-  hideGridPill();
-  stopPip();
-});
+if(!isTouchDevice){
+  gridEl.addEventListener('mouseover', function(e){
+    var card = e.target.closest('.channel-card');
+    if(!card || isPipActive || overlayEl.classList.contains('active')) return;
+    if(card === hoverCard) return;
+    hoverCard = card;
+    moveGridPill(card);
+    var idx = Number(card.dataset.i);
+    var ch = Number.isFinite(idx) ? filtered[idx] : null;
+    if(ch) startPip(ch);
+  });
+  gridEl.addEventListener('mouseout', function(e){
+    var card = e.target.closest('.channel-card');
+    if(!card) return;
+    var related = e.relatedTarget;
+    var to = (related && related.closest) ? related.closest('.channel-card') : null;
+    if(card === to) return;
+    if(card === hoverCard) hoverCard = null;
+    hideGridPill();
+    stopPip();
+  });
+}
 
 // ===== RECENT CLICK =====
 recentScroll.addEventListener('click', function(e){
@@ -1341,10 +1357,14 @@ async function openPlayer(ch){
   overlayEl.classList.add('active');
   topbarEl.classList.add('show');
   playerInfoEl.classList.add('show');
-  try{
-    if(document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
-    else if(document.documentElement.webkitRequestFullscreen) await document.documentElement.webkitRequestFullscreen();
-  }catch(_){}
+  // Only request fullscreen on desktop — mobile browsers block or break it
+  var isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  if(!isMobile){
+    try{
+      if(document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+      else if(document.documentElement.webkitRequestFullscreen) await document.documentElement.webkitRequestFullscreen();
+    }catch(_){}
+  }
   try{
     shaka.polyfill.installAll();
     if(!shaka.Player.isBrowserSupported()){ closePlayer(); return; }
@@ -1391,7 +1411,12 @@ async function openPlayer(ch){
             }
           }catch(_){}
         }, 300);
-        await videoEl.play();
+        // Try to play — on mobile autoplay may be blocked
+        try{ await videoEl.play(); }catch(playErr){
+          // Autoplay blocked — show big play button so user can tap to start
+          videoEl.muted = true;
+          try{ await videoEl.play(); }catch(_){}
+        }
         loaded = true;
         isLoadingPlayer = false;
         showBuffering(false);
@@ -1672,7 +1697,7 @@ function throttledShowControls(){
 // Use pointermove on document — works even when cursor is hidden via CSS
 document.addEventListener('pointermove', function(e){
   if(isPlayerOpen) throttledShowControls();
-});
+}, {passive:true});
 // Fallback: also listen on overlay for browsers that don't fire pointermove when cursor:none
 overlayEl.addEventListener('mousemove', function(){ if(isPlayerOpen) throttledShowControls(); });
 overlayEl.addEventListener('touchstart', function(){ showControls(); }, {passive:true});
@@ -1914,7 +1939,12 @@ overlayEl.addEventListener('touchmove', function(e){
   } else if(touchGesture === 'brightness'){
     // Visual brightness via CSS filter
     var bDelta = -dy / (window.innerHeight * 0.6);
-    var curFilter = parseFloat(videoEl.style.filter?.match(/brightness\(([^)]+)\)/)?.[1] || 1);
+    var curFilter = 1;
+    try{
+      var filterStr = videoEl.style.filter || '';
+      var match = filterStr.match(/brightness\(([^)]+)\)/);
+      if(match && match[1]) curFilter = parseFloat(match[1]);
+    }catch(_){}
     var newB = Math.max(0.2, Math.min(1.5, curFilter + bDelta));
     videoEl.style.filter = 'brightness(' + newB + ')';
     showGesture('right', (newB - 0.2) / 1.3);
