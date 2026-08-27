@@ -1,237 +1,192 @@
-// Service Worker v3 — Advanced caching with TTL, background sync, and offline support
-const CACHE_VERSION = 'ltv-v3';
-const SHELL_CACHE = `${CACHE_VERSION}-shell`;
-const CDN_CACHE = `${CACHE_VERSION}-cdn`;
-const API_CACHE = `${CACHE_VERSION}-api`;
-const IMAGE_CACHE = `${CACHE_VERSION}-images`;
-const CACHE_TTL = 30 * 60 * 1000; // 30 minutes for API data
-const CDN_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days for CDN assets
-
-const SHELL = ['./', './index.html', './worker.js'];
-const CDN_ASSETS = [
+// Service Worker v4 — Final optimized version
+'use strict';
+var V='ltv-v4',SC=V+'-shell',CC=V+'-cdn',AC=V+'-api',IC=V+'-img';
+var TTL=18e5; // 30 min
+var SHELL=['./','./index.html','./worker.js'];
+var CDN=[
   'https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css'
 ];
 
-// ---- Install: pre-cache shell + CDN ----
-self.addEventListener('install', e => {
+// Install: pre-cache shell + CDN
+self.addEventListener('install', function(e) {
   e.waitUntil(
     Promise.all([
-      caches.open(SHELL_CACHE).then(c => c.addAll(SHELL)),
-      caches.open(CDN_CACHE).then(c =>
-        Promise.all(CDN_ASSETS.map(url =>
-          fetch(url, { mode: 'cors' }).then(r => c.put(url, r)).catch(() => {})
-        ))
-      )
-    ]).then(() => self.skipWaiting())
+      caches.open(SC).then(function(c) { return c.addAll(SHELL); }),
+      caches.open(CC).then(function(c) {
+        return Promise.all(CDN.map(function(u) {
+          return fetch(u, {mode: 'cors'}).then(function(r) { return c.put(u, r); }).catch(function() {});
+        }));
+      })
+    ]).then(function() { self.skipWaiting(); })
   );
 });
 
-// ---- Activate: clean old caches ----
-self.addEventListener('activate', e => {
-  const keep = new Set([SHELL_CACHE, CDN_CACHE, API_CACHE, IMAGE_CACHE]);
+// Activate: clean old caches
+self.addEventListener('activate', function(e) {
+  var keep = new Set([SC, CC, AC, IC]);
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => !keep.has(k)).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches.keys().then(function(ks) {
+      return Promise.all(ks.filter(function(k) { return !keep.has(k); }).map(function(k) { return caches.delete(k); }));
+    }).then(function() { self.clients.claim(); })
   );
 });
 
-// ---- Helper: TTL-aware cache put ----
-async function ttlPut(cacheName, request, response, ttl) {
-  const cache = await caches.open(cacheName);
-  const headers = new Headers(response.headers);
-  headers.set('sw-cached-at', Date.now().toString());
-  headers.set('sw-ttl', ttl.toString());
-  const timedResponse = new Response(response.clone().body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers
+// TTL cache put
+function tp(cn, req, res, t) {
+  return caches.open(cn).then(function(c) {
+    var h = new Headers(res.headers);
+    h.set('ca', Date.now().toString());
+    h.set('tl', t.toString());
+    return c.put(req, new Response(res.clone().body, {status: res.status, statusText: res.statusText, headers: h}));
   });
-  await cache.put(request, timedResponse);
 }
 
-// ---- Helper: check TTL expiry ----
-function isExpired(response) {
-  const cachedAt = parseInt(response.headers.get('sw-cached-at') || '0', 10);
-  const ttl = parseInt(response.headers.get('sw-ttl') || '0', 10);
-  return ttl > 0 && (Date.now() - cachedAt) > ttl;
+// Check TTL expiry
+function exp(r) {
+  var a = parseInt(r.headers.get('ca') || '0', 10);
+  var t = parseInt(r.headers.get('tl') || '0', 10);
+  return t > 0 && (Date.now() - a) > t;
 }
 
-// ---- Fetch handler with strategy routing ----
-self.addEventListener('fetch', e => {
-  const u = new URL(e.request.url);
-  const method = e.request.method;
+// Fetch routing
+self.addEventListener('fetch', function(e) {
+  var u = new URL(e.request.url);
+  if (e.request.method !== 'GET') return;
 
-  // Only handle GET requests
-  if (method !== 'GET') return;
-
-  // CDN assets: cache-first (versioned, immutable)
+  // CDN: cache-first
   if (u.hostname === 'cdnjs.cloudflare.com') {
-    e.respondWith(cacheFirst(e.request, CDN_CACHE));
+    e.respondWith(cf(e.request, CC));
     return;
   }
-
-  // API calls: network-first with TTL cache fallback
+  // API: network-first + TTL
   if (u.pathname === '/channels' || u.pathname === '/cookies') {
-    e.respondWith(networkFirstWithTTL(e.request, API_CACHE, CACHE_TTL));
+    e.respondWith(nwt(e.request, AC, TTL));
     return;
   }
-
-  // Image assets (ui-avatars, logos): cache-first with network fallback
-  if (u.hostname === 'ui-avatars.com' || /\.(png|jpg|jpeg|gif|webp|avif|svg)(\?|$)/i.test(u.pathname)) {
-    e.respondWith(cacheFirst(e.request, IMAGE_CACHE));
+  // Images: cache-first
+  if (u.hostname === 'ui-avatars.com' || /\.(png|jpe?g|gif|webp|avif|svg)(\?|$)/i.test(u.pathname)) {
+    e.respondWith(cf(e.request, IC));
     return;
   }
-
-  // HTML shell: stale-while-revalidate
+  // HTML: stale-while-revalidate
   if (e.request.mode === 'navigate' || u.pathname === '/' || u.pathname === '/index.html') {
-    e.respondWith(staleWhileRevalidate(e.request, SHELL_CACHE));
+    e.respondWith(swr(e.request, SC));
     return;
   }
-
-  // Worker JS: cache-first
+  // Worker: cache-first
   if (u.pathname === '/worker.js') {
-    e.respondWith(cacheFirst(e.request, SHELL_CACHE));
+    e.respondWith(cf(e.request, SC));
     return;
   }
-
-  // Everything else: network-first
-  e.respondWith(networkFirst(e.request));
+  // Default: network-first
+  e.respondWith(nf(e.request));
 });
 
-// ---- Strategy: Cache-first ----
-async function cacheFirst(request, cacheName) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch (_) {
-    return new Response('', { status: 408, statusText: 'Offline' });
-  }
-}
-
-// ---- Strategy: Network-first ----
-async function networkFirst(request) {
-  try {
-    const response = await fetch(request);
-    return response;
-  } catch (_) {
-    const cached = await caches.match(request);
-    return cached || new Response('Offline', { status: 503 });
-  }
-}
-
-// ---- Strategy: Network-first with TTL cache ----
-async function networkFirstWithTTL(request, cacheName, ttl) {
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      await ttlPut(cacheName, request, response, ttl);
-    }
-    return response;
-  } catch (_) {
-    const cached = await caches.match(request);
-    if (cached && !isExpired(cached)) return cached;
-    return cached || new Response('[]', {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
+// Strategy: cache-first
+function cf(request, cn) {
+  return caches.match(request).then(function(cached) {
+    if (cached) return cached;
+    return fetch(request).then(function(res) {
+      if (res.ok) {
+        caches.open(cn).then(function(c) { c.put(request, res.clone()); });
+      }
+      return res;
+    }).catch(function() {
+      return new Response('', {status: 408, statusText: 'Offline'});
     });
-  }
+  });
 }
 
-// ---- Strategy: Stale-while-revalidate ----
-async function staleWhileRevalidate(request, cacheName) {
-  const cached = await caches.match(request);
-  const fetchPromise = fetch(request).then(response => {
-    if (response.ok) {
-      ttlPut(cacheName, request, response, CACHE_TTL);
-    }
-    return response;
-  }).catch(() => cached);
-
-  return cached || fetchPromise;
+// Strategy: network-first
+function nf(request) {
+  return fetch(request).catch(function() {
+    return caches.match(request).then(function(cached) {
+      return cached || new Response('Offline', {status: 503});
+    });
+  });
 }
 
-// ---- Background Sync: retry failed API calls when back online ----
-self.addEventListener('sync', e => {
+// Strategy: network-first + TTL cache
+function nwt(request, cn, ttl) {
+  return fetch(request).then(function(res) {
+    if (res.ok) tp(cn, request, res, ttl);
+    return res;
+  }).catch(function() {
+    return caches.match(request).then(function(cached) {
+      if (cached && !exp(cached)) return cached;
+      return cached || new Response('[]', {status: 200, headers: {'Content-Type': 'application/json'}});
+    });
+  });
+}
+
+// Strategy: stale-while-revalidate
+function swr(request, cn) {
+  return caches.match(request).then(function(cached) {
+    var fetchPromise = fetch(request).then(function(res) {
+      if (res.ok) tp(cn, request, res, TTL);
+      return res;
+    }).catch(function() { return cached; });
+    return cached || fetchPromise;
+  });
+}
+
+// Background sync
+self.addEventListener('sync', function(e) {
   if (e.tag === 'retry-channels') {
     e.waitUntil(retryChannels());
   }
 });
 
-async function retryChannels() {
-  try {
-    const response = await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/channels');
-    if (response.ok) {
-      const cache = await caches.open(API_CACHE);
-      await ttlPut(API_CACHE, new Request('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/channels'), response, CACHE_TTL);
-      // Notify all clients that data is updated
-      const clients = await self.clients.matchAll();
-      clients.forEach(client => client.postMessage({ type: 'CHANNELS_UPDATED' }));
+function retryChannels() {
+  return fetch(API_URL + '/channels').then(function(r) {
+    if (r.ok) {
+      return tp(AC, new Request(API_URL + '/channels'), r, TTL).then(function() {
+        return self.clients.matchAll();
+      }).then(function(cs) {
+        cs.forEach(function(c) { c.postMessage({type: 'CHANNELS_UPDATED'}); });
+      });
     }
-  } catch (_) {}
+  }).catch(function() {});
 }
+var API_URL = 'https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev';
 
-// ---- Push notifications (for future use) ----
-self.addEventListener('push', e => {
+// Push notifications
+self.addEventListener('push', function(e) {
   if (!e.data) return;
-  const data = e.data.json();
-  e.waitUntil(
-    self.registration.showNotification(data.title || 'Live TV', {
-      body: data.body || 'New content available',
-      icon: data.icon || '/icon-192.png',
-      badge: data.badge || '/badge-72.png',
-      data: data.url || '/'
-    })
-  );
+  var d = e.data.json();
+  e.waitUntil(self.registration.showNotification(d.title || 'Live TV', {
+    body: d.body || 'New content available',
+    data: d.url || '/'
+  }));
 });
 
-self.addEventListener('notificationclick', e => {
+self.addEventListener('notificationclick', function(e) {
   e.notification.close();
-  e.waitUntil(
-    self.clients.matchAll({ type: 'window' }).then(clients => {
-      const url = e.notification.data || '/';
-      for (const client of clients) {
-        if (client.url.includes(self.registration.scope) && 'focus' in client) {
-          client.navigate(url);
-          return client.focus();
-        }
-      }
-      return self.clients.openWindow(url);
-    })
-  );
+  e.waitUntil(self.clients.matchAll({type: 'window'}).then(function(cs) {
+    var u = e.notification.data || '/';
+    for (var i = 0; i < cs.length; i++) {
+      if ('focus' in cs[i]) { cs[i].navigate(u); return cs[i].focus(); }
+    }
+    return self.clients.openWindow(u);
+  }));
 });
 
-// ---- Message handler for cache management ----
-self.addEventListener('message', e => {
-  if (e.data && e.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-  if (e.data && e.data.type === 'CLEAR_API_CACHE') {
-    caches.delete(API_CACHE);
-  }
-  if (e.data && e.data.type === 'CACHE_STATS') {
+// Message handler
+self.addEventListener('message', function(e) {
+  if (!e.data) return;
+  if (e.data.type === 'SKIP_WAITING') self.skipWaiting();
+  if (e.data.type === 'CLEAR_API_CACHE') caches.delete(AC);
+  if (e.data.type === 'CACHE_STATS') {
     Promise.all([
-      caches.open(SHELL_CACHE).then(c => c.keys()),
-      caches.open(CDN_CACHE).then(c => c.keys()),
-      caches.open(API_CACHE).then(c => c.keys()),
-      caches.open(IMAGE_CACHE).then(c => c.keys())
-    ]).then(([shell, cdn, api, images]) => {
+      caches.open(SC).then(function(c) { return c.keys(); }),
+      caches.open(CC).then(function(c) { return c.keys(); }),
+      caches.open(AC).then(function(c) { return c.keys(); }),
+      caches.open(IC).then(function(c) { return c.keys(); })
+    ]).then(function(ks) {
       e.source.postMessage({
         type: 'CACHE_STATS',
-        data: {
-          shell: shell.length,
-          cdn: cdn.length,
-          api: api.length,
-          images: images.length,
-          total: shell.length + cdn.length + api.length + images.length
-        }
+        data: {shell: ks[0].length, cdn: ks[1].length, api: ks[2].length, images: ks[3].length, total: ks[0].length + ks[1].length + ks[2].length + ks[3].length}
       });
     });
   }

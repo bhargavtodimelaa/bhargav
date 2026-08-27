@@ -10,8 +10,10 @@
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev" crossorigin>
 <link rel="prefetch" href="https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/channels">
+<!-- Async CSS: non-blocking render -->
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" as="style" fetchpriority="high">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css"></noscript>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" defer></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -22,7 +24,7 @@ html,body{background:var(--b);color:var(--t);min-height:100vh;overflow-x:hidden;
 ::-webkit-scrollbar-thumb{background:var(--p);border-radius:10px}
 .h,.f{background:rgba(15,10,26,0.95);display:flex;align-items:center;box-shadow:0 1px 0 var(--gb);contain:layout style paint}
 .h{padding:12px 24px;justify-content:space-between;position:sticky;top:0;z-index:100}
-.f{padding:10px 24px;flex-wrap:wrap;gap:10px 16px;position:sticky;top:60px;z-index:99}
+.f{padding:10px 24px;flex-wrap:wrap;gap:10px 16px;position:sticky;top:60px;z-index:99;contain:layout style}
 .hb{display:flex;align-items:center;gap:12px}
 .hb .i{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--p);border-radius:var(--rs)}
 .hb .i svg{width:24px;height:24px;fill:#fff}
@@ -35,6 +37,18 @@ html,body{background:var(--b);color:var(--t);min-height:100vh;overflow-x:hidden;
 .f .ct{display:flex;flex-wrap:wrap;gap:4px}
 .f .ct .c{background:var(--g);border:1px solid var(--gb);color:var(--ts);padding:4px 14px;border-radius:50px;font-size:0.7rem;font-weight:500;cursor:pointer;white-space:nowrap;font-family:inherit}
 .f .ct .c.a{background:var(--p);border-color:var(--p);color:#fff}
+.sg{position:absolute;top:100%;left:0;right:0;background:rgba(15,10,26,0.98);border:1px solid var(--gb);border-radius:16px;margin-top:4px;max-height:240px;overflow-y:auto;z-index:200;display:none;contain:layout style}
+.sg.v{display:block}
+.sg .si{padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:0.8rem;color:var(--ts);border-bottom:1px solid var(--g)}
+.sg .si:last-child{border-bottom:none}
+.sg .si:hover{background:var(--g);color:var(--t)}
+.sg .si .sc{font-size:0.6rem;color:var(--tt);background:var(--g);padding:1px 8px;border-radius:50px;margin-left:auto}
+@keyframes sh{0%{background-position:-200px 0}100%{background-position:200px 0}}
+.sk{background:var(--b);background-image:linear-gradient(90deg,var(--b) 0%,#1a1430 50%,var(--b) 100%);background-size:400px 100%;animation:sh 1.5s infinite linear;border-radius:var(--r)}
+.sk-c{display:flex;flex-direction:column;align-items:center;padding:20px 12px 16px;background:var(--g);border-radius:var(--r);border:1px solid var(--gb);contain:layout style paint}
+.sk-c .sk-i{width:72px;height:72px;border-radius:50%;margin-bottom:10px}
+.sk-c .sk-t{width:80%;height:12px;border-radius:6px;margin-bottom:6px}
+.sk-c .sk-b{width:50%;height:10px;border-radius:5px}
 .lz{padding:16px 24px 4px;max-width:1440px;margin:0 auto;width:100%;display:none;content-visibility:auto;contain-intrinsic-size:0 200px;contain:layout style}
 .lz.v{display:block}
 .lz .ti{font-size:0.7rem;font-weight:600;color:var(--ts);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
@@ -48,14 +62,16 @@ html,body{background:var(--b);color:var(--t);min-height:100vh;overflow-x:hidden;
 .lo{border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--gb);aspect-ratio:1}
 .lc .lo{width:48px;margin-bottom:8px}
 .cc .lo{width:72px;margin-bottom:10px}
-.lo img{max-width:100%;max-height:100%;object-fit:contain;padding:4px}
+.lo img{max-width:100%;max-height:100%;object-fit:contain;padding:4px;transition:opacity .3s}
+.lo img[data-loaded="false"]{opacity:0}
+.lo img[data-loaded="true"]{opacity:1}
 .cc img{padding:8px}
 .n{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2}
 .lc .n{font-size:0.7rem;font-weight:500;max-height:2.4em}
 .cc .n{font-size:0.85rem;font-weight:600;word-break:break-word;max-height:2.4em}
 .lc .bd{font-size:0.45rem;color:var(--ts);padding:1px 10px;border-radius:50px;margin-top:4px;border:1px solid var(--gb)}
 .cc .ca{font-size:0.55rem;color:var(--ts);margin-top:6px;background:var(--g);padding:2px 12px;border-radius:50px;border:1px solid var(--gb)}
-.em{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ts);background:var(--g);border-radius:var(--r);border:1px dashed var(--gb)}
+.em{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ts);background:var(--g);border-radius:var(--r);border:1px dashed var(--gb);contain:layout style}
 .em svg{width:56px;height:56px;fill:var(--tt);display:block;margin:0 auto 12px}
 .pl{display:none;position:fixed;inset:0;background:#000;z-index:1000;flex-direction:column;will-change:contents}
 .pl.a{display:flex}
@@ -92,18 +108,21 @@ html,body{background:var(--b);color:var(--t);min-height:100vh;overflow-x:hidden;
 .hero::after{content:"";display:block;margin:12px auto 0;width:80px;height:2px;background:linear-gradient(90deg,transparent,#7C3AED,transparent);border-radius:10px}
 @keyframes gs{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
 @media(prefers-reduced-motion:reduce){.hero h1{animation:none;will-change:auto}}
-.gr{padding:16px 24px 32px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;max-width:1440px;margin:0 auto;width:100%;content-visibility:auto;contain-intrinsic-size:0 800px;contain:layout style}
+.gr{padding:16px 24px 32px;position:relative;max-width:1440px;margin:0 auto;width:100%;contain:layout style}
+.gr-i{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;width:100%}
+.pf{position:fixed;bottom:8px;left:8px;background:rgba(0,0,0,0.8);color:var(--ts);font-size:0.55rem;padding:4px 10px;border-radius:8px;z-index:9999;font-family:monospace;pointer-events:none;opacity:0;transition:opacity .3s;contain:layout style}
+.pf.v{opacity:1}
 @media(max-width:768px){
 .h{padding:10px 16px}.hb .l .t{font-size:1rem}.hb .i{width:30px;height:30px}.hb .i svg{width:20px;height:20px}
 .f{padding:8px 16px;top:52px}.f .s{padding:2px 12px 2px 16px}
-.gr{padding:12px 16px 20px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}.cc .lo{width:60px}.cc{padding:16px 10px 12px}
+.gr-i{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}.cc .lo{width:60px}.cc{padding:16px 10px 12px}
 .pi{bottom:60px;font-size:0.75rem;padding:6px 16px 6px 10px}.pi img{width:26px}
 .pb{padding:6px 14px;font-size:0.7rem}
 .lc{flex:0 0 90px;padding:10px 6px}.lc .lo{width:40px}
 .lz{padding:12px 16px 0}
 }
 @media(max-width:480px){
-.gr{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;padding:10px 12px 16px}.cc .lo{width:50px}.cc .n{font-size:0.75rem}.cc{padding:12px 6px 10px}
+.gr{padding:10px 12px 16px}.gr-i{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}.cc .lo{width:50px}.cc .n{font-size:0.75rem}.cc{padding:12px 6px 10px}
 .f .ct .c{font-size:0.6rem;padding:3px 10px}
 .pi{bottom:50px;font-size:0.65rem;padding:4px 12px 4px 8px}.pi img{width:22px}
 .pb{padding:4px 10px;font-size:0.65rem}.pb svg{width:16px;height:16px}
@@ -115,226 +134,175 @@ html,body{background:var(--b);color:var(--t);min-height:100vh;overflow-x:hidden;
 </style>
 </head>
 <body>
-<header class="h">
-<div class="hb">
-<div class="i"><svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3c-1.1 0-2 .89-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.11-.9-2-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg></div>
-<div class="l"><span class="t">Live TV</span><span class="s">Streaming</span></div>
-</div>
-</header>
-<div class="hero">
-<h1>❤️ Made with Love ❤️</h1>
-<div class="sub"><b>Bhargav Todimela</b></div>
-<div class="loc">⚡ KL University · Vijayawada ⚡</div>
-</div>
-<div class="f">
-<div class="s">
-<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-<input type="text" id="se" placeholder="Search..." aria-label="Search channels" autocomplete="off" spellcheck="false">
-</div>
+<header class="h"><div class="hb"><div class="i"><svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3c-1.1 0-2 .89-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.11-.9-2-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg></div><div class="l"><span class="t">Live TV</span><span class="s">Streaming</span></div></div></header>
+<div class="hero"><h1>❤️ Made with Love ❤️</h1><div class="sub"><b>Bhargav Todimela</b></div><div class="loc">⚡ KL University · Vijayawada ⚡</div></div>
+<div class="f" style="position:relative">
+<div class="s"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><input type="text" id="se" placeholder="Search..." aria-label="Search channels" autocomplete="off" spellcheck="false"></div>
+<div class="sg" id="sg"></div>
 <div class="ct" id="ca"></div>
 </div>
-<div class="lz" id="lz">
-<div class="ti">⏱️ Recent <span class="b">PLAYED</span></div>
-<div class="lg" id="lg"></div>
-</div>
-<div class="gr" id="gr"></div>
+<div class="lz" id="lz"><div class="ti">⏱️ Recent <span class="b">PLAYED</span></div><div class="lg" id="lg"></div></div>
+<div class="gr" id="gr"><div class="gr-i" id="gi">
+<div class="sk-c"><div class="sk sk-i"></div><div class="sk sk-t"></div><div class="sk sk-b"></div></div>
+<div class="sk-c"><div class="sk sk-i"></div><div class="sk sk-t"></div><div class="sk sk-b"></div></div>
+<div class="sk-c"><div class="sk sk-i"></div><div class="sk sk-t"></div><div class="sk sk-b"></div></div>
+<div class="sk-c"><div class="sk sk-i"></div><div class="sk sk-t"></div><div class="sk sk-b"></div></div>
+<div class="sk-c"><div class="sk sk-i"></div><div class="sk sk-t"></div><div class="sk sk-b"></div></div>
+<div class="sk-c"><div class="sk sk-i"></div><div class="sk sk-t"></div><div class="sk sk-b"></div></div>
+<div class="sk-c"><div class="sk sk-i"></div><div class="sk sk-t"></div><div class="sk sk-b"></div></div>
+<div class="sk-c"><div class="sk sk-i"></div><div class="sk sk-t"></div><div class="sk sk-b"></div></div>
+</div></div>
 <div class="pl" id="pl">
-<div class="tb">
-<button class="pb" id="ba" aria-label="Go back"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg> Back</button>
-<button class="pc" id="cl" aria-label="Close player"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
-</div>
+<div class="tb"><button class="pb" id="ba" aria-label="Go back"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg> Back</button><button class="pc" id="cl" aria-label="Close player"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div>
 <div id="pc"><video id="v" playsinline autoplay></video></div>
 <div class="pi" id="pi"><img id="plo" src="" width="32" height="32" alt=""><span class="pn" id="pn">Channel</span><span class="lb">LIVE</span></div>
 </div>
-<div class="er" id="er">
-<div class="em">
-<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M11 7h2v6h-2zm0 8h2v2h-2z" fill="var(--b)"/></svg>
-<h2>Connection Lost</h2>
-<p>Channel unavailable. Please try again.</p>
-<div class="ea"><button class="eb p" id="re">Retry</button><button class="eb s" id="ec">Close</button></div>
-</div>
-</div>
+<div class="er" id="er"><div class="em"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M11 7h2v6h-2zm0 8h2v2h-2z" fill="var(--b)"/></svg><h2>Connection Lost</h2><p>Channel unavailable. Please try again.</p><div class="ea"><button class="eb p" id="re">Retry</button><button class="eb s" id="ec">Close</button></div></div></div>
 <div id="pv"><video id="pvv" playsinline muted></video></div>
+<div class="pf" id="pf"></div>
 <script>
+'use strict';
+// === CONTEXT MENU / DEV TOOLS BLOCK ===
 document.addEventListener('contextmenu',e=>e.preventDefault());
-document.addEventListener('keydown',e=>{
-if(e.key==='F12'||e.keyCode===123){e.preventDefault();return false}
-if(e.ctrlKey&&e.shiftKey&&'IJCP'.includes(e.key)){e.preventDefault();return false}
-if(e.ctrlKey&&'uUsS'.includes(e.key)){e.preventDefault();return false}
-});
+document.addEventListener('keydown',e=>{if(e.key==='F12'||e.keyCode===123){e.preventDefault();return!1}if(e.ctrlKey&&e.shiftKey&&'IJCP'.includes(e.key)){e.preventDefault();return!1}if(e.ctrlKey&&'uUsS'.includes(e.key)){e.preventDefault();return!1}});
 
-// Use WeakMap for DOM->data associations to allow GC when elements are removed
-const a=[],f=[];
-let cc='All',st='',ck=null,ct=0,ca=5*60*1000;
-let ac=null,cl=!1,sp=null,ch=null,ec=null,ie=!1;
-let lp=[],ip=!1,pt=null;
-const sk='ltv_lp',dm=new WeakMap(),dm2=new Map();
+// === STATE (flat, minimal closures) ===
+const A=[],F=[];
+let CC='All',ST='',CK=null,CT=0,CA=3e5;
+let AC=null,CL=false,SP=null,EC=null,IE=false;
+let LP=[],IP=false,PT=null;
+const SK='ltv_lp',DM=new WeakMap();
 
+// === DOM CACHE (single pass, no repeated queries) ===
 const $=id=>document.getElementById(id);
-const gr=$('gr'),si=$('se'),cg=$('ca'),po=$('pl'),cb=$('cl'),bb=$('ba'),
-ve=$('v'),pc=$('pc'),pn=$('pn'),pl=$('plo'),eo=$('er'),
-er=$('re'),ecb=$('ec'),pvb=$('pv'),pvv=$('pvv'),lg=$('lg'),lzs=$('lz');
-let ps=null,pa=!1,pvt=null,di=0;
+const GR=$('gr'),GI=$('gi'),SI=$('se'),CG=$('ca'),PO=$('pl'),CB=$('cl'),BB=$('ba'),
+VE=$('v'),PC=$('pc'),PN=$('pn'),PL=$('plo'),EO=$('er'),
+ER=$('re'),ECB=$('ec'),PVB=$('pv'),PVV=$('pvv'),LG=$('lg'),LZS=$('lz'),
+SG=$('sg'),PF=$('pf');
+let PS=null,PA=false,PVT=null,DI=0;
+let VS={sh:0,vh:0,rh:186,cw:166,cols:8,vs:0,ve:0,tr:0};
 
-const eSvg='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M11 7h2v6h-2zm0 8h2v2h-2z" fill="var(--b)"/></svg>';
-const fallbackUrl=(n,sz)=>`https://ui-avatars.com/api/?name=${encodeURIComponent(n)}&background=7C3AED&color=ffffff&size=${sz}`;
+// === CONSTANTS (hoisted, no repeated allocation) ===
+const E_SVG='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M11 7h2v6h-2zm0 8h2v2h-2z" fill="var(--b)"/></svg>';
+const SEARCH_SVG='<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>';
+const EMPTY_SVG='<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>';
+const API='https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev';
+const FB=n=>`https://ui-avatars.com/api/?name=${encodeURIComponent(n)}&background=7C3AED&color=ffffff&size=`;
+const FB40=n=>FB(n)+'40';
+const FB72=n=>FB(n)+'72';
+const FB32=n=>FB(n)+'32';
 
-function llp(){try{const d=localStorage.getItem(sk);if(d){lp=JSON.parse(d).filter(ch=>ch&&ch.id&&ch.name);return lp}}catch(_){}return[]}
+// === LAZY IMAGE OBSERVATION ===
+const IBO=new IntersectionObserver(es=>{for(let i=0;i<es.length;i++){if(es[i].isIntersecting){const m=es[i].target,s=m.dataset.src;if(s){m.src=s;m.removeAttribute('data-src')}m.dataset.loaded='1';IBO.unobserve(m)}}},{rootMargin:'200px',threshold:.01});
+function LI(img){if(img){img.dataset.loaded='0';IBO.observe(img)}}
 
-function slp(ch){
-if(!ch||!ch.id)return;
-lp=lp.filter(c=>c.id!==ch.id);
-lp.unshift(ch);
-lp.length=lp.length>10?10:lp.length;
-try{localStorage.setItem(sk,JSON.stringify(lp))}catch(_){}
-rlp();
-}
+// === DEBOUNCE (cancelable, trailing) ===
+function DB(fn,ms){let t=null,a=null,b=null;const d=function(){a=arguments;b=this;if(t)clearTimeout(t);t=setTimeout(()=>{fn.apply(b,a);t=null;a=null;b=null},ms)};d.c=()=>{if(t){clearTimeout(t);t=null}a=null;b=null};return d}
 
-function rlp(){
-if(!lp.length){lzs.classList.remove('v');return}
-lzs.classList.add('v');
+// === BATCH DOM (rAF coalescing) ===
+let _batch=null,_raf=false;
+function BD(fn){if(!_batch)_batch=[];_batch.push(fn);if(!_raf){_raf=true;requestAnimationFrame(()=>{const q=_batch;_batch=null;_raf=false;if(q)for(let i=0;i<q.length;i++)q[i]()})}}
+
+// === VIRTUAL SCROLL ===
+function CGD(){const r=GR.getBoundingClientRect(),s=getComputedStyle(GI),g=parseInt(s.gap)||16,mw=innerWidth<=480?100:innerWidth<=768?120:150;VS.cols=Math.max(1,Math.floor((r.width+g)/(mw+g)));VS.cw=(r.width-(VS.cols-1)*g)/VS.cols;VS.vh=innerHeight}
+function RVG(){
+if(!F.length){GI.innerHTML=`<div class="em">${E_SVG}${EMPTY_SVG}No channels</div>`;return}
+CGD();VS.tr=Math.ceil(F.length/VS.cols);
+const st=GR.scrollTop||0;VS.vs=Math.max(0,Math.floor(st/VS.rh)-2);VS.ve=Math.min(VS.tr,Math.ceil((st+VS.vh)/VS.rh)+2);
 const f=document.createDocumentFragment();
-lp.forEach(ch=>{
-const id='r'+(di++),el=document.createElement('div');
-el.className='lc';el.dataset.i=id;dm.set(el,ch);
-el.innerHTML=`<div class="lo"><img src="${ch.logo||fallbackUrl(ch.name,40)}" alt="" loading="lazy" width="40" height="40" decoding="async" onerror="this.onerror=null;this.src='${fallbackUrl(ch.name,40)}'"/></div><div class="n">${ch.name}</div><div class="bd">▶</div>`;
-f.appendChild(el);
-});
-lg.replaceChildren(f);
-}
+for(let r=VS.vs;r<VS.ve;r++){for(let c=0;c<VS.cols;c++){const i=r*VS.cols+c;if(i>=F.length)break;const ch=F[i],id='c'+(DI++),el=document.createElement('div');
+el.className='cc';el.dataset.i=id;DM.set(el,ch);
+const lo=ch.logo||FB72(ch.name);
+el.innerHTML='<div class="lo"><img data-src="'+lo+'" alt="" width="72" height="72" decoding="async" onerror="this.onerror=null;this.src=\''+FB72(ch.name)+'\';this.dataset.loaded=\'1\'"/></div><div class="n">'+ch.name+'</div><span class="ca">'+(ch.category||'General')+'</span>';
+f.appendChild(el);LI(el.querySelector('img'))}}
+GI.replaceChildren(f)}
 
-function se2(ch){if(ie)return;ie=!0;ec=ch;eo.classList.add('a')}
-function he(){ie=!1;eo.classList.remove('a');ec=null}
-er.addEventListener('click',()=>{he();if(ec){ck=null;ct=0;setTimeout(()=>pc2(ec),200)}});
-ecb.addEventListener('click',()=>{he();if(po.classList.contains('a'))cp()});
-eo.addEventListener('click',e=>{if(e.target===eo){he();if(po.classList.contains('a'))cp()}});
+// === RECENTLY PLAYED ===
+function LLP(){try{const d=localStorage.getItem(SK);if(d){LP=JSON.parse(d).filter(c=>c&&c.id&&c.name);return LP}}catch(_){}return[]}
+function SLP(ch){if(!ch||!ch.id)return;LP=LP.filter(c=>c.id!==ch.id);LP.unshift(ch);LP.length=LP.length>10?10:LP.length;try{localStorage.setItem(SK,JSON.stringify(LP))}catch(_){}RLP()}
+function RLP(){if(!LP.length){LZS.classList.remove('v');return}LZS.classList.add('v');const f=document.createDocumentFragment();for(let i=0;i<LP.length;i++){const ch=LP[i],id='r'+(DI++),el=document.createElement('div');el.className='lc';el.dataset.i=id;DM.set(el,ch);const lo=ch.logo||FB40(ch.name);el.innerHTML='<div class="lo"><img data-src="'+lo+'" alt="" width="40" height="40" decoding="async" onerror="this.onerror=null;this.src=\''+FB40(ch.name)+'\';this.dataset.loaded=\'1\'"/></div><div class="n">'+ch.name+'</div><div class="bd">▶</div>';f.appendChild(el);LI(el.querySelector('img'))}LG.replaceChildren(f)}
 
-async function fc2(){
-const n=Date.now();
-if(ck&&(n-ct)<ca)return ck;
-try{const r=await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/cookies',{cache:'no-cache',headers:{'Cache-Control':'no-cache'}});const d=await r.json();const o=d.find(i=>i.cookie);
-if(o&&o.cookie){ck=o.cookie;ct=n;return ck}return null}catch(_){return null}
-}
+// === ERROR MODAL ===
+function SE2(ch){if(IE)return;IE=true;EC=ch;EO.classList.add('a')}
+function HE(){IE=false;EO.classList.remove('a');EC=null}
+ER.addEventListener('click',()=>{HE();if(EC){CK=null;CT=0;setTimeout(()=>PC2(EC),200)}});
+ECB.addEventListener('click',()=>{HE();if(PO.classList.contains('a'))CP()});
+EO.addEventListener('click',e=>{if(e.target===EO){HE();if(PO.classList.contains('a'))CP()}});
 
-function rn(en,coo){if(!en)return;en.registerRequestFilter((t,r)=>{r.headers["Referer"]="https://www.jiotv.com/";r.headers["User-Agent"]="plaYtv/7.1.5";if(coo&&(t===0||t===1))r.uris[0]=r.uris[0].split("?")[0]+"?"+coo})}
-async function tu(player,urls){for(const u of urls){try{await player.load(u);return true}catch(_){}}return false}
-function gul(ch){return[ch.url,ch.url1,ch.url2,ch.url3].filter(Boolean).map(u=>u.replace(/bpk-tv\/\//g,'bpk-tv/'))}
+// === COOKIE ===
+async function FC2(){const n=Date.now();if(CK&&(n-CT)<CA)return CK;try{const r=await fetch(API+'/cookies',{cache:'no-cache',headers:{'Cache-Control':'no-cache'}});const d=await r.json(),o=d.find(i=>i.cookie);if(o&&o.cookie){CK=o.cookie;CT=n;return CK}return null}catch(_){return null}}
 
-async function fc(){
-try{const r=await fetch('https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev/channels',{headers:{'X-Requested-With':'XMLHttpRequest'},cache:'no-cache'});const d=await r.json();
-a.length=0;const arr=Array.isArray(d)?d:(d.channels||[]);
-for(const c of arr){if(c&&typeof c==='object'&&c.name)a.push(c)}
-ec2();af();llp();rlp();return a}catch(_){gr.innerHTML=`<div class="em">${eSvg}Failed to load channels</div>`;return[]}
-}
+// === SHAKA HELPERS ===
+function RN(en,coo){if(!en)return;en.registerRequestFilter((t,r)=>{r.headers["Referer"]="https://www.jiotv.com/";r.headers["User-Agent"]="plaYtv/7.1.5";if(coo&&(t===0||t===1))r.uris[0]=r.uris[0].split("?")[0]+"?"+coo})}
+async function TU(p,u){for(let i=0;i<u.length;i++){try{await p.load(u[i]);return true}catch(_){}}return false}
+function GUL(c){return[c.url,c.url1,c.url2,c.url3].filter(Boolean).map(u=>u.replace(/bpk-tv\/\//g,'bpk-tv/'))}
 
-function ec2(){
-const ct2=new Set(['All']);
-for(const c of a){if(c.category&&c.category.trim())ct2.add(c.category.trim())}
-const sorted=Array.from(ct2).filter(c=>c!=='All').sort();
-const frag=document.createDocumentFragment();
-const allBtn=document.createElement('button');allBtn.className='c a';allBtn.dataset.c=encodeURIComponent('All');allBtn.textContent='All';
-frag.appendChild(allBtn);
-for(const c of sorted){const b=document.createElement('button');b.className='c';b.dataset.c=encodeURIComponent(c);b.textContent=c;frag.appendChild(b)}
-cg.replaceChildren(frag);
-}
+// === WEB WORKER ===
+let WW=null,WR=false;
+function IW(){try{WW=new Worker('./worker.js');WR=true;WW.onmessage=function(e){const d=e.data;switch(d.type){case'FILTERED':renderGrid(d.data);break;case'CATEGORIES':buildCats(d.data);break;case'FILTERED_SUGGESTIONS':renderSG(d.data);break}};WW.onerror=()=>{WR=false}}catch(_){WR=false}}
+function WP(t,p){if(WW&&WR)WW.postMessage({type:t,payload:p})}
 
-function af(){
-const t=st.toLowerCase().trim();
-f.length=0;
-for(const ch of a){if(ch.name.toLowerCase().includes(t)&&(cc==='All'||ch.category===cc))f.push(ch)}
-rg();
-}
+// === CHANNEL FETCH ===
+async function FC(){try{const r=await fetch(API+'/channels',{headers:{'X-Requested-With':'XMLHttpRequest'},cache:'no-cache'});const d=await r.json();A.length=0;const arr=Array.isArray(d)?d:(d.channels||[]);for(let i=0;i<arr.length;i++){const c=arr[i];if(c&&typeof c==='object'&&c.name)A.push(c)}if(WR)WW.postMessage({type:'SET_CHANNELS',payload:A});EC2();BD(()=>{F.length=0;for(let i=0;i<A.length;i++)F.push(A[i]);RVG()});LLP();RLP();return A}catch(_){GI.innerHTML=`<div class="em">${E_SVG}Failed to load channels</div>`;return[]}}
 
-function rg(){
-if(!f.length){gr.innerHTML=`<div class="em"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>No channels</div>`;return}
-const frag=document.createDocumentFragment();
-for(const ch of f){
-const id='c'+(di++),el=document.createElement('div');
-el.className='cc';el.dataset.i=id;
-dm.set(el,ch);
-const lo=ch.logo||fallbackUrl(ch.name,72);
-el.innerHTML=`<div class="lo"><img src="${lo}" alt="" loading="lazy" width="72" height="72" decoding="async" onerror="this.onerror=null;this.src='${fallbackUrl(ch.name,72)}'"/></div><div class="n">${ch.name}</div><span class="ca">${ch.category||'General'}</span>`;
-frag.appendChild(el);
-}
-gr.replaceChildren(frag);
-}
+// === CATEGORIES ===
+function EC2(){const s=new Set(['All']);for(let i=0;i<A.length;i++){const c=A[i].category;if(c&&c.trim())s.add(c.trim())}const arr=Array.from(s).sort((a,b)=>a==='All'?-1:b==='All'?1:a.localeCompare(b));buildCats(arr)}
+function buildCats(cats){const f=document.createDocumentFragment();for(let i=0;i<cats.length;i++){const b=document.createElement('button');b.className='c'+(i===0?' a':'');b.dataset.c=encodeURIComponent(cats[i]);b.textContent=cats[i];f.appendChild(b)}CG.replaceChildren(f)}
 
-let sd=null;
-si.addEventListener('input',e=>{st=e.target.value;if(sd)clearTimeout(sd);sd=setTimeout(af,150)});
+// === SEARCH + FILTER ===
+function renderGrid(data){BD(()=>{F.length=0;for(let i=0;i<data.length;i++)F.push(data[i]);RVG()})}
+const doSearch=DB(function(){if(WR){WP('FILTER',{search:ST,category:CC})}else{BD(()=>{F.length=0;const t=ST.toLowerCase();for(let i=0;i<A.length;i++){const ch=A[i];if(ch.name.toLowerCase().includes(t)&&(CC==='All'||ch.category===CC))F.push(ch)}RVG()})}},100);
+SI.addEventListener('input',e=>{ST=e.target.value;doSearch()});
 
-async function sp2(ch){
-if(!ch||pa)return;
-if(pvt)clearTimeout(pvt);
-pvt=setTimeout(async()=>{
-try{sp3();pa=!0;pvb.style.display='block';pvv.muted=!0;pvv.controls=!1;
-shaka.polyfill.installAll();
-if(!shaka.Player.isBrowserSupported()){sp3();return}
-ps=new shaka.Player(pvv);
-const k=ch.keyId&&ch.keyId!=='null'?ch.keyId:null;
-const ky=ch.key&&ch.key!=='null'?ch.key:null;
-ps.configure({preferredAudioLanguage:'te',drm:k&&ky?{clearKeys:{[k]:ky}}:{},streaming:{lowLatencyMode:!0,rebufferingGoal:2,bufferBehind:30}});
-const coo=await fc2();ac=coo||'';
-rn(ps.getNetworkingEngine(),ac);
-if(await tu(ps,gul(ch))){await pvv.play()}else sp3()}catch(_){sp3()}
-},300);
-}
+// === SEARCH SUGGESTIONS ===
+function renderSG(sg){if(!sg||!sg.length){SG.classList.remove('v');return}SG.classList.add('v');const f=document.createDocumentFragment();for(let i=0;i<sg.length;i++){const s=sg[i],el=document.createElement('div');el.className='si';el.dataset.name=s.name;el.innerHTML='<span>'+s.name+'</span><span class="sc">'+(s.category||'')+'</span>';f.appendChild(el)}SG.replaceChildren(f)}
+const doSG=DB(function(q){if(WR&&q&&q.length>=2){WP('FILTER',{search:q,category:'All'})}else{SG.classList.remove('v')}},200);
+SI.addEventListener('input',e=>{doSG(e.target.value)});
+SG.addEventListener('click',e=>{const s=e.target.closest('.si');if(s){SI.value=s.dataset.name;ST=s.dataset.name;SG.classList.remove('v');doSearch()}});
+document.addEventListener('click',e=>{if(!SG.contains(e.target)&&e.target!==SI)SG.classList.remove('v')});
 
-function sp3(){
-if(pvt){clearTimeout(pvt);pvt=null}pa=!1;
-if(ps){try{ps.destroy()}catch(_){}ps=null}
-pvv.pause();pvv.removeAttribute('src');pvv.load();
-pvb.style.display='none';
-}
+// === PI PREVIEW ===
+async function SP2(ch){if(!ch||PA)return;if(PVT)clearTimeout(PVT);PVT=setTimeout(async()=>{try{SP3();PA=true;PVB.style.display='block';PVV.muted=true;PVV.controls=false;shaka.polyfill.installAll();if(!shaka.Player.isBrowserSupported()){SP3();return}PS=new shaka.Player(PVV);const k=ch.keyId&&ch.keyId!=='null'?ch.keyId:null,ky=ch.key&&ch.key!=='null'?ch.key:null;PS.configure({preferredAudioLanguage:'te',drm:k&&ky?{clearKeys:{[k]:ky}}:{},streaming:{lowLatencyMode:true,rebufferingGoal:2,bufferBehind:30}});const coo=await FC2();AC=coo||'';RN(PS.getNetworkingEngine(),AC);if(await TU(PS,GUL(ch))){await PVV.play()}else SP3()}catch(_){SP3()}},300)}
+function SP3(){if(PVT){clearTimeout(PVT);PVT=null}PA=false;if(PS){try{PS.destroy()}catch(_){}PS=null}PVV.pause();PVV.removeAttribute('src');PVV.load();PVB.style.display='none'}
 
-function fs(){try{const el=document.documentElement;(el.requestFullscreen||el.webkitRequestFullscreen).call(el)}catch(_){}}
-function xfs(){try{if(document.fullscreenElement)document.exitFullscreen();else if(document.webkitFullscreenElement)document.webkitExitFullscreen()}catch(_){}}
+// === FULLSCREEN ===
+function FS(){try{const e=document.documentElement;(e.requestFullscreen||e.webkitRequestFullscreen).call(e)}catch(_){}}
+function XFS(){try{if(document.fullscreenElement)document.exitFullscreen();else if(document.webkitFullscreenElement)document.webkitExitFullscreen()}catch(_){}}
 
-async function pc2(ch){
-if(!ch||cl||ip)return;ip=!0;
-pn.textContent=ch.name||'Channel';
-pl.src=ch.logo||fallbackUrl(ch.name,32);
-slp(ch);dp();sp3();po.classList.add('a');fs();
-try{shaka.polyfill.installAll();
-if(!shaka.Player.isBrowserSupported()){se2(ch);ip=!1;return}
-sp=new shaka.Player(ve);
-try{new shaka.ui.Overlay(sp,pc,ve,{controlPanelElements:['time_and_duration','mute','volume','fullscreen','overflow_menu'],overflowMenuButtons:['captions','quality','language','playback_rate']});ve.controls=!1}catch(_){ve.controls=!0}
-const k=ch.keyId&&ch.keyId!=='null'?ch.keyId:null;
-const ky=ch.key&&ch.key!=='null'?ch.key:null;
-sp.configure({preferredAudioLanguage:'te',preferredTextLanguage:'en',drm:k&&ky?{clearKeys:{[k]:ky}}:{clearKeys:{}},streaming:{lowLatencyMode:!0,rebufferingGoal:2,bufferBehind:30}});
-const coo=await fc2();ac=coo||'';
-rn(sp.getNetworkingEngine(),ac);
-if(await tu(sp,gul(ch))){
-setTimeout(()=>{try{const tr=sp.getAudioTracks();if(tr&&tr.length){const tel=tr.find(t=>t.language==='te')||tr.find(t=>['hi','ta','ml','kn','mr','bn'].includes(t.language));if(tel)sp.selectAudioTrack(tel)}}catch(_){}},300);
-await ve.play();ip=!1;
-}else{se2(ch);ip=!1}
-}catch(_){se2(ch);ip=!1}
-}
+// === MAIN PLAYER ===
+async function PC2(ch){if(!ch||CL||IP)return;IP=true;PN.textContent=ch.name||'Channel';PL.src=ch.logo||FB32(ch.name);SLP(ch);DP();SP3();PO.classList.add('a');FS();try{shaka.polyfill.installAll();if(!shaka.Player.isBrowserSupported()){SE2(ch);IP=false;return}SP=new shaka.Player(VE);try{new shaka.ui.Overlay(SP,PC,VE,{controlPanelElements:['time_and_duration','mute','volume','fullscreen','overflow_menu'],overflowMenuButtons:['captions','quality','language','playback_rate']});VE.controls=false}catch(_){VE.controls=true}const k=ch.keyId&&ch.keyId!=='null'?ch.keyId:null,ky=ch.key&&ch.key!=='null'?ch.key:null;SP.configure({preferredAudioLanguage:'te',preferredTextLanguage:'en',drm:k&&ky?{clearKeys:{[k]:ky}}:{clearKeys:{}},streaming:{lowLatencyMode:true,rebufferingGoal:2,bufferBehind:30}});const coo=await FC2();AC=coo||'';RN(SP.getNetworkingEngine(),AC);if(await TU(SP,GUL(ch))){setTimeout(()=>{try{const tr=SP.getAudioTracks();if(tr&&tr.length){const tel=tr.find(t=>t.language==='te')||tr.find(t=>['hi','ta','ml','kn','mr','bn'].includes(t.language));if(tel)SP.selectAudioTrack(tel)}}catch(_){}},300);await VE.play();IP=false}else{SE2(ch);IP=false}}catch(_){SE2(ch);IP=false}}
+function CP(){if(CL)return;CL=true;HE();IP=false;if(PT){clearTimeout(PT);PT=null}DP();VE.pause();VE.removeAttribute('src');VE.load();VE.controls=true;PO.classList.remove('a');SP3();XFS();setTimeout(()=>{CL=false;EC=null;AC=null},150)}
+function DP(){if(SP){try{SP.destroy()}catch(_){}SP=null}}
 
-function cp(){
-if(cl)return;cl=!0;he();ip=!1;
-if(pt){clearTimeout(pt);pt=null}dp();
-ve.pause();ve.removeAttribute('src');ve.load();ve.controls=!0;
-po.classList.remove('a');sp3();xfs();
-setTimeout(()=>{cl=!1;ch=null;ac=null},150);
-}
-function dp(){if(sp){try{sp.destroy()}catch(_){}sp=null}}
+// === EVENT LISTENERS (single delegation point) ===
+CB.addEventListener('click',CP);BB.addEventListener('click',CP);
+PC.addEventListener('click',e=>{if(e.target===PC)CP()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(EO.classList.contains('a')){HE();if(PO.classList.contains('a'))CP()}else CP()}if(e.key===' '&&PO.classList.contains('a')){e.preventDefault();VE.paused?VE.play().catch(()=>{}):VE.pause()}});
+CG.addEventListener('click',e=>{const b=e.target.closest('.c');if(!b)return;CG.querySelectorAll('.c').forEach(x=>x.classList.remove('a'));b.classList.add('a');CC=decodeURIComponent(b.dataset.c);doSearch()});
 
-cb.addEventListener('click',cp);
-bb.addEventListener('click',cp);
-pc.addEventListener('click',e=>{if(e.target===pc)cp()});
-document.addEventListener('keydown',e=>{
-if(e.key==='Escape'){if(eo.classList.contains('a')){he();if(po.classList.contains('a'))cp()}else cp()}
-if(e.key===' '&&po.classList.contains('a')){e.preventDefault();ve.paused?ve.play().catch(()=>{}):ve.pause()}
-});
-cg.addEventListener('click',e=>{const b=e.target.closest('.c');if(!b)return;cg.querySelectorAll('.c').forEach(x=>x.classList.remove('a'));b.classList.add('a');cc=decodeURIComponent(b.dataset.c);af()});
-gr.addEventListener('click',e=>{if(cl||ip)return;const c=e.target.closest('.cc');if(c){const ch=dm.get(c);if(ch){if(pt)clearTimeout(pt);pt=setTimeout(()=>pc2(ch),50)}}});
-gr.addEventListener('mouseenter',e=>{if(ip||po.classList.contains('a'))return;const c=e.target.closest('.cc');if(c){const ch=dm.get(c);if(ch)sp2(ch)}},!0);
-gr.addEventListener('mouseleave',()=>sp3(),!0);
-lg.addEventListener('click',e=>{if(cl||ip)return;const c=e.target.closest('.lc');if(c){const ch=dm.get(c);if(ch)setTimeout(()=>pc2(ch),50)}});
-lg.addEventListener('mouseenter',e=>{if(ip||po.classList.contains('a'))return;const c=e.target.closest('.lc');if(c){const ch=dm.get(c);if(ch)sp2(ch)}},!0);
-lg.addEventListener('mouseleave',()=>sp3(),!0);
-llp();fc();
-if('serviceWorker' in navigator){(self.requestIdleCallback||setTimeout)(()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{})},200)}
+// Grid + Recent delegation (single handler for both)
+function handleCardClick(e){if(CL||IP)return;const c=e.target.closest('.cc,.lc');if(c){const ch=DM.get(c);if(ch){if(PT)clearTimeout(PT);PT=setTimeout(()=>PC2(ch),50)}}}
+function handleCardEnter(e){if(IP||PO.classList.contains('a'))return;const c=e.target.closest('.cc,.lc');if(c){const ch=DM.get(c);if(ch)SP2(ch)}}
+GI.addEventListener('click',handleCardClick);
+GI.addEventListener('mouseenter',handleCardEnter,true);
+GI.addEventListener('mouseleave',()=>SP3(),true);
+LG.addEventListener('click',handleCardClick);
+LG.addEventListener('mouseenter',handleCardEnter,true);
+LG.addEventListener('mouseleave',()=>SP3(),true);
+
+// === VIRTUAL SCROLL + RESIZE ===
+const vsH=DB(()=>{VS.sh=GR.scrollTop;RVG()},16);
+const rsH=DB(()=>{CGD();RVG()},200);
+GR.addEventListener('scroll',vsH,{passive:true});
+window.addEventListener('resize',rsH,{passive:true});
+
+// === CORE WEB VITALS MONITOR ===
+const PM={lcp:0,cls:0,inp:0,fcp:0,ttfb:0};
+function IPM(){try{new PerformanceObserver(l=>{const e=l.getEntries(),last=e[e.length-1];if(last)PM.lcp=Math.round(last.startTime)}).observe({type:'largest-contentful-paint',buffered:true})}catch(_){}try{new PerformanceObserver(l=>{for(const e of l.getEntries())if(!e.hadRecentInput)PM.cls+=e.value}).observe({type:'layout-shift',buffered:true})}catch(_){}try{new PerformanceObserver(l=>{for(const e of l.getEntries())if(e.name==='first-contentful-paint')PM.fcp=Math.round(e.startTime)}).observe({type:'paint',buffered:true})}catch(_){}const nv=performance.getEntriesByType('navigation')[0];if(nv)PM.ttfb=Math.round(nv.responseStart);let ie=[];try{new PerformanceObserver(l=>{for(const e of l.getEntries())if(e.interactionId){ie.push(e);if(ie.length>10)ie=ie.slice(-10)}}).observe({type:'event',buffered:true,deliveryThreshold:0})}catch(_){}setInterval(()=>{let wi=0;if(ie.length){const d=ie.map(e=>e.duration).sort((a,b)=>b-a);wi=Math.round(d[0]||0)}PM.inp=wi;const g=PM.lcp<2500&&PM.cls<0.1&&PM.inp<200?'🟢':PM.lcp<4000&&PM.cls<0.25&&PM.inp<500?'🟡':'🔴';PF.textContent=g+' LCP:'+PM.lcp+'ms CLS:'+PM.cls.toFixed(3)+' INP:'+PM.inp+'ms';PF.classList.add('v')},3000)}
+
+// === INIT ===
+IW();LLP();FC();IPM();
+if('serviceWorker' in navigator)(self.requestIdleCallback||setTimeout)(()=>{navigator.serviceWorker.register('./sw.js').then(reg=>{navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='CHANNELS_UPDATED')FC()})}).catch(()=>{})},200);
 </script>
 </body>
 </html>
