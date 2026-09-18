@@ -3,19 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="color-scheme" content="light only">
 <title>Live TV</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" defer></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+html{color-scheme:light only}
 :root{--b:#1a73e8;--g1:#f1f3f4;--g2:#e8eaed;--g3:#dadce0;--g6:#5f6368;--w:#fff;--bg:#f8f9fa;--t:#202124;--sh:0 1px 3px rgba(0,0,0,.12)}
-body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--t);min-height:100vh;overflow-x:hidden}
+html[data-theme="dark"]{--b:#8ab4f8;--g1:#3c4043;--g2:#5f6368;--g3:#80868b;--g6:#bdc1c6;--w:#202124;--bg:#171717;--t:#e8eaed;--sh:0 1px 3px rgba(0,0,0,.5)}
+body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--t);min-height:100vh;overflow-x:hidden;transition:background .2s,color .2s}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--g3);border-radius:8px}
 .h{background:var(--w);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--g2);position:sticky;top:0;z-index:10;box-shadow:var(--sh)}
 .hb{display:flex;align-items:center;gap:10px}
 .hb svg{width:28px;height:28px;fill:var(--b)}
 .h h1{font-size:1.3rem;font-weight:600}
+.hr{display:flex;align-items:center;gap:8px}
 .cnt{background:var(--g1);padding:4px 16px;border-radius:40px;font-size:.75rem;font-weight:500;color:var(--g6);border:1px solid var(--g2)}
+.tt{background:var(--g1);border:1px solid var(--g2);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.tt:hover{background:var(--g2)}
+.tt svg{width:20px;height:20px;fill:var(--t)}
+.tt .sun{display:block}
+.tt .moon{display:none}
+html[data-theme="dark"] .tt .sun{display:none}
+html[data-theme="dark"] .tt .moon{display:block}
 .fb{background:var(--w);padding:8px 24px;display:flex;flex-wrap:wrap;gap:8px 16px;border-bottom:1px solid var(--g2);position:sticky;top:64px;z-index:9}
 .sr{flex:1 1 200px;display:flex;align-items:center;background:var(--g1);border-radius:24px;padding:4px 12px 4px 16px;border:1px solid transparent}
 .sr:focus-within{background:var(--w);border-color:var(--b);box-shadow:0 0 0 2px rgba(26,115,232,.2)}
@@ -67,7 +78,16 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
 </style>
 </head>
 <body>
-<header class="h"><div class="hb"><svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg><h1>Live TV</h1></div><span class="cnt" id="counter">Loading…</span></header>
+<header class="h">
+  <div class="hb"><svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg><h1>Live TV</h1></div>
+  <div class="hr">
+    <span class="cnt" id="counter">Loading…</span>
+    <button class="tt" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+      <svg class="sun" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3zm0-11V1h-1v3h1zm0 16v-3h-1v3h1zM4.22 4.22l-.71.71 2.12 2.12.71-.71-2.12-2.12zm13.44 13.44-.71.71 2.12 2.12.71-.71-2.12-2.12zM1 11v1h3v-1H1zm19 0v1h3v-1h-3zM4.22 19.78l2.12-2.12-.71-.71-2.12 2.12.71.71zm13.44-13.44 2.12-2.12-.71-.71-2.12 2.12.71.71z"/></svg>
+      <svg class="moon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-5.4-5.4c0-1.81.89-3.42 2.26-4.4A9.13 9.13 0 0 0 12 3z"/></svg>
+    </button>
+  </div>
+</header>
 <div class="fb"><div class="sr"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><input type="text" id="search" placeholder="Search channels..." autocomplete="off"></div><div class="cats" id="cats"></div></div>
 <div class="ls" id="lastSection"><div class="title">🕐 Recently played</div><div class="lg" id="lastGrid"></div></div>
 <div class="g" id="grid"></div>
@@ -77,6 +97,7 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
 'use strict';
 const API='https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev';
 const STORAGE='liveTV_lastPlayed';
+const THEME_KEY='liveTV_theme';
 const HIDE_DELAY=4000;
 const SEEK_STEP=10;
 const AVATAR='https://ui-avatars.com/api/?name=';
@@ -85,6 +106,29 @@ const $=id=>document.getElementById(id);
 const grid=$('grid'),search=$('search'),cats=$('cats'),counter=$('counter');
 const player=$('player'),pc=$('pc'),video=$('video'),pname=$('pname'),plogo=$('plogo');
 const lastSection=$('lastSection'),lastGrid=$('lastGrid');
+const themeToggle=$('themeToggle');
+
+// Force light on load, unless user explicitly saved dark
+(function initTheme(){
+  try{
+    const saved=localStorage.getItem(THEME_KEY);
+    if(saved==='dark')document.documentElement.setAttribute('data-theme','dark');
+    else document.documentElement.removeAttribute('data-theme');
+  }catch(_){
+    document.documentElement.removeAttribute('data-theme');
+  }
+})();
+
+themeToggle.addEventListener('click',()=>{
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  if(isDark){
+    document.documentElement.removeAttribute('data-theme');
+    try{localStorage.setItem(THEME_KEY,'light');}catch(_){}
+  }else{
+    document.documentElement.setAttribute('data-theme','dark');
+    try{localStorage.setItem(THEME_KEY,'dark');}catch(_){}
+  }
+});
 
 let all=[],filtered=[],category='All',term='',last=[];
 const map=new Map();
@@ -209,7 +253,7 @@ function waitShaka(t){
 
 function seekBy(seconds){
   try{
-    if(!playerObj&&!video)return;
+    if(!video)return;
     const buffered=video.buffered;
     if(buffered.length){
       const live=buffered.end(buffered.length-1);
