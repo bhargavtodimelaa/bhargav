@@ -1,24 +1,59 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="color-scheme" content="light only">
-<title>Live TV</title>
+<title>Live TV · Login</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" defer></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html{color-scheme:light only}
-:root{--b:#1a73e8;--g1:#f1f3f4;--g2:#e8eaed;--g3:#dadce0;--g6:#5f6368;--w:#fff;--bg:#f8f9fa;--t:#202124;--sh:0 1px 3px rgba(0,0,0,.12)}
+:root{--b:#1a73e8;--g1:#f1f3f4;--g2:#e8eaed;--g3:#dadce0;--g6:#5f6368;--w:#fff;--bg:#f8f9fa;--t:#202124;--sh:0 1px 3px rgba(0,0,0,.12);--danger:#d93025;--success:#188038}
 html[data-theme="dark"]{--b:#8ab4f8;--g1:#3c4043;--g2:#5f6368;--g3:#80868b;--g6:#bdc1c6;--w:#202124;--bg:#171717;--t:#e8eaed;--sh:0 1px 3px rgba(0,0,0,.5)}
 body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--t);min-height:100vh;overflow-x:hidden;transition:background .2s,color .2s}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--g3);border-radius:8px}
+
+/* ---- AUTH OVERLAY ---- */
+#authOverlay{position:fixed;inset:0;background:var(--bg);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;transition:opacity .25s,visibility .25s}
+#authOverlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.auth-card{background:var(--w);border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,.15),0 8px 20px rgba(0,0,0,.1);padding:36px 32px;width:100%;max-width:400px;border:1px solid var(--g2)}
+.auth-card .logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:28px}
+.auth-card .logo svg{width:34px;height:34px;fill:var(--b)}
+.auth-card .logo h1{font-size:1.6rem;font-weight:600;color:var(--t)}
+.auth-tabs{display:flex;gap:4px;background:var(--g1);border-radius:40px;padding:4px;margin-bottom:24px}
+.auth-tab{flex:1;padding:10px;border:none;background:transparent;border-radius:40px;font-family:inherit;font-size:.9rem;font-weight:500;color:var(--g6);cursor:pointer;transition:all .2s}
+.auth-tab.active{background:var(--w);color:var(--b);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.auth-form{display:flex;flex-direction:column;gap:16px}
+.auth-form .field{display:flex;flex-direction:column;gap:6px}
+.auth-form label{font-size:.75rem;font-weight:600;color:var(--g6);letter-spacing:.3px;text-transform:uppercase}
+.auth-form input{padding:12px 16px;border-radius:12px;border:1px solid var(--g2);background:var(--g1);font-family:inherit;font-size:.9rem;color:var(--t);outline:none;transition:border .2s,box-shadow .2s}
+.auth-form input:focus{border-color:var(--b);background:var(--w);box-shadow:0 0 0 3px rgba(26,115,232,.15)}
+.auth-btn{padding:12px;border-radius:40px;border:none;background:var(--b);color:#fff;font-family:inherit;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s,transform .1s;margin-top:8px}
+.auth-btn:hover{background:#1557b0}
+.auth-btn:active{transform:scale(.98)}
+.auth-msg{font-size:.8rem;text-align:center;min-height:20px;padding:4px;border-radius:8px}
+.auth-msg.error{color:var(--danger);background:rgba(217,48,37,.08)}
+.auth-msg.success{color:var(--success);background:rgba(24,128,56,.08)}
+.auth-hint{font-size:.75rem;color:var(--g6);text-align:center;margin-top:8px}
+.auth-hint a{color:var(--b);text-decoration:none;font-weight:500;cursor:pointer}
+.auth-hint a:hover{text-decoration:underline}
+
+/* ---- MAIN APP ---- */
+#app{display:none}
+#app.ready{display:block}
+
 .h{background:var(--w);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--g2);position:sticky;top:0;z-index:10;box-shadow:var(--sh)}
 .hb{display:flex;align-items:center;gap:10px}
 .hb svg{width:28px;height:28px;fill:var(--b)}
 .h h1{font-size:1.3rem;font-weight:600}
 .hr{display:flex;align-items:center;gap:8px}
+.user-tag{display:flex;align-items:center;gap:8px;background:var(--g1);padding:4px 14px 4px 8px;border-radius:40px;font-size:.8rem;font-weight:500;color:var(--g6);border:1px solid var(--g2)}
+.user-tag .avatar{width:26px;height:26px;border-radius:50%;background:var(--b);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;text-transform:uppercase}
+.logout-btn{background:transparent;border:1px solid var(--g2);color:var(--g6);padding:6px 12px;border-radius:40px;font-size:.75rem;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+.logout-btn:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
 .cnt{background:var(--g1);padding:4px 16px;border-radius:40px;font-size:.75rem;font-weight:500;color:var(--g6);border:1px solid var(--g2)}
 .tt{background:var(--g1);border:1px solid var(--g2);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .tt:hover{background:var(--g2)}
@@ -73,14 +108,78 @@ html[data-theme="dark"] .tt .moon{display:block}
 .pl.hide-ui .tb,.pl.hide-ui .pi,.pl.hide-ui .shaka-controls-container,.pl.hide-ui .shaka-scrim-container,.pl.hide-ui .shaka-bottom-controls,.pl.hide-ui .shaka-seek-bar-container,.pl.hide-ui .shaka-volume-bar-container,.pl.hide-ui .shaka-overflow-menu,.pl.hide-ui .shaka-settings-menu,.pl.hide-ui .shaka-text-container,.pl.hide-ui .shaka-play-button-container,.pl.hide-ui .shaka-fullscreen-button-container,.pl.hide-ui .shaka-small-play-button,.pl.hide-ui .shaka-current-time,.pl.hide-ui .shaka-time-container,.pl.hide-ui .shaka-range-element,.pl.hide-ui .shaka-slider,.pl.hide-ui .shaka-scrubber-container,.pl.hide-ui .shaka-top-bar,.pl.hide-ui input[type=range]{opacity:0!important;pointer-events:none!important;visibility:hidden!important;transition:opacity .4s,visibility .4s!important}
 .pl.hide-ui video::-webkit-media-controls{display:none!important}
 :fullscreen,:fullscreen body,:fullscreen .pl,:fullscreen #pc,:fullscreen video{background:#000!important;margin:0!important;padding:0!important;border:none!important;overflow:hidden!important}
-@media(max-width:768px){.h{padding:10px 16px}.h h1{font-size:1.1rem}.fb{padding:6px 16px;top:56px}.g{padding:12px 16px 20px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}.c .logo{width:60px;height:60px}.pi{bottom:60px;font-size:.75rem}.pb{padding:6px 12px;font-size:.75rem}.lc{flex:0 0 90px;padding:8px 6px}.lc .ll{width:40px;height:40px}}
-@media(max-width:480px){.g{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:8px 12px 16px}.c .logo{width:50px;height:50px}.c .name{font-size:.7rem}}
+@media(max-width:768px){
+  .h{padding:10px 16px}.h h1{font-size:1.1rem}.fb{padding:6px 16px;top:56px}.g{padding:12px 16px 20px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}.c .logo{width:60px;height:60px}.pi{bottom:60px;font-size:.75rem}.pb{padding:6px 12px;font-size:.75rem}.lc{flex:0 0 90px;padding:8px 6px}.lc .ll{width:40px;height:40px}
+  .auth-card{padding:28px 20px}
+  .user-tag{padding:2px 10px 2px 6px;font-size:.7rem}
+  .user-tag .avatar{width:22px;height:22px;font-size:.65rem}
+  .logout-btn{padding:4px 10px;font-size:.7rem}
+}
+@media(max-width:480px){
+  .g{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:8px 12px 16px}.c .logo{width:50px;height:50px}.c .name{font-size:.7rem}
+  .auth-card{padding:24px 16px}
+  .auth-card .logo h1{font-size:1.3rem}
+}
 </style>
 </head>
 <body>
+
+<!-- ===== AUTH OVERLAY ===== -->
+<div id="authOverlay">
+  <div class="auth-card">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg>
+      <h1>Live TV</h1>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Login</button>
+      <button class="auth-tab" data-tab="signup">Sign Up</button>
+    </div>
+
+    <!-- Login form -->
+    <div class="auth-form" id="loginForm">
+      <div class="field">
+        <label for="loginUser">Username</label>
+        <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="loginPass">Password</label>
+        <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password">
+      </div>
+      <div class="auth-msg" id="loginMsg"></div>
+      <button class="auth-btn" id="loginBtn">Login</button>
+      <div class="auth-hint">No account? <a id="goSignup">Create one</a></div>
+    </div>
+
+    <!-- Signup form -->
+    <div class="auth-form" id="signupForm" style="display:none">
+      <div class="field">
+        <label for="signupUser">Username</label>
+        <input type="text" id="signupUser" placeholder="Choose a username" autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="signupPass">Password</label>
+        <input type="password" id="signupPass" placeholder="Create a password" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label for="signupConfirm">Confirm Password</label>
+        <input type="password" id="signupConfirm" placeholder="Confirm password" autocomplete="new-password">
+      </div>
+      <div class="auth-msg" id="signupMsg"></div>
+      <button class="auth-btn" id="signupBtn">Sign Up</button>
+      <div class="auth-hint">Already have an account? <a id="goLogin">Login</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN APP (hidden until login) ===== -->
+<div id="app">
 <header class="h">
   <div class="hb"><svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg><h1>Live TV</h1></div>
   <div class="hr">
+    <span class="user-tag" id="userTag"><span class="avatar" id="userAvatar">U</span><span id="userName">User</span></span>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
     <span class="cnt" id="counter">Loading…</span>
     <button class="tt" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
       <svg class="sun" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3zm0-11V1h-1v3h1zm0 16v-3h-1v3h1zM4.22 4.22l-.71.71 2.12 2.12.71-.71-2.12-2.12zm13.44 13.44-.71.71 2.12 2.12.71-.71-2.12-2.12zM1 11v1h3v-1H1zm19 0v1h3v-1h-3zM4.22 19.78l2.12-2.12-.71-.71-2.12 2.12.71.71zm13.44-13.44 2.12-2.12-.71-.71-2.12 2.12.71.71z"/></svg>
@@ -92,12 +191,16 @@ html[data-theme="dark"] .tt .moon{display:block}
 <div class="ls" id="lastSection"><div class="title">🕐 Recently played</div><div class="lg" id="lastGrid"></div></div>
 <div class="g" id="grid"></div>
 <div class="pl" id="player"><div class="tb"><button class="pb" id="back"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back</button><button class="px" id="close"><svg viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div><div id="pc"><video id="video" playsinline autoplay></video></div><div class="pi" id="pinfo"><img id="plogo" alt="logo"><span class="pname" id="pname"></span></div></div>
+</div>
+
 <script>
 (function(){
 'use strict';
 const API='https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev';
 const STORAGE='liveTV_lastPlayed';
 const THEME_KEY='liveTV_theme';
+const AUTH_KEY='liveTV_auth';
+const USERS_KEY='liveTV_users';
 const HIDE_DELAY=4000;
 const SEEK_STEP=10;
 const AVATAR='https://ui-avatars.com/api/?name=';
@@ -107,7 +210,17 @@ const grid=$('grid'),search=$('search'),cats=$('cats'),counter=$('counter');
 const player=$('player'),pc=$('pc'),video=$('video'),pname=$('pname'),plogo=$('plogo');
 const lastSection=$('lastSection'),lastGrid=$('lastGrid');
 const themeToggle=$('themeToggle');
+const authOverlay=$('authOverlay');
+const appContainer=$('app');
+const userAvatar=$('userAvatar'),userName=$('userName');
 
+// ---- AUTH elements ----
+const loginForm=$('loginForm'),signupForm=$('signupForm');
+const loginUser=$('loginUser'),loginPass=$('loginPass'),loginMsg=$('loginMsg'),loginBtn=$('loginBtn');
+const signupUser=$('signupUser'),signupPass=$('signupPass'),signupConfirm=$('signupConfirm'),signupMsg=$('signupMsg'),signupBtn=$('signupBtn');
+const goSignup=$('goSignup'),goLogin=$('goLogin');
+
+// ---- THEME INIT ----
 (function initTheme(){
   try{
     const saved=localStorage.getItem(THEME_KEY);
@@ -129,9 +242,138 @@ themeToggle.addEventListener('click',()=>{
   }
 });
 
+// ---- AUTH LOGIC ----
+function getUsers(){
+  try{return JSON.parse(localStorage.getItem(USERS_KEY)||'{}');}catch(_){return {};}
+}
+function saveUsers(users){
+  try{localStorage.setItem(USERS_KEY,JSON.stringify(users));}catch(_){}
+}
+function setAuth(username){
+  try{localStorage.setItem(AUTH_KEY,JSON.stringify({username,ts:Date.now()}));}catch(_){}
+}
+function clearAuth(){
+  try{localStorage.removeItem(AUTH_KEY);}catch(_){}
+}
+function getAuth(){
+  try{return JSON.parse(localStorage.getItem(AUTH_KEY)||'null');}catch(_){return null;}
+}
+
+function showAuthOverlay(){
+  authOverlay.classList.remove('hidden');
+  appContainer.classList.remove('ready');
+}
+function hideAuthOverlay(){
+  authOverlay.classList.add('hidden');
+  appContainer.classList.add('ready');
+}
+
+function setUserUI(username){
+  userName.textContent=username;
+  userAvatar.textContent=username.charAt(0).toUpperCase();
+}
+
+function doLogin(username,password){
+  const users=getUsers();
+  if(!users[username])return {ok:false,msg:'User not found. Please sign up.'};
+  if(users[username]!==password)return {ok:false,msg:'Incorrect password.'};
+  setAuth(username);
+  setUserUI(username);
+  hideAuthOverlay();
+  initApp();
+  return {ok:true};
+}
+
+function doSignup(username,password,confirm){
+  if(!username||username.length<3)return {ok:false,msg:'Username must be at least 3 characters.'};
+  if(!password||password.length<4)return {ok:false,msg:'Password must be at least 4 characters.'};
+  if(password!==confirm)return {ok:false,msg:'Passwords do not match.'};
+  const users=getUsers();
+  if(users[username])return {ok:false,msg:'Username already exists. Please login.'};
+  users[username]=password;
+  saveUsers(users);
+  return {ok:true,msg:'Account created! You can now login.'};
+}
+
+// ---- LOGIN / SIGNUP UI ----
+document.querySelectorAll('.auth-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const target=tab.dataset.tab;
+    if(target==='login'){
+      loginForm.style.display='flex';
+      signupForm.style.display='none';
+    }else{
+      loginForm.style.display='none';
+      signupForm.style.display='flex';
+    }
+    loginMsg.textContent='';signupMsg.textContent='';
+  });
+});
+
+goSignup.addEventListener('click',()=>{
+  document.querySelector('.auth-tab[data-tab="signup"]').click();
+});
+goLogin.addEventListener('click',()=>{
+  document.querySelector('.auth-tab[data-tab="login"]').click();
+});
+
+function clearMsg(el){el.textContent='';el.className='auth-msg';}
+function showMsg(el,msg,type){
+  el.textContent=msg;
+  el.className='auth-msg '+(type||'');
+}
+
+loginBtn.addEventListener('click',()=>{
+  clearMsg(loginMsg);
+  const u=loginUser.value.trim();
+  const p=loginPass.value;
+  if(!u||!p){showMsg(loginMsg,'Please fill in both fields.','error');return;}
+  const res=doLogin(u,p);
+  if(!res.ok)showMsg(loginMsg,res.msg,'error');
+});
+
+signupBtn.addEventListener('click',()=>{
+  clearMsg(signupMsg);
+  const u=signupUser.value.trim();
+  const p=signupPass.value;
+  const c=signupConfirm.value;
+  const res=doSignup(u,p,c);
+  if(res.ok){
+    showMsg(signupMsg,res.msg,'success');
+    signupUser.value='';signupPass.value='';signupConfirm.value='';
+    setTimeout(()=>{
+      document.querySelector('.auth-tab[data-tab="login"]').click();
+      loginUser.value=u;
+      loginPass.focus();
+    },1200);
+  }else{
+    showMsg(signupMsg,res.msg,'error');
+  }
+});
+
+// Allow Enter key to submit
+loginPass.addEventListener('keydown',e=>{if(e.key==='Enter')loginBtn.click();});
+signupConfirm.addEventListener('keydown',e=>{if(e.key==='Enter')signupBtn.click();});
+
+// ---- LOGOUT ----
+$('logoutBtn').addEventListener('click',()=>{
+  clearAuth();
+  showAuthOverlay();
+  // reset forms
+  loginUser.value='';loginPass.value='';loginMsg.textContent='';
+  signupUser.value='';signupPass.value='';signupConfirm.value='';signupMsg.textContent='';
+  document.querySelector('.auth-tab[data-tab="login"]').click();
+  // stop any playing video
+  try{close();}catch(_){}
+});
+
+// ---- APP VARIABLES (original) ----
 let all=[],filtered=[],category='All',term='',last=[];
 const map=new Map();
 let playerObj=null,overlay=null,playing=false,closing=false,hideTimer=null;
+let appInitialized=false;
 
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const av=(n,s)=>AVATAR+encodeURIComponent(n)+'&background=e8eaed&color=202124&size='+s;
@@ -404,8 +646,64 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-loadLast();renderLast();fetchChannels();
+// ---- INIT APP (called after login) ----
+function initApp(){
+  if(appInitialized)return;
+  appInitialized=true;
+  loadLast();renderLast();fetchChannels();
+}
+
+// ---- CHECK AUTH ON LOAD ----
+(function bootstrap(){
+  const auth=getAuth();
+  if(auth&&auth.username){
+    setUserUI(auth.username);
+    hideAuthOverlay();
+    initApp();
+  }else{
+    showAuthOverlay();
+  }
 })();
+
+})();
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
 </script>
 </body>
 </html>
