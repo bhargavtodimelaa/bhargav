@@ -1,0 +1,11 @@
+/* ===== CHANNEL GRID CONTAINER ===== */
+.g {
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 16px;
+  max-width: 1360px;
+  margin: 0 auto;
+  content-visibility: auto;
+  contain-intrinsic-size: 520px;
+}

@@ -1,0 +1,110 @@
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .h {
+    padding: 10px 16px;
+  }
+  .h h1 {
+    font-size: 1.2rem;
+  }
+  .hero {
+    padding: 20px 16px 12px;
+  }
+  .hero h2 {
+    font-size: 1.25rem;
+  }
+  .hero p {
+    font-size: 0.78rem;
+  }
+  .sr {
+    padding: 6px 14px;
+  }
+  .cats {
+    padding: 8px 16px;
+  }
+  .cat {
+    padding: 4px 12px;
+    font-size: 0.7rem;
+  }
+  .title {
+    padding: 14px 16px 6px;
+  }
+  .ls,
+  .lg,
+  .g {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .g {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+  }
+  .c .channel-logo {
+    width: 56px;
+    height: 56px;
+  }
+  .c .channel-name {
+    font-size: 0.7rem;
+  }
+  .lc {
+    flex: 0 0 80px;
+    width: 80px;
+    padding: 10px 4px;
+  }
+  .lc .channel-logo {
+    width: 36px;
+    height: 36px;
+  }
+  .pi {
+    bottom: 60px;
+    font-size: 0.75rem;
+  }
+  .pb {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .h {
+    padding: 8px 12px;
+  }
+  .hero {
+    padding: 16px 12px 8px;
+  }
+  .hero h2 {
+    font-size: 1.1rem;
+  }
+  .sr {
+    padding: 4px 12px;
+  }
+  .sr input {
+    font-size: 0.85rem;
+  }
+  .cats {
+    padding: 6px 12px;
+  }
+  .cat {
+    padding: 4px 10px;
+    font-size: 0.65rem;
+  }
+  .title {
+    padding: 12px 12px 4px;
+  }
+  .g {
+    padding: 0 12px 60px;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 8px;
+  }
+  .c .channel-logo {
+    width: 48px;
+    height: 48px;
+  }
+  .c .channel-name {
+    font-size: 0.65rem;
+  }
+  .lc {
+    flex: 0 0 70px;
+    width: 70px;
+    padding: 8px 2px;
+  }
+}

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="color-scheme" content="dark">
+  <title>Live TV</title>
+
+  <!-- Performance: preconnect -->
+  <link rel="preconnect" href="https://fragrant-butterfly-575f.bhargavtodimela4.workers.dev">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://ui-avatars.com">
+
+  <!-- Critical CSS inlined for instant first paint -->
+  <style id="critical">
+    :root{
+      --b:#8b5cf6;--b-em:#a78bfa;--b-d:#7c3aed;--accent2:#06b6d4;--card:#1e2028;--border:#333740;--text:#e4e7ef;--muted:#9ca3af;--bg:#111218;--bg-2:#171921;--hdr:#1e2028;--hdr-border:#333740;--loading-bg:rgba(17,18,24,.9);--shadow:0 4px 24px rgba(0,0,0,.28);--shadow-lg:0 12px 40px rgba(0,0,0,.48);--danger:#f87171;--success:#34d399;--radius:20px;--radius-sm:14px;--radius-full:999px;--transition:0.22s cubic-bezier(.22,1,.36,1)
+    }
+    html[data-theme="light"]{--b:#3b82f6;--b-em:#60a5fa;--b-d:#2563eb;--accent2:#0891b2;--card:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--bg:#f8fafc;--bg-2:#f1f5f9;--hdr:#fff;--hdr-border:#e2e8f0;--loading-bg:rgba(248,250,252,.9);--shadow:0 4px 24px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.12)}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;background:radial-gradient(120% 140% at 50% -10%,var(--bg-2),var(--bg) 70%);transition:background .22s,color .22s}
+    #app{max-width:1280px;margin:0 auto;padding-bottom:24px}
+    .h{position:sticky;top:0;z-index:30;background:var(--hdr);border-bottom:1px solid var(--hdr-border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);transition:box-shadow .22s,border-color .22s}
+    .hb{display:flex;align-items:center;gap:12px}
+    .hb svg{width:26px;height:26px;fill:var(--b)}
+    .h h1{font-size:1.35rem;font-weight:800;letter-spacing:-.3px;background:linear-gradient(135deg,var(--b) 25%,var(--accent2) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hr{display:flex;align-items:center;gap:10px}
+    .cnt{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:5px 14px;border-radius:999px;font-size:.78rem;font-weight:500;box-shadow:var(--shadow)}
+    .tt{background:var(--card);border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:all .22s;box-shadow:var(--shadow)}
+    .tt:hover{transform:scale(1.08);border-color:var(--b);color:var(--b)}
+    .tt svg{width:18px;height:18px;fill:currentColor}
+    .tt .sun{display:block}.tt .moon{display:none}
+    html[data-theme="light"] .tt .sun{display:none}
+    html[data-theme="light"] .tt .moon{display:block}
+    .hero{padding:28px 24px 16px;text-align:center}
+    .hero h2{font-size:1.5rem;font-weight:800;margin-bottom:4px}
+    .hero p{color:var(--muted);font-size:.85rem;margin-bottom:18px}
+    .sr{position:relative;max-width:560px;margin:0 auto;display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:6px 16px 6px 44px;box-shadow:var(--shadow);transition:all .22s}
+    .sr:focus-within{border-color:var(--b);box-shadow:0 0 0 3px rgba(139,92,246,.25)}
+    .sr svg{position:absolute;left:14px;width:18px;height:18px;fill:var(--muted)}
+    .sr input{flex:1;background:0 0;border:none;padding:10px 4px;font-size:1rem;font-family:inherit;color:inherit;outline:0;min-width:0}
+    .sr input::placeholder{color:var(--muted)}
+    .cats{padding:14px 24px 6px;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .cats::-webkit-scrollbar{height:3px}
+    .cat{flex:0 0 auto;background:var(--card);border:1px solid var(--border);color:var(--muted);padding:6px 16px;border-radius:999px;font-size:.8rem;font-weight:500;cursor:pointer;font-family:inherit;text-transform:capitalize;white-space:nowrap;transition:all .22s;box-shadow:var(--shadow)}
+    .cat:hover{transform:translateY(-1px)}
+    .cat.active{background:linear-gradient(135deg,var(--b),var(--accent2));color:#fff;border-color:var(--b)}
+    .title{padding:18px 24px 8px;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+    .ls{padding:0 24px 14px;display:none}
+    .ls.visible{display:block}
+    .lg{display:flex;gap:13px;overflow-x:auto;padding:0 24px 6px;-webkit-overflow-scrolling:touch}
+    .lg::-webkit-scrollbar{height:4px}
+    .g{padding:0 24px 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:16px}
+    .c,.lc{position:relative;background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border);padding:14px 8px 12px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;overflow:hidden;transition:all .22s}
+    .lc{flex:0 0 96px;width:96px}
+    .c:hover,.lc:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--b)}
+    .channel-logo{position:relative;width:64px;height:64px;border-radius:14px;background:var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--border);margin-bottom:8px;transition:all .22s}
+    .c:hover .channel-logo,.lc:hover .channel-logo{transform:scale(1.08)}
+    .channel-logo img{max-width:100%;max-height:100%;object-fit:contain;padding:4px}
+    .channel-logo .play-ico{position:absolute;inset:0;margin:auto;width:28px;height:28px;background:rgba(0,0,0,.55);border-radius:8px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .22s}
+    .c:hover .play-ico,.lc:hover .play-ico{opacity:1}
+    .play-ico svg{width:14px;height:18px;fill:#fff}
+    .channel-name{font-size:.85rem;font-weight:600;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;margin-bottom:4px}
+    .lc .channel-name{font-size:.7rem}
+    .channel-cat{font-size:.58rem;color:var(--muted);background:var(--border);padding:2px 8px;border-radius:999px;font-weight:600;text-transform:uppercase;border:1px solid transparent}
+    .empty{grid-column:1/-1;text-align:center;padding:56px 20px;color:var(--muted);background:var(--card);border-radius:12px;border:1px dashed var(--border);box-shadow:var(--shadow)}
+    .empty svg{width:48px;height:48px;fill:var(--muted);display:block;margin:0 auto 8px;opacity:.5}
+    .loading{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;gap:12px;background:var(--loading-bg);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+    .loading.active{display:flex}
+    .spinner{width:40px;height:40px;border:4px solid var(--border);border-top-color:var(--b);border-right-color:var(--accent2);border-radius:50%;animation:spin .9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading span{color:var(--muted);font-size:.9rem;font-weight:500}
+    .pl{display:none;position:fixed;inset:0;background:#000;z-index:1000}
+    .pl.active{display:block}
+  </style>
+
+  <!-- Foundation styles (small, synchronous) -->
+  <link rel="stylesheet" href="css/base.css">
+
+  <!-- Non-critical styles (deferred so they don't block first paint) -->
+  <link rel="preload" href="css/components.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="css/grid.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="css/player.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="css/responsive.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/grid.css"><link rel="stylesheet" href="css/player.css"><link rel="stylesheet" href="css/responsive.css"></noscript>
+
+  <!-- JS: defer, dependency order (Shaka lazy-loads only on first play) -->
+  <script src="js/config.js" defer></script>
+  <script src="js/theme.js" defer></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/ui.js" defer></script>
+  <script src="js/player.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+
+  <div id="app">
+    <div id="loading" class="loading" aria-label="Loading">
+      <div class="spinner"></div>
+      <span>Loading channels…</span>
+    </div>
+
+    <header class="h">
+      <div class="hb">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg>
+        <h1>Live TV</h1>
+      </div>
+      <div class="hr">
+        <span class="cnt" id="counter">0 channels</span>
+        <button class="tt" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+          <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7a5 5 0 010 10 5 5 0 010-10zM12 5a7 7 0 100 14 7 7 0 000-14zm-.5 14.5h1v-3h-1v3zm0-11V2h1v3h-1zm7.66 4.34l.71.71.71-.71-.71-.71-.71.71zm-12.32.71l.71.71.71-.71-.71-.71-.71.71zM3 11h3v1H3zm18 0h3v1h-3zm-1.66 5.66l-.71-.71-.71.71.71.71.71-.71zm-12.32-.71l-.71-.71-.71.71.71.71.71-.71z"/></svg>
+          <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-5.4-5.4c0-1.81.89-3.42 2.26-4.4A9.13 9.13 0 0 0 12 3z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <h2>Watch Live TV</h2>
+      <p>Search and play channels instantly — no signups, no waiting.</p>
+      <div class="sr" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" id="search" placeholder="Search channels…" autocomplete="off" spellcheck="false">
+      </div>
+    </section>
+
+    <nav class="cats" id="cats" aria-label="Categories"></nav>
+
+    <section class="ls" id="lastSection" aria-label="Recently played">
+      <div class="title">🕐 Recently played</div>
+      <div class="lg" id="lastGrid"></div>
+    </section>
+
+    <main class="g" id="grid" aria-label="Channels"></main>
+
+    <div class="pl" id="player" aria-hidden="true">
+      <div class="tb">
+        <button class="pb" id="back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back</button>
+        <button class="px" id="close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+      </div>
+      <div id="pc"><video id="video" playsinline preload="metadata"></video></div>
+      <div class="pi" id="pinfo"><img id="plogo" alt="channel logo"><span class="pname" id="pname"></span></div>
+    </div>
+  </div>
+
+</body>
+</html>

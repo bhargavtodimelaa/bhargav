@@ -1,0 +1,189 @@
+/* ===== PLAYER OVERLAY ===== */
+.pl {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 1000;
+  transition: opacity var(--transition);
+}
+
+.pl.active {
+  display: block;
+}
+
+#pc {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+#video {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: block;
+}
+
+/* ===== TRANSPORT BAR ===== */
+.tb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.65), transparent);
+  z-index: 1001;
+  pointer-events: none;
+  transition: opacity var(--transition);
+}
+
+.tb > * {
+  pointer-events: auto;
+}
+
+.pb {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+
+.pb:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: scale(1.04);
+}
+
+.pb svg {
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+}
+
+.px {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.px:hover {
+  background: rgba(255, 59, 59, 0.35);
+  border-color: #ff3b3b;
+  transform: scale(1.05);
+}
+
+.px svg {
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+}
+
+/* ===== CHANNEL INFO ===== */
+.pi {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  padding: 6px 20px 6px 14px;
+  border-radius: 50px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity var(--transition);
+  z-index: 1002;
+  backdrop-filter: blur(4px);
+}
+
+.pi img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 3px;
+}
+
+.pi .pname {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== HIDE CONTROLS ===== */
+.pl.hide-ui .tb,
+.pl.hide-ui .pi,
+.pl.hide-ui .shaka-controls-container,
+.pl.hide-ui .shaka-scrim-container,
+.pl.hide-ui .shaka-bottom-controls,
+.pl.hide-ui .shaka-seek-bar-container,
+.pl.hide-ui .shaka-volume-bar-container,
+.pl.hide-ui .shaka-overflow-menu,
+.pl.hide-ui .shaka-settings-menu,
+.pl.hide-ui .shaka-text-container,
+.pl.hide-ui .shaka-play-button-container,
+.pl.hide-ui .shaka-fullscreen-button-container,
+.pl.hide-ui .shaka-small-play-button,
+.pl.hide-ui .shaka-current-time,
+.pl.hide-ui .shaka-time-container,
+.pl.hide-ui .shaka-range-element,
+.pl.hide-ui .shaka-slider,
+.pl.hide-ui .shaka-scrubber-container,
+.pl.hide-ui .shaka-top-bar,
+.pl.hide-ui input[type="range"] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: opacity 0.4s, visibility 0.4s !important;
+}
+
+.pl.hide-ui video::-webkit-media-controls {
+  display: none !important;
+}
+
+/* ===== FULLSCREEN ===== */
+:fullscreen,
+:fullscreen body,
+:fullscreen .pl,
+:fullscreen #pc,
+:fullscreen video,
+:-webkit-full-screen,
+:-webkit-full-screen body,
+:-webkit-full-screen .pl,
+:-webkit-full-screen #pc,
+:-webkit-full-screen video {
+  background: #000 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  overflow: hidden !important;
+}
