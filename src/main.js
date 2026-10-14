@@ -98,25 +98,30 @@ function flagDevtools() {
   else if (now - dtSince >= 1000) { terminate(DT_REDIRECT); }
 }
 
-/* `debugger` stalls only while devtools are open — a reliable timing oracle */
-function timingProbe() {
-  const t0 = performance.now();
-  /* eslint-disable-next-line no-debugger */
-  debugger;
-  return performance.now() - t0 > 80;
+/* Strictly NO `debugger` statement anywhere — that pauses the page instead
+   of redirecting. Two silent oracles instead:
+   (1) console oracle — Chrome calls toString on a logged RegExp only while the
+       console is rendering (closed console short-circuits it),
+   (2) size oracle — docked devtools shrink/offset the viewport by hundreds of
+       pixels; a devicePixelRatio guard prevents page-zoom false positives. */
+let consoleOpenHit = false;
+const consoleOracle = /lt/;
+consoleOracle.toString = () => { consoleOpenHit = true; return '/lt/'; };
+
+const dpr0 = window.devicePixelRatio;
+function sizeOracle() {
+  if (Math.abs(window.devicePixelRatio - dpr0) > 0.01) return false; // zoom, not devtools
+  const dw = window.outerWidth - window.innerWidth;
+  const dh = window.outerHeight - window.innerHeight;
+  return dh > 240 || dw > 240;
 }
-/* console renders the Image object → fires the id getter only in devtools */
-function consoleProbe() {
-  let hit = false;
-  const el = new Image();
-  Object.defineProperty(el, 'id', { get() { hit = true; return 'x'; } });
-  console.log('%c', el);
-  return hit;
-}
+
 setInterval(() => {
   if (dtNuked) return;
+  consoleOpenHit = false;
   let opened = false;
-  try { opened = timingProbe() || consoleProbe(); } catch (_) {}
+  try { console.log(consoleOracle); } catch (_) {}
+  try { opened = consoleOpenHit || sizeOracle(); } catch (_) {}
   if (opened) { probeStreak++; flagDevtools(); }
   else { probeStreak = 0; dtSince = 0; }
 }, 250);
