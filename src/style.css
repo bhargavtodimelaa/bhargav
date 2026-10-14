@@ -138,6 +138,44 @@ html[data-theme="light"] .theme .moon{opacity:0;transform:scale(.4) rotate(90deg
   padding:56px 20px;color:var(--t2);background:var(--card);border:1px dashed var(--border);border-radius:var(--radius)}
 .empty svg{width:44px;height:44px;fill:var(--t2);opacity:.55}
 
+/* ---------------- header icon buttons ---------------- */
+.icon-btn{position:relative;width:38px;height:38px;border-radius:12px;border:1px solid var(--border);
+  background:var(--surface);color:var(--t2);cursor:pointer;display:grid;place-items:center;flex-shrink:0;
+  transition:border-color .2s,color .2s,transform .2s}
+.icon-btn:hover{border-color:var(--border-h);color:var(--t);transform:translateY(-1px)}
+.icon-btn svg{width:19px;height:19px;fill:currentColor}
+.icon-btn.hidden{display:none}
+
+/* ---------------- back to top ---------------- */
+.totop{position:fixed;right:18px;bottom:18px;z-index:60;width:44px;height:44px;border-radius:50%;
+  border:none;background:var(--grad);box-shadow:var(--sh-acc);cursor:pointer;display:grid;place-items:center;
+  opacity:0;pointer-events:none;transform:translateY(12px) scale(.9);
+  transition:opacity .25s,transform .25s}
+.totop.show{opacity:1;pointer-events:auto;transform:none}
+.totop svg{width:20px;height:20px;fill:#fff}
+
+/* ---------------- favourite star on cards ---------------- */
+.c .fav{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;
+  border:none;background:transparent;color:var(--t2);display:grid;place-items:center;
+  cursor:pointer;opacity:0;transition:opacity .2s,color .2s,transform .2s}
+.c:hover .fav,.c .fav.on{opacity:1}
+.c .fav svg{width:17px;height:17px;fill:currentColor}
+.c .fav:hover{color:var(--t);transform:scale(1.15)}
+.c .fav.on{color:#fbbf24}
+
+/* ---------------- help overlay ---------------- */
+.help{position:fixed;inset:0;z-index:1100;display:none;place-items:center;
+  background:rgba(4,6,12,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.help.show{display:grid}
+.help-card{background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:24px 28px;max-width:360px;width:calc(100% - 40px);box-shadow:var(--sh);animation:cardIn .3s both}
+.help-card h3{font-size:1rem;font-weight:700;margin:0 0 10px}
+.krow{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:8px 0;
+  font-size:.85rem;color:var(--t2);border-bottom:1px solid var(--border)}
+.krow:last-child{border-bottom:none}
+.kbox{background:var(--chip);border:1px solid var(--border);padding:3px 10px;border-radius:7px;
+  font-size:.72rem;font-weight:600;color:var(--t);white-space:nowrap}
+
 /* ---------------- scroll lock + toast ---------------- */
 body.lock{overflow:hidden}
 .toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,14px);z-index:1200;
@@ -192,6 +230,7 @@ body.lock{overflow:hidden}
   .hb .logo{width:33px;height:33px;border-radius:10px}.hb .logo svg{width:18px;height:18px}
   .h h1{font-size:1.03rem}
   .theme{width:33px;height:33px;border-radius:10px}.theme svg{width:17px;height:17px}
+  .icon-btn{width:33px;height:33px;border-radius:10px}.icon-btn svg{width:17px;height:17px}
   .offline-bar{top:49px}
   .fb{top:49px;padding:8px 12px 10px;gap:8px 12px}
   .g{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;padding:14px 12px 28px}

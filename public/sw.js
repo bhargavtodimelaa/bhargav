@@ -1,5 +1,5 @@
 /* Live TV service worker — offline app shell + cached channel data */
-const VERSION = 'v2';
+const VERSION = 'v3';
 const SHELL_CACHE = `shell-${VERSION}`;
 const RUNTIME_CACHE = `runtime-${VERSION}`;
 const API_CACHE = `api-${VERSION}`;

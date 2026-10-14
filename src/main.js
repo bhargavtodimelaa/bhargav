@@ -1,6 +1,6 @@
 import 'shaka-player/dist/controls.css';
 import './style.css';
-import { API, STORAGE, THEME_KEY, HIDE_DELAY, SEEK_STEP, COOKIE_TTL, AUDIO_PREF } from './config.js';
+import { API, STORAGE, THEME_KEY, FAV_KEY, HIDE_DELAY, SEEK_STEP, COOKIE_TTL, AUDIO_PREF } from './config.js';
 import { esc, key, fixUrl, avatar } from './utils.js';
 
 /* ================================================================
@@ -11,6 +11,7 @@ const grid = $('grid'), search = $('search'), cats = $('cats'), counter = $('cou
 const player = $('player'), pc = $('pc'), video = $('video'), pname = $('pname'), plogo = $('plogo');
 const lastSection = $('lastSection'), lastGrid = $('lastGrid');
 const offlineBar = $('offlineBar'), themeBtn = $('themeToggle'), pload = $('pload'), toastEl = $('toast');
+const randomBtn = $('randomBtn'), installBtn = $('installBtn'), toTop = $('toTop'), helpEl = $('help');
 
 /* ================================================================
  *  state
@@ -21,6 +22,18 @@ let playerObj = null, overlay = null, playing = false, closing = false, hideTime
 let shakaLib = null;            // lazily imported player chunk
 let cookieCache = { v: null, t: 0 };
 let popStateBusy = false;       // guards history juggling while closing
+
+/* ---- favourites (persisted) ---- */
+function loadFavs() {
+  try {
+    const d = JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
+    return Array.isArray(d) ? d : [];
+  } catch (_) { return []; }
+}
+const favs = new Set(loadFavs());
+function saveFavs() {
+  try { localStorage.setItem(FAV_KEY, JSON.stringify([...favs])); } catch (_) {}
+}
 
 /* ================================================================
  *  theme
@@ -38,7 +51,7 @@ themeBtn.addEventListener('click', () =>
   applyTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'));
 
 /* ================================================================
- *  toast (replaces alert)
+ *  toast + global error handling — never silent
  * ================================================================ */
 let toastTimer = null;
 function toast(msg) {
@@ -47,10 +60,6 @@ function toast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3000);
 }
-
-/* ================================================================
- *  global error handling — visible toasts, never silent
- * ================================================================ */
 function reportError(err) {
   const text = err instanceof Error ? err.message : typeof err === 'string' ? err : '';
   console.error('[LiveTV]', err);
@@ -60,9 +69,68 @@ window.addEventListener('error', (e) => reportError(e.error || e.message));
 window.addEventListener('unhandledrejection', (e) => reportError(e.reason));
 
 /* ================================================================
- *  devtools protections → visible warning
+ *  devtools protection: warn → (open >1s) → redirect, abuse → terminate
  * ================================================================ */
-const DT_MSG = "DevTools can't be accessed on this platform due to security reasons.";
+const DT_MSG = 'Access to developer utilities is impermissible on this platform, by virtue of stringent security protocols.';
+const DT_REDIRECT = 'Insidious instrumentation detected — this session is being terminated forthwith, and you are being redirected.';
+const DT_ABUSE = 'Wilful evasion or impermissible usage ascertained — this session concludes with immediate effect.';
+
+let dtNuked = false;      // terminal state — nothing further runs
+let dtSince = 0;          // timestamp of first consecutive detection
+let probeStreak = 0;
+
+/** Show a caution, then obliterate the session: wipe → window.close → google.com */
+function terminate(reason) {
+  if (dtNuked) return;
+  dtNuked = true;
+  toast(reason || DT_ABUSE);
+  setTimeout(() => {
+    try { window.open('', '_self'); window.close(); } catch (_) {}
+    setTimeout(() => {
+      try { location.replace('https://www.google.com'); } catch (_) {}
+    }, 120);
+  }, 700);
+}
+
+function flagDevtools() {
+  const now = performance.now();
+  if (!dtSince) { dtSince = now; toast(DT_REDIRECT); }
+  else if (now - dtSince >= 1000) { terminate(DT_REDIRECT); }
+}
+
+/* `debugger` stalls only while devtools are open — a reliable timing oracle */
+function timingProbe() {
+  const t0 = performance.now();
+  /* eslint-disable-next-line no-debugger */
+  debugger;
+  return performance.now() - t0 > 80;
+}
+/* console renders the Image object → fires the id getter only in devtools */
+function consoleProbe() {
+  let hit = false;
+  const el = new Image();
+  Object.defineProperty(el, 'id', { get() { hit = true; return 'x'; } });
+  console.log('%c', el);
+  return hit;
+}
+setInterval(() => {
+  if (dtNuked) return;
+  let opened = false;
+  try { opened = timingProbe() || consoleProbe(); } catch (_) {}
+  if (opened) { probeStreak++; flagDevtools(); }
+  else { probeStreak = 0; dtSince = 0; }
+}, 250);
+
+/* manual attempts (keys / context menu) — spam counted as forced usage */
+let manualHits = 0, manualTimer = null;
+function manualHit() {
+  if (dtNuked) return;
+  toast(DT_MSG);
+  manualHits++;
+  clearTimeout(manualTimer);
+  manualTimer = setTimeout(() => { manualHits = 0; }, 10000);
+  if (manualHits > 8) terminate();
+}
 
 /* ================================================================
  *  recently played
@@ -122,7 +190,7 @@ async function fetchChannels() {
   }
 }
 
-/** Cached fetch so repeated plays don't re-hit the API */
+/** Cached so repeated plays don't re-hit the API */
 async function fetchCookie() {
   if (cookieCache.v && Date.now() - cookieCache.t < COOKIE_TTL) return cookieCache.v;
   try {
@@ -139,8 +207,10 @@ async function fetchCookie() {
 function buildCats() {
   const s = new Set(['All']);
   for (const c of all) if (c.category && c.category.trim()) s.add(c.category.trim());
-  const sorted = ['All', ...[...s].filter((x) => x !== 'All').sort()];
-  cats.innerHTML = sorted.map((c) => `<button class="cat${c === 'All' ? ' active' : ''}" data-c="${esc(c)}">${esc(c)}</button>`).join('');
+  const sorted = ['All', '__fav', ...[...s].filter((x) => x !== 'All').sort()];
+  cats.innerHTML = sorted.map((c) =>
+    `<button class="cat${c === 'All' ? ' active' : ''}" data-c="${esc(c)}">${esc(c === '__fav' ? '★ Favourites' : c)}</button>`
+  ).join('');
 }
 cats.addEventListener('click', (e) => {
   const b = e.target.closest('.cat');
@@ -154,20 +224,23 @@ cats.addEventListener('click', (e) => {
 
 function apply() {
   const t = term.toLowerCase().trim();
-  filtered = all.filter((ch) =>
-    (category === 'All' || ch.category === category) &&
-    (!t || ch.name.toLowerCase().includes(t))
-  );
+  filtered = all.filter((ch) => {
+    if (t && !ch.name.toLowerCase().includes(t)) return false;
+    if (category === 'All') return true;
+    if (category === '__fav') return favs.has(key(ch));
+    return ch.category === category;
+  });
   counter.textContent = filtered.length + ' / ' + all.length + ' channels';
   // skip the DOM rebuild when the filter signature hasn't changed (cheap typing)
-  const sig = category + '|' + t + '|' + all.length;
+  const sig = category + '|' + t + '|' + all.length + '|' + favs.size;
   if (sig !== renderSig) { renderSig = sig; render(); }
 }
 let renderSig = '';
 
 function render() {
   if (!filtered.length) {
-    grid.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>No channels found</div>';
+    const msg = category === '__fav' ? 'No favourite channels yet — tap ★ on any card' : 'No channels found';
+    grid.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>${esc(msg)}</div>`;
     return;
   }
   let h = '';
@@ -179,16 +252,26 @@ function render() {
     idx++;
     const av = avatar(ch.name, 80);
     const logo = ch.logo || av;
-    h += `<div class="c" data-k="${esc(k)}" style="--i:${delay}" tabindex="0" role="button" aria-label="${esc(ch.name)}"><div class="logo"><img src="${esc(logo)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${esc(av)}'"></div><div class="name">${esc(ch.name)}</div><span class="cat">${esc(ch.category || 'General')}</span></div>`;
+    const fav = favs.has(k);
+    h += `<div class="c" data-k="${esc(k)}" style="--i:${delay}" tabindex="0" role="button" aria-label="${esc(ch.name)}"><button class="fav${fav ? ' on' : ''}" data-fav="${esc(k)}" aria-label="Toggle favourite"><svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button><div class="logo"><img src="${esc(logo)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${esc(av)}'"></div><div class="name">${esc(ch.name)}</div><span class="cat">${esc(ch.category || 'General')}</span></div>`;
   }
   grid.innerHTML = h;
 }
 grid.addEventListener('click', (e) => {
+  const fb = e.target.closest('.fav');
+  if (fb) { toggleFav(fb.dataset.fav, fb); return; }
   const c = e.target.closest('.c');
   if (!c || closing || playing) return;
   const ch = map.get(c.dataset.k);
   if (ch) playCh(ch);
 });
+function toggleFav(k, btn) {
+  if (favs.has(k)) favs.delete(k); else favs.add(k);
+  saveFavs();
+  if (btn) btn.classList.toggle('on', favs.has(k));
+  if (category === '__fav') { renderSig = ''; apply(); }
+  else if (renderSig) { renderSig = renderSig.replace(/(\|[0-9]+)$/, '|' + favs.size); }
+}
 grid.addEventListener('keydown', (e) => {
   if (e.key !== 'Enter') return;
   const c = e.target.closest('.c');
@@ -202,6 +285,42 @@ search.addEventListener('input', (e) => {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => { term = e.target.value; apply(); }, 150);
 });
+
+/* ---- random channel ---- */
+randomBtn.addEventListener('click', () => {
+  if (!filtered.length) { toast('Nothing to roll on — refine your filters first.'); return; }
+  const ch = filtered[Math.floor(Math.random() * filtered.length)];
+  if (ch) playCh(ch);
+});
+
+/* ---- PWA install ---- */
+let installEv = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  installEv = e;
+  installBtn.classList.remove('hidden');
+});
+installBtn.addEventListener('click', () => {
+  if (!installEv) return;
+  installEv.prompt();
+  installEv = null;
+  installBtn.classList.add('hidden');
+});
+
+/* ---- back to top ---- */
+let topShown = false;
+window.addEventListener('scroll', () => {
+  const s = window.scrollY > 600;
+  if (s !== topShown) { topShown = s; toTop.classList.toggle('show', s); }
+}, { passive: true });
+toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* ---- shortcut help overlay ---- */
+function toggleHelp(force) {
+  const show = force !== undefined ? force : !helpEl.classList.contains('show');
+  helpEl.classList.toggle('show', show);
+}
+helpEl.addEventListener('click', (e) => { if (e.target === helpEl) toggleHelp(false); });
 
 /* ================================================================
  *  player: UI chrome
@@ -268,7 +387,6 @@ function seekBy(seconds) {
   } catch (_) {}
 }
 
-/** Attach request filters (Referer / UA / cookie auth) to the player's engine */
 function applyNetworkProfile(cookie) {
   const eng = playerObj.getNetworkingEngine();
   if (!eng) return;
@@ -279,7 +397,6 @@ function applyNetworkProfile(cookie) {
   });
 }
 
-/** Prefer Tamil audio, then any regional fallback */
 function pickAudioTrack() {
   try {
     const ts = playerObj.getAudioTracks();
@@ -395,6 +512,13 @@ pc.addEventListener('click', (e) => { if (e.target === pc) closePlayer(); });
 document.addEventListener('keydown', (e) => {
   const active = player.classList.contains('active');
 
+  if (e.key === 'Escape') { if (helpEl.classList.contains('show')) { toggleHelp(false); return; } }
+  if (e.key === '?' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) {
+    e.preventDefault();
+    toggleHelp();
+    return;
+  }
+
   if (e.key === 'Escape' && active) { e.preventDefault(); closePlayer(); return; }
   if (!active) return;
 
@@ -453,13 +577,13 @@ if ('serviceWorker' in navigator) {
 }
 
 /* ================================================================
- *  original protections kept
+ *  protections (manual triggers → escalating warning)
  * ================================================================ */
-document.addEventListener('contextmenu', (e) => { e.preventDefault(); toast(DT_MSG); });
+document.addEventListener('contextmenu', (e) => { e.preventDefault(); manualHit(); });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'F12' || e.keyCode === 123 ||
       (e.ctrlKey && e.shiftKey && 'IJC'.includes(e.key)) ||
-      (e.ctrlKey && 'uUsS'.includes(e.key))) { e.preventDefault(); toast(DT_MSG); return false; }
+      (e.ctrlKey && 'uUsS'.includes(e.key))) { e.preventDefault(); manualHit(); return false; }
 });
 
 /* ================================================================
