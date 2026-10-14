@@ -69,73 +69,12 @@ window.addEventListener('error', (e) => reportError(e.error || e.message));
 window.addEventListener('unhandledrejection', (e) => reportError(e.reason));
 
 /* ================================================================
- *  devtools protection: warn → (open >1s) → redirect, abuse → terminate
+ *  devtools protection: visible warning on blocked attempts only.
+ *  No silent auto-detection, no redirects — that logic is fully removed
+ *  (the viewport/console oracles false-positived on normal browsing).
  * ================================================================ */
 const DT_MSG = 'Access to developer utilities is impermissible on this platform, by virtue of stringent security protocols.';
-const DT_REDIRECT = 'Insidious instrumentation detected — this session is being terminated forthwith, and you are being redirected.';
-const DT_ABUSE = 'Wilful evasion or impermissible usage ascertained — this session concludes with immediate effect.';
-
-let dtNuked = false;      // terminal state — nothing further runs
-let dtSince = 0;          // timestamp of first consecutive detection
-let probeStreak = 0;
-
-/** Show a caution, then obliterate the session: wipe → window.close → google.com */
-function terminate(reason) {
-  if (dtNuked) return;
-  dtNuked = true;
-  toast(reason || DT_ABUSE);
-  setTimeout(() => {
-    try { window.open('', '_self'); window.close(); } catch (_) {}
-    setTimeout(() => {
-      try { location.replace('https://www.google.com'); } catch (_) {}
-    }, 120);
-  }, 700);
-}
-
-function flagDevtools() {
-  const now = performance.now();
-  if (!dtSince) { dtSince = now; toast(DT_REDIRECT); }
-  else if (now - dtSince >= 1000) { terminate(DT_REDIRECT); }
-}
-
-/* Strictly NO `debugger` statement anywhere — that pauses the page instead
-   of redirecting. Two silent oracles instead:
-   (1) console oracle — Chrome calls toString on a logged RegExp only while the
-       console is rendering (closed console short-circuits it),
-   (2) size oracle — docked devtools shrink/offset the viewport by hundreds of
-       pixels; a devicePixelRatio guard prevents page-zoom false positives. */
-let consoleOpenHit = false;
-const consoleOracle = /lt/;
-consoleOracle.toString = () => { consoleOpenHit = true; return '/lt/'; };
-
-const dpr0 = window.devicePixelRatio;
-function sizeOracle() {
-  if (Math.abs(window.devicePixelRatio - dpr0) > 0.01) return false; // zoom, not devtools
-  const dw = window.outerWidth - window.innerWidth;
-  const dh = window.outerHeight - window.innerHeight;
-  return dh > 240 || dw > 240;
-}
-
-setInterval(() => {
-  if (dtNuked) return;
-  consoleOpenHit = false;
-  let opened = false;
-  try { console.log(consoleOracle); } catch (_) {}
-  try { opened = consoleOpenHit || sizeOracle(); } catch (_) {}
-  if (opened) { probeStreak++; flagDevtools(); }
-  else { probeStreak = 0; dtSince = 0; }
-}, 250);
-
-/* manual attempts (keys / context menu) — spam counted as forced usage */
-let manualHits = 0, manualTimer = null;
-function manualHit() {
-  if (dtNuked) return;
-  toast(DT_MSG);
-  manualHits++;
-  clearTimeout(manualTimer);
-  manualTimer = setTimeout(() => { manualHits = 0; }, 10000);
-  if (manualHits > 8) terminate();
-}
+function manualHit() { toast(DT_MSG); }
 
 /* ================================================================
  *  recently played
