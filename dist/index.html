@@ -9,8 +9,8 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <title>Live TV</title>
 <style>html{background:#0b0e14}body{margin:0;visibility:hidden}body.ready{visibility:visible}</style>
-  <script type="module" crossorigin src="/assets/index-CYvikHzh.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-Ckz3Fro4.css">
+  <script type="module" crossorigin src="/assets/index-BKLUBvtN.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CR6p5vSY.css">
 </head>
 <body>
 <header class="h">
@@ -36,6 +36,8 @@
   <div class="sr">
     <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
     <input type="text" id="search" placeholder="Search channels..." autocomplete="off" enterkeyhint="search">
+    <button class="clear" id="clearSearch" aria-label="Clear search" hidden>×</button>
+    <span class="slash" aria-hidden="true">/</span>
   </div>
   <div class="cats" id="cats"></div>
 </div>
@@ -49,6 +51,8 @@
 
 <button class="totop" id="toTop" aria-label="Back to top"><svg viewBox="0 0 24 24"><path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-8-8-8 8z"/></svg></button>
 
+<footer class="ft">Press <span class="kbox">?</span> shortcuts · <span class="kbox">/</span> search · <span class="kbox">M</span> mute · <span class="kbox">F</span> fullscreen</footer>
+
 <div class="help" id="help">
   <div class="help-card">
     <h3>Keyboard shortcuts</h3>
@@ -60,6 +64,8 @@
     <div class="krow"><span>Close player</span><span class="kbox">Esc</span></div>
     <div class="krow"><span>Favourite</span><span class="kbox">★ on card</span></div>
     <div class="krow"><span>This panel</span><span class="kbox">?</span></div>
+    <div class="krow"><span>Search</span><span class="kbox">Ctrl+K · /</span></div>
+    <div class="krow"><span>Clear search</span><span class="kbox">×</span></div>
   </div>
 </div>
 

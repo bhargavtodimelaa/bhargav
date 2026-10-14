@@ -166,6 +166,20 @@ cats.addEventListener('click', (e) => {
   apply();
 });
 
+/** Escape a channel name and wrap search-term matches in <mark> */
+function hi(name, t) {
+  if (!t) return esc(name);
+  let out = '', i = 0;
+  const n = name.toLowerCase(), q = t.toLowerCase();
+  while (true) {
+    const j = n.indexOf(q, i);
+    if (j === -1) { out += esc(name.slice(i)); break; }
+    out += esc(name.slice(i, j)) + '<mark>' + esc(name.slice(j, j + q.length)) + '</mark>';
+    i = j + q.length;
+  }
+  return out;
+}
+
 function apply() {
   const t = term.toLowerCase().trim();
   filtered = all.filter((ch) => {
@@ -197,7 +211,7 @@ function render() {
     const av = avatar(ch.name, 80);
     const logo = ch.logo || av;
     const fav = favs.has(k);
-    h += `<div class="c" data-k="${esc(k)}" style="--i:${delay}" tabindex="0" role="button" aria-label="${esc(ch.name)}"><button class="fav${fav ? ' on' : ''}" data-fav="${esc(k)}" aria-label="Toggle favourite"><svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button><div class="logo"><img src="${esc(logo)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${esc(av)}'"></div><div class="name">${esc(ch.name)}</div><span class="cat">${esc(ch.category || 'General')}</span></div>`;
+    h += `<div class="c" data-k="${esc(k)}" style="--i:${delay}" tabindex="0" role="button" aria-label="${esc(ch.name)}"><button class="fav${fav ? ' on' : ''}" data-fav="${esc(k)}" aria-label="Toggle favourite"><svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button><div class="logo"><img src="${esc(logo)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${esc(av)}'"></div><div class="name">${hi(ch.name, term.trim() === '' ? '' : term.trim())}</div><span class="cat">${esc(ch.category || 'General')}</span></div>`;
   }
   grid.innerHTML = h;
 }
@@ -225,10 +239,30 @@ grid.addEventListener('keydown', (e) => {
 });
 
 let searchTimer;
+const headerEl = document.querySelector('.h');
+const clearSearch = $('clearSearch');
 search.addEventListener('input', (e) => {
+  clearSearch.hidden = !e.target.value;
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => { term = e.target.value; apply(); }, 150);
 });
+clearSearch.addEventListener('click', () => {
+  search.value = '';
+  term = '';
+  clearSearch.hidden = true;
+  search.focus();
+  apply();
+});
+
+/* deepens the header glass once the page is scrolled */
+let scrolledCls = false;
+window.addEventListener('scroll', () => {
+  const s = window.scrollY > 12;
+  if (s !== scrolledCls) {
+    scrolledCls = s;
+    headerEl.classList.toggle('scrolled', s);
+  }
+}, { passive: true });
 
 /* ---- random channel ---- */
 randomBtn.addEventListener('click', () => {
@@ -462,6 +496,13 @@ document.addEventListener('keydown', (e) => {
     toggleHelp();
     return;
   }
+  if (!active && (e.key === '/' || (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey))) &&
+      !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) {
+    e.preventDefault();
+    search.focus();
+    search.select();
+    return;
+  }
 
   if (e.key === 'Escape' && active) { e.preventDefault(); closePlayer(); return; }
   if (!active) return;
@@ -492,6 +533,7 @@ let probeTimer = null;
 function setOfflineUI(o) {
   offline = o;
   offlineBar.hidden = !o;
+  document.body.classList.toggle('offline', o);
   document.title = o ? 'You are offline — Live TV' : 'Live TV';
   if (!o) {
     clearInterval(probeTimer);
