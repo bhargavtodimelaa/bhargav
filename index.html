@@ -10,16 +10,54 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html{color-scheme:light only}
-:root{--b:#1a73e8;--g1:#f1f3f4;--g2:#e8eaed;--g3:#dadce0;--g6:#5f6368;--w:#fff;--bg:#f8f9fa;--t:#202124;--sh:0 1px 3px rgba(0,0,0,.12);--danger:#d93025;--success:#0f9d58;--warning:#f9ab00}
-html[data-theme="dark"]{--b:#8ab4f8;--g1:#3c4043;--g2:#5f6368;--g3:#80868b;--g6:#bdc1c6;--w:#202124;--bg:#171717;--t:#e8eaed;--sh:0 1px 3px rgba(0,0,0,.5);--danger:#f28b82;--success:#81c995;--warning:#fdd663}
+:root{
+  --b:#1a73e8;--g1:#f1f3f4;--g2:#e8eaed;--g3:#dadce0;--g6:#5f6368;
+  --w:#fff;--bg:#f8f9fa;--t:#202124;--sh:0 1px 3px rgba(0,0,0,.12);
+  --danger:#d93025;--success:#0f9d58;
+}
+html[data-theme="dark"]{
+  --b:#8ab4f8;--g1:#3c4043;--g2:#5f6368;--g3:#80868b;--g6:#bdc1c6;
+  --w:#202124;--bg:#171717;--t:#e8eaed;--sh:0 1px 3px rgba(0,0,0,.5);
+  --danger:#f28b82;--success:#81c995;
+}
 body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--t);min-height:100vh;overflow-x:hidden;transition:background .2s,color .2s}
-::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--g3);border-radius:8px}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:var(--g3);border-radius:8px}
+
+/* ---------- Header ---------- */
 .h{background:var(--w);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--g2);position:sticky;top:0;z-index:10;box-shadow:var(--sh)}
 .hb{display:flex;align-items:center;gap:10px}
 .hb svg{width:28px;height:28px;fill:var(--b)}
 .h h1{font-size:1.3rem;font-weight:600}
-.hr{display:flex;align-items:center;gap:8px}
+.hr{display:flex;align-items:center;gap:12px}
 .cnt{background:var(--g1);padding:4px 16px;border-radius:40px;font-size:.75rem;font-weight:500;color:var(--g6);border:1px solid var(--g2)}
+
+/* ---------- HyperOS Powered Badge (clickable) ---------- */
+.hyper-badge{
+  display:flex;align-items:center;gap:6px;
+  background:var(--g1);border:1px solid var(--g2);
+  padding:4px 12px 4px 6px;border-radius:40px;
+  font-size:.65rem;font-weight:600;color:var(--g6);
+  white-space:nowrap;letter-spacing:.2px;
+  cursor:pointer;transition:background .2s,border-color .2s,box-shadow .2s;
+  user-select:none;
+}
+.hyper-badge:hover{
+  background:var(--g2);
+  border-color:var(--b);
+  box-shadow:0 0 0 2px rgba(26,115,232,.15);
+}
+.hyper-badge:active{
+  transform:scale(.97);
+}
+.hyper-badge img{
+  height:16px;width:auto;display:block;pointer-events:none;
+}
+html[data-theme="dark"] .hyper-badge img{
+  filter:invert(1);
+}
+
+/* ---------- Theme Toggle ---------- */
 .tt{background:var(--g1);border:1px solid var(--g2);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .tt:hover{background:var(--g2)}
 .tt svg{width:20px;height:20px;fill:var(--t)}
@@ -27,6 +65,8 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
 .tt .moon{display:none}
 html[data-theme="dark"] .tt .sun{display:none}
 html[data-theme="dark"] .tt .moon{display:block}
+
+/* ---------- Filter Bar ---------- */
 .fb{background:var(--w);padding:8px 24px;display:flex;flex-wrap:wrap;gap:8px 16px;border-bottom:1px solid var(--g2);position:sticky;top:64px;z-index:9}
 .sr{flex:1 1 200px;display:flex;align-items:center;background:var(--g1);border-radius:24px;padding:4px 12px 4px 16px;border:1px solid transparent}
 .sr:focus-within{background:var(--w);border-color:var(--b);box-shadow:0 0 0 2px rgba(26,115,232,.2)}
@@ -36,6 +76,59 @@ html[data-theme="dark"] .tt .moon{display:block}
 .cat{background:0 0;border:1px solid var(--g2);color:var(--g6);padding:4px 16px;border-radius:40px;font-size:.75rem;font-weight:500;cursor:pointer;font-family:inherit;text-transform:capitalize}
 .cat:hover{background:var(--g1)}
 .cat.active{background:var(--b);border-color:var(--b);color:#fff}
+
+/* ---------- HyperOS Welcome Banner ---------- */
+.hyper-welcome{
+  max-width:1440px;margin:16px auto 0;padding:0 24px;
+}
+.hyper-welcome-inner{
+  display:flex;align-items:center;gap:16px;
+  background:linear-gradient(135deg,rgba(26,115,232,.08),rgba(138,180,248,.12));
+  border:1px solid var(--g2);
+  border-radius:16px;
+  padding:16px 22px;
+  position:relative;overflow:hidden;
+  transition:box-shadow .2s;
+}
+.hyper-welcome-inner:hover{
+  box-shadow:0 4px 16px rgba(26,115,232,.12);
+}
+.hyper-welcome-inner::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--b),#8ab4f8,#f9ab00);
+  opacity:.7;
+}
+.hyper-welcome-logo{
+  height:36px;width:auto;flex-shrink:0;
+}
+html[data-theme="dark"] .hyper-welcome-logo{
+  filter:invert(1);
+}
+.hyper-welcome-text{
+  flex:1;min-width:0;
+}
+.hyper-welcome-text h2{
+  font-size:1.05rem;font-weight:600;color:var(--t);
+  margin-bottom:4px;line-height:1.3;
+}
+.hyper-welcome-text p{
+  font-size:.85rem;color:var(--g6);line-height:1.45;
+}
+.hyper-welcome-text p strong{
+  color:var(--b);font-weight:600;
+}
+.hyper-welcome-cta{
+  flex-shrink:0;
+  padding:8px 18px;border-radius:40px;
+  background:var(--b);color:#fff;border:none;
+  font-size:.8rem;font-weight:600;cursor:pointer;
+  font-family:inherit;white-space:nowrap;
+  transition:opacity .2s,transform .15s;
+}
+.hyper-welcome-cta:hover{opacity:.9}
+.hyper-welcome-cta:active{transform:scale(.97)}
+
+/* ---------- Recently Played ---------- */
 .ls{padding:16px 24px 4px;max-width:1440px;margin:0 auto;display:none}
 .ls.visible{display:block}
 .ls .title{font-size:.8rem;font-weight:500;color:var(--g6);text-transform:uppercase;letter-spacing:.3px;margin-bottom:10px}
@@ -46,6 +139,8 @@ html[data-theme="dark"] .tt .moon{display:block}
 .lc .ll img{max-width:100%;max-height:100%;object-fit:contain;padding:4px}
 .lc .ln{font-size:.7rem;font-weight:500;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .lc .lb{font-size:.5rem;color:var(--b);background:rgba(26,115,232,.08);padding:1px 10px;border-radius:40px;margin-top:4px;font-weight:600;text-transform:uppercase}
+
+/* ---------- Channel Grid ---------- */
 .g{padding:16px 24px 30px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;max-width:1440px;margin:0 auto}
 .c{background:var(--w);border-radius:12px;border:1px solid var(--g2);cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;padding:16px 8px 14px;box-shadow:var(--sh)}
 .c:hover{border-color:var(--b);box-shadow:0 6px 20px rgba(0,0,0,.08)}
@@ -53,14 +148,55 @@ html[data-theme="dark"] .tt .moon{display:block}
 .c img{max-width:100%;max-height:100%;object-fit:contain;padding:6px}
 .c .name{font-size:.85rem;font-weight:500;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
 .c .cat{font-size:.6rem;color:var(--g6);margin-top:4px;background:var(--g1);padding:2px 12px;border-radius:40px;font-weight:500;text-transform:uppercase;border:1px solid var(--g2)}
+
+/* ---------- Empty / Error States ---------- */
 .empty{grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--g6);background:var(--w);border-radius:12px;border:1px dashed var(--g3)}
 .empty svg{width:48px;height:48px;fill:var(--g3);display:block;margin:0 auto 8px}
-/* Loading indicator */
-.loading{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;gap:16px}
-.spinner{width:40px;height:40px;border:4px solid var(--g2);border-top-color:var(--b);border-radius:50%;animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading p{color:var(--g6);font-size:.9rem}
-/* Player */
+
+/* ---------- CUSTOM LOADER (user-provided) ---------- */
+.loader {
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  position: relative;
+  animation: rotate 0.8s linear infinite;
+  margin: 0 auto;
+}
+.loader::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #ccc;
+  border-radius: 50%;
+  top: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.25);
+}
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.loader-lg{
+  width:40px;height:40px;border-width:3px;
+}
+.loader-lg::after{width:12px;height:12px;top:2px}
+.loader-player{
+  width:48px;height:48px;border-width:4px;
+}
+.loader-player::after{width:14px;height:14px;top:3px}
+
+/* Grid loading container */
+.grid-loading{
+  grid-column:1/-1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 20px;gap:16px;
+}
+.grid-loading p{color:var(--g6);font-size:.9rem}
+
+/* ---------- Player ---------- */
 .pl{display:none;position:fixed;inset:0;background:#000;z-index:1000}
 .pl.active{display:block}
 #pc{width:100%;height:100%;background:#000;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
@@ -76,32 +212,164 @@ html[data-theme="dark"] .tt .moon{display:block}
 .pi{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:6px 20px 6px 14px;border-radius:50px;color:#fff;font-size:.85rem;font-weight:500;display:flex;align-items:center;gap:10px;pointer-events:none;white-space:nowrap;transition:opacity .3s;z-index:1002}
 .pi img{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);padding:3px}
 .pi .pname{max-width:180px;overflow:hidden;text-overflow:ellipsis}
-/* Player loading/error overlay */
-.pl-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.75);z-index:1003;gap:16px;padding:24px;text-align:center}
-.pl-overlay .spinner{width:48px;height:48px;border-width:5px}
+
+/* Hide UI when idle */
+.pl.hide-ui .tb,.pl.hide-ui .pi,
+.pl.hide-ui .shaka-controls-container,.pl.hide-ui .shaka-scrim-container,
+.pl.hide-ui .shaka-bottom-controls,.pl.hide-ui .shaka-seek-bar-container,
+.pl.hide-ui .shaka-volume-bar-container,.pl.hide-ui .shaka-overflow-menu,
+.pl.hide-ui .shaka-settings-menu,.pl.hide-ui .shaka-text-container,
+.pl.hide-ui .shaka-play-button-container,.pl.hide-ui .shaka-fullscreen-button-container,
+.pl.hide-ui .shaka-small-play-button,.pl.hide-ui .shaka-current-time,
+.pl.hide-ui .shaka-time-container,.pl.hide-ui .shaka-range-element,
+.pl.hide-ui .shaka-slider,.pl.hide-ui .shaka-scrubber-container,
+.pl.hide-ui .shaka-top-bar,.pl.hide-ui input[type=range]{
+  opacity:0!important;pointer-events:none!important;visibility:hidden!important;
+  transition:opacity .4s,visibility .4s!important;
+}
+.pl.hide-ui video::-webkit-media-controls{display:none!important}
+
+/* Fullscreen fixes */
+:fullscreen,:fullscreen body,:fullscreen .pl,:fullscreen #pc,:fullscreen video{
+  background:#000!important;margin:0!important;padding:0!important;
+  border:none!important;overflow:hidden!important;
+}
+
+/* Player overlay (loading / error) */
+.pl-overlay{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:rgba(0,0,0,.75);z-index:1003;gap:16px;padding:24px;text-align:center;
+}
+.pl-overlay.hidden{display:none}
 .pl-overlay p{color:#fff;font-size:1rem;max-width:400px}
 .pl-overlay .err-icon{width:64px;height:64px;fill:#ff6b6b}
 .pl-overlay .err-text{color:#ff6b6b;font-size:1.1rem;font-weight:600}
 .pl-overlay .err-detail{color:#ccc;font-size:.85rem;max-width:360px;line-height:1.4}
-.pl-overlay .retry-btn{margin-top:8px;padding:10px 24px;border-radius:40px;background:var(--b);color:#fff;border:none;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit}
+.pl-overlay .retry-btn{
+  margin-top:8px;padding:10px 24px;border-radius:40px;
+  background:var(--b);color:#fff;border:none;font-size:.9rem;
+  font-weight:600;cursor:pointer;font-family:inherit;
+}
 .pl-overlay .retry-btn:hover{opacity:.9}
-.pl-overlay.hidden{display:none}
-.pl.hide-ui .tb,.pl.hide-ui .pi,.pl.hide-ui .shaka-controls-container,.pl.hide-ui .shaka-scrim-container,.pl.hide-ui .shaka-bottom-controls,.pl.hide-ui .shaka-seek-bar-container,.pl.hide-ui .shaka-volume-bar-container,.pl.hide-ui .shaka-overflow-menu,.pl.hide-ui .shaka-settings-menu,.pl.hide-ui .shaka-text-container,.pl.hide-ui .shaka-play-button-container,.pl.hide-ui .shaka-fullscreen-button-container,.pl.hide-ui .shaka-small-play-button,.pl.hide-ui .shaka-current-time,.pl.hide-ui .shaka-time-container,.pl-hide-ui .shaka-range-element,.pl.hide-ui .shaka-slider,.pl.hide-ui .shaka-scrubber-container,.pl.hide-ui .shaka-top-bar,.pl.hide-ui input[type=range]{opacity:0!important;pointer-events:none!important;visibility:hidden!important;transition:opacity .4s,visibility .4s!important}
-.pl.hide-ui video::-webkit-media-controls{display:none!important}
-:fullscreen,:fullscreen body,:fullscreen .pl,:fullscreen #pc,:fullscreen video{background:#000!important;margin:0!important;padding:0!important;border:none!important;overflow:hidden!important}
-/* Toast notification */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--t);color:var(--bg);padding:12px 24px;border-radius:40px;font-size:.85rem;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:2000;opacity:0;transition:transform .3s,opacity .3s;pointer-events:none;max-width:90vw;text-align:center}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--t);color:var(--bg);padding:12px 24px;border-radius:40px;
+  font-size:.85rem;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.3);
+  z-index:2000;opacity:0;transition:transform .3s,opacity .3s;
+  pointer-events:none;max-width:90vw;text-align:center;
+}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .toast.error{background:var(--danger);color:#fff}
 .toast.success{background:var(--success);color:#fff}
-@media(max-width:768px){.h{padding:10px 16px}.h h1{font-size:1.1rem}.fb{padding:6px 16px;top:56px}.g{padding:12px 16px 20px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}.c .logo{width:60px;height:60px}.pi{bottom:60px;font-size:.75rem}.pb{padding:6px 12px;font-size:.75rem}.lc{flex:0 0 90px;padding:8px 6px}.lc .ll{width:40px;height:40px}}
-@media(max-width:480px){.g{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:8px 12px 16px}.c .logo{width:50px;height:50px}.c .name{font-size:.7rem}}
+
+/* ---------- HyperOS Popup Modal ---------- */
+.hyper-modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);
+  z-index:3000;display:none;align-items:center;justify-content:center;
+  padding:20px;backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  opacity:0;transition:opacity .25s ease;
+}
+.hyper-modal-backdrop.show{
+  display:flex;opacity:1;
+}
+.hyper-modal{
+  background:var(--w);color:var(--t);
+  border-radius:20px;
+  padding:28px 32px 24px;
+  max-width:380px;width:100%;
+  box-shadow:0 24px 60px rgba(0,0,0,.35);
+  text-align:center;position:relative;
+  transform:translateY(20px) scale(.96);
+  transition:transform .25s ease;
+  border:1px solid var(--g2);
+}
+.hyper-modal-backdrop.show .hyper-modal{
+  transform:translateY(0) scale(1);
+}
+.hyper-modal .modal-logo{
+  height:38px;width:auto;display:block;margin:0 auto 18px;
+}
+html[data-theme="dark"] .hyper-modal .modal-logo{
+  filter:invert(1);
+}
+.hyper-modal h2{
+  font-size:1.15rem;font-weight:600;margin-bottom:10px;
+  color:var(--t);line-height:1.35;
+}
+.hyper-modal p{
+  font-size:.9rem;color:var(--g6);line-height:1.55;margin-bottom:22px;
+}
+.hyper-modal .modal-close-btn{
+  width:100%;padding:11px 24px;border-radius:40px;
+  background:var(--b);color:#fff;border:none;
+  font-size:.9rem;font-weight:600;cursor:pointer;
+  font-family:inherit;transition:opacity .2s;
+}
+.hyper-modal .modal-close-btn:hover{opacity:.9}
+.hyper-modal .modal-close-btn:active{transform:scale(.98)}
+.hyper-modal .modal-x{
+  position:absolute;top:12px;right:12px;
+  width:32px;height:32px;border-radius:50%;
+  background:var(--g1);border:1px solid var(--g2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;transition:background .2s;
+}
+.hyper-modal .modal-x:hover{background:var(--g2)}
+.hyper-modal .modal-x svg{width:16px;height:16px;fill:var(--g6)}
+
+/* Responsive */
+@media(max-width:768px){
+  .h{padding:10px 16px}
+  .h h1{font-size:1.1rem}
+  .fb{padding:6px 16px;top:56px}
+  .g{padding:12px 16px 20px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
+  .c .logo{width:60px;height:60px}
+  .pi{bottom:60px;font-size:.75rem}
+  .pb{padding:6px 12px;font-size:.75rem}
+  .lc{flex:0 0 90px;padding:8px 6px}
+  .lc .ll{width:40px;height:40px}
+  .hyper-badge{font-size:.55rem;padding:3px 8px 3px 6px}
+  .hyper-badge img{height:12px}
+  .hyper-modal{padding:24px 22px 20px}
+  .hyper-modal .modal-logo{height:32px}
+  .hyper-welcome{padding:0 16px;margin-top:12px}
+  .hyper-welcome-inner{flex-direction:column;text-align:center;gap:12px;padding:14px 18px}
+  .hyper-welcome-logo{height:30px}
+  .hyper-welcome-text h2{font-size:.95rem}
+  .hyper-welcome-text p{font-size:.8rem}
+  .hyper-welcome-cta{width:100%;padding:9px 18px}
+}
+@media(max-width:480px){
+  .g{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:8px 12px 16px}
+  .c .logo{width:50px;height:50px}
+  .c .name{font-size:.7rem}
+  .hyper-badge{display:none}
+  .hyper-welcome-inner{padding:12px 14px}
+  .hyper-welcome-logo{height:26px}
+  .hyper-welcome-text h2{font-size:.88rem}
+  .hyper-welcome-text p{font-size:.75rem}
+}
 </style>
 </head>
 <body>
+
 <header class="h">
-  <div class="hb"><svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg><h1>Live TV</h1></div>
+  <div class="hb">
+    <svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg>
+    <h1>Live TV</h1>
+  </div>
   <div class="hr">
+    <!-- HyperOS Powered Badge — clickable -->
+    <span class="hyper-badge" id="hyperBadge" role="button" tabindex="0" aria-label="About Xiaomi HyperOS">
+      <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Xiaomi_HyperOS_logo.svg/1920px-Xiaomi_HyperOS_logo.svg.png"
+           alt="Xiaomi HyperOS"
+           onerror="this.style.display='none'">
+      Powered by Xiaomi HyperOS
+    </span>
     <span class="cnt" id="counter">Loading…</span>
     <button class="tt" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
       <svg class="sun" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3zm0-11V1h-1v3h1zm0 16v-3h-1v3h1zM4.22 4.22l-.71.71 2.12 2.12.71-.71-2.12-2.12zm13.44 13.44-.71.71 2.12 2.12.71-.71-2.12-2.12zM1 11v1h3v-1H1zm19 0v1h3v-1h-3zM4.22 19.78l2.12-2.12-.71-.71-2.12 2.12.71.71zm13.44-13.44 2.12-2.12-.71-.71-2.12 2.12.71.71z"/></svg>
@@ -109,6 +377,7 @@ html[data-theme="dark"] .tt .moon{display:block}
     </button>
   </div>
 </header>
+
 <div class="fb">
   <div class="sr">
     <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
@@ -116,19 +385,65 @@ html[data-theme="dark"] .tt .moon{display:block}
   </div>
   <div class="cats" id="cats"></div>
 </div>
-<div class="ls" id="lastSection"><div class="title">🕐 Recently played</div><div class="lg" id="lastGrid"></div></div>
-<div class="g" id="grid">
-  <div class="loading"><div class="spinner"></div><p>Loading channels…</p></div>
+
+<!-- HyperOS Welcome Banner above channels -->
+<div class="hyper-welcome">
+  <div class="hyper-welcome-inner">
+    <img class="hyper-welcome-logo"
+         src="https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Xiaomi_HyperOS_logo.svg/1920px-Xiaomi_HyperOS_logo.svg.png"
+         alt="Xiaomi HyperOS"
+         onerror="this.style.display='none'">
+    <div class="hyper-welcome-text">
+      <h2>Powered by Xiaomi HyperOS</h2>
+      <p>Enjoy a <strong>smooth, optimized streaming experience</strong> with HyperOS — fast, fluid, and efficient.</p>
+    </div>
+    <button class="hyper-welcome-cta" id="hyperWelcomeCta">Learn more</button>
+  </div>
 </div>
+
+<div class="ls" id="lastSection">
+  <div class="title">🕐 Recently played</div>
+  <div class="lg" id="lastGrid"></div>
+</div>
+
+<div class="g" id="grid">
+  <div class="grid-loading">
+    <div class="loader loader-lg" role="status" aria-label="Loading"></div>
+    <p>Loading channels…</p>
+  </div>
+</div>
+
 <div class="pl" id="player">
   <div class="tb">
-    <button class="pb" id="back"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back</button>
-    <button class="px" id="close"><svg viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+    <button class="pb" id="back">
+      <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back
+    </button>
+    <button class="px" id="close">
+      <svg viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
   </div>
   <div id="pc"><video id="video" playsinline autoplay></video></div>
   <div class="pi" id="pinfo"><img id="plogo" alt="logo"><span class="pname" id="pname"></span></div>
 </div>
+
 <div class="toast" id="toast"></div>
+
+<!-- HyperOS Popup Modal -->
+<div class="hyper-modal-backdrop" id="hyperModal" role="dialog" aria-modal="true" aria-labelledby="hyperModalTitle">
+  <div class="hyper-modal">
+    <button class="modal-x" id="hyperModalX" aria-label="Close">
+      <svg viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+    <img class="modal-logo"
+         src="https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Xiaomi_HyperOS_logo.svg/1920px-Xiaomi_HyperOS_logo.svg.png"
+         alt="Xiaomi HyperOS"
+         onerror="this.style.display='none'">
+    <h2 id="hyperModalTitle">Powered by Xiaomi HyperOS</h2>
+    <p>This Live TV page is powered by Xiaomi HyperOS. Enjoy a smooth, optimized streaming experience with enhanced performance and efficiency.</p>
+    <button class="modal-close-btn" id="hyperModalClose">Got it</button>
+  </div>
+</div>
+
 <script>
 (function(){
 'use strict';
@@ -145,6 +460,11 @@ const player = $('player'), pc = $('pc'), video = $('video'), pname = $('pname')
 const lastSection = $('lastSection'), lastGrid = $('lastGrid');
 const themeToggle = $('themeToggle');
 const toastEl = $('toast');
+const hyperBadge = $('hyperBadge');
+const hyperModal = $('hyperModal');
+const hyperModalClose = $('hyperModalClose');
+const hyperModalX = $('hyperModalX');
+const hyperWelcomeCta = $('hyperWelcomeCta');
 
 /* ---------- Toast ---------- */
 let toastTimer;
@@ -154,6 +474,33 @@ function toast(msg, type) {
   toastEl.className = 'toast show' + (type ? ' ' + type : '');
   toastTimer = setTimeout(() => { toastEl.classList.remove('show'); }, 3000);
 }
+
+/* ---------- HyperOS Popup ---------- */
+function openHyperModal() {
+  hyperModal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => { try { hyperModalClose.focus(); } catch(_){} }, 100);
+}
+function closeHyperModal() {
+  hyperModal.classList.remove('show');
+  document.body.style.overflow = '';
+  try { hyperBadge.focus(); } catch(_){}
+}
+hyperBadge.addEventListener('click', openHyperModal);
+hyperBadge.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openHyperModal(); }
+});
+hyperWelcomeCta.addEventListener('click', openHyperModal);
+hyperModalClose.addEventListener('click', closeHyperModal);
+hyperModalX.addEventListener('click', closeHyperModal);
+hyperModal.addEventListener('click', e => {
+  if (e.target === hyperModal) closeHyperModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && hyperModal.classList.contains('show')) {
+    closeHyperModal();
+  }
+});
 
 /* ---------- Theme ---------- */
 (function initTheme(){
@@ -181,7 +528,7 @@ themeToggle.addEventListener('click', () => {
 let all = [], filtered = [], category = 'All', term = '', last = [];
 const map = new Map();
 let playerObj = null, overlay = null, playing = false, closing = false, hideTimer = null;
-let playerOverlay = null; // overlay for loading/error inside player
+let playerOverlay = null;
 
 /* ---------- Helpers ---------- */
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -189,7 +536,7 @@ const av = (n, s) => AVATAR + encodeURIComponent(n) + '&background=e8eaed&color=
 const key = ch => ch.id != null ? String(ch.id) : 'n:' + ch.name;
 const url = u => u.replace(/bpk-tv\/\//g, 'bpk-tv/');
 
-/* ---------- Security (disable context menu / devtools shortcuts) ---------- */
+/* ---------- Security ---------- */
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', e => {
   if (e.key === 'F12' || e.keyCode === 123 ||
@@ -265,7 +612,10 @@ async function fetchChannels() {
 }
 
 function showGridLoading(msg) {
-  grid.innerHTML = `<div class="loading"><div class="spinner"></div><p>${esc(msg || 'Loading…')}</p></div>`;
+  grid.innerHTML = `<div class="grid-loading">
+    <div class="loader loader-lg" role="status" aria-label="Loading"></div>
+    <p>${esc(msg || 'Loading…')}</p>
+  </div>`;
 }
 
 /* ---------- Fetch cookie ---------- */
@@ -416,7 +766,7 @@ function ensurePlayerOverlay() {
 }
 function showPlayerLoading(msg) {
   const o = ensurePlayerOverlay();
-  o.innerHTML = `<div class="spinner"></div><p>${esc(msg || 'Loading stream…')}</p>`;
+  o.innerHTML = `<div class="loader loader-player" role="status" aria-label="Loading"></div><p>${esc(msg || 'Loading stream…')}</p>`;
   o.classList.remove('hidden');
 }
 function showPlayerError(title, detail, retryFn) {
@@ -450,7 +800,6 @@ async function playCh(ch) {
     goFs();
     reset();
 
-    /* Loading overlay */
     showPlayerLoading('Loading stream…');
 
     await waitShaka();
@@ -473,7 +822,6 @@ async function playCh(ch) {
     }
     playerObj.configure(cfg);
 
-    /* Network request filter */
     const cookie = await fetchCookie() || '';
     const eng = playerObj.getNetworkingEngine();
     if (eng) {
@@ -486,7 +834,6 @@ async function playCh(ch) {
       });
     }
 
-    /* Try multiple URLs */
     const urls = [ch.url, ch.url1, ch.url2, ch.url3].filter(Boolean).map(url);
     if (!urls.length) throw new Error('No stream URL provided');
 
@@ -505,7 +852,6 @@ async function playCh(ch) {
     }
     if (!loaded) throw lastErr || new Error('All stream URLs failed');
 
-    /* Audio track selection */
     setTimeout(() => {
       try {
         const ts = playerObj.getAudioTracks();
